@@ -15,6 +15,9 @@ function initMap(containerId, center, zoom = 15) {
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
+
+  setTimeout(() => map.invalidateSize(), 100);
+
   return map;
 }
 
@@ -38,4 +41,10 @@ function renderLegend(containerId) {
   el.innerHTML = TEMP_COLOR_SCALE.map((step, i) =>
     `<div><span style="background:${step.color}"></span>${labels[i]}</div>`
   ).join('');
+}
+
+function colorByTemperature(temp) {
+  if (typeof temp !== 'number' || isNaN(temp)) return '#999999';
+  const match = TEMP_COLOR_SCALE.find(step => temp <= step.max);
+  return match ? match.color : '#d7191c';
 }
