@@ -1,6 +1,12 @@
 MIT License
 
-Copyright (c) 2026 ankam charan teja
+Copyright (c) 2026
+
+    Ankam Charan Teja
+    Sriya Sudakshina
+    Yogeshwar S
+    Nikhil Cheepati
+    Dandu Uddeep Sri Shourya
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +25,40 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+---
+
+THIRD-PARTY DATA
+
+The MIT licence above covers the source code in this repository. It does NOT
+cover the datasets, which are redistributed here under their own terms and
+remain the property of their providers. Attribution as required by each:
+
+  Landsat 8 Collection 2 Level 2 (surface reflectance and surface temperature)
+    Courtesy of the U.S. Geological Survey. Landsat data are in the public
+    domain and free to redistribute with attribution.
+    https://www.usgs.gov/landsat-missions
+
+  ESA WorldCover v200 (land cover)
+    © ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data.
+    Licensed CC BY 4.0 -- redistribution permitted with attribution.
+    https://esa-worldcover.org/
+
+  geoBoundaries (administrative boundary of Guwahati)
+    Runfola, D. et al. (2020) geoBoundaries: A global database of political
+    administrative boundaries. Licensed CC BY 4.0.
+    https://www.geoboundaries.org/
+
+  OpenStreetMap / CARTO (basemap tiles used by the dashboard)
+    © OpenStreetMap contributors, licensed ODbL. Tiles © CARTO.
+    Tiles are fetched at runtime and are not redistributed in this repository.
+    https://www.openstreetmap.org/copyright
+
+Derived products in this repository -- the grid dataset, the tiered
+recommendations and the exported GeoJSON -- are computed from the sources above
+and inherit their attribution requirements.
+
+The cost and cooling figures are planning assumptions authored by the project
+team, not third-party data, and are not fit for procurement. See
+docs/08-limitations.md.

@@ -196,6 +196,37 @@ def test_ml_and_decision_support_agree_on_every_cell(tiered):
     assert mismatched.empty, f"{len(mismatched)} cells disagree between modules"
 
 
+def test_ml_readme_quotes_the_committed_metrics():
+    """
+    The module README documents the model scores in prose. Prose does not
+    regenerate when the pipeline does, so it silently rots -- the README spent a
+    while quoting an R2 of 0.1510 against a committed metrics.json saying 0.5130,
+    which is the difference between "barely beats the mean" and "usable".
+
+    Asserting the numbers appear verbatim is crude but catches exactly that.
+    """
+    metrics_path = ML_RESULTS / "metrics.json"
+    readme_path = REPO_DIR / "Machine Learning & Prediction" / "README.md"
+    if not (metrics_path.exists() and readme_path.exists()):
+        pytest.skip("metrics.json not built")
+
+    metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
+    readme = readme_path.read_text(encoding="utf-8")
+
+    missing = [
+        f"{r['split']}/{r['features']}/{r['model']} R2={r['r2']:.4f}"
+        for r in metrics["results"]
+        if f"{r['r2']:.4f}" not in readme
+    ]
+    assert not missing, f"README does not quote these committed scores: {missing}"
+
+    stale = [
+        value for value in ("0.9010", "0.1510", "-0.0245", "0.179546")
+        if value in readme
+    ]
+    assert not stale, f"README still quotes superseded figures: {stale}"
+
+
 def test_tiered_costs_match_the_shared_rate_table(tiered):
     recomputed = [
         round(shared.action_cost(action, area))
