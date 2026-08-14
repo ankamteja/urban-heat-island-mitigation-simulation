@@ -2,23 +2,27 @@
 
 Target: **LST** (degrees C). Seed: `42`. Rows: 8,144. Test fraction: 20%.
 
-> NDVI is uncorrected (Remote Sensing SPEC_AUDIT #3). Metrics are internally valid but the NDVI-temperature relationship is attenuated.
+> NDVI comes from the corrected surface-reflectance export.
+
+> Quote the **spatial_block** R2, not the random_80_20 one. Adjacent 100 m cells are near-duplicates, so a random split leaks most test answers through their neighbours and flatters the model badly.
 
 | Split | Features | Model | RMSE (C) | MAE (C) | R2 |
 |---|---|---|---|---|---|
-| random_80_20 | base | LinearRegression | 1.4363 | 1.0917 | 0.2475 |
-| random_80_20 | base | RandomForest | 0.5209 | 0.3844 | 0.9010 |
-| random_80_20 | base+spatial_lag | LinearRegression | 0.4262 | 0.3194 | 0.9337 |
-| random_80_20 | base+spatial_lag | RandomForest | 0.4125 | 0.3088 | 0.9379 |
-| spatial_block | base | LinearRegression | 1.4810 | 1.3196 | -0.6136 |
-| spatial_block | base | RandomForest | 1.0742 | 0.7399 | 0.1510 |
-| spatial_block | base+spatial_lag | LinearRegression | 1.2017 | 0.8990 | -0.0624 |
-| spatial_block | base+spatial_lag | RandomForest | 1.1801 | 0.8892 | -0.0245 |
+| random_80_20 | base | LinearRegression | 1.0515 | 0.8083 | 0.5954 |
+| random_80_20 | base | RandomForest | 0.5354 | 0.4104 | 0.8951 |
+| random_80_20 | base+spatial_lag | LinearRegression | 0.3972 | 0.3023 | 0.9423 |
+| random_80_20 | base+spatial_lag | RandomForest | 0.3725 | 0.2794 | 0.9492 |
+| spatial_block | base | LinearRegression | 0.9342 | 0.7408 | 0.3594 |
+| spatial_block | base | RandomForest | 0.8146 | 0.6411 | 0.5130 |
+| spatial_block | base+spatial_lag | LinearRegression | 1.0769 | 0.8313 | 0.1489 |
+| spatial_block | base+spatial_lag | RandomForest | 1.1032 | 0.8520 | 0.1068 |
 
 ## Feature importances (canonical model)
 
 | Feature | Importance |
 |---|---|
-| Latitude | 0.4885 |
-| Longitude | 0.2653 |
-| NDVI | 0.2462 |
+| NDBI | 0.4081 |
+| Latitude | 0.2635 |
+| Longitude | 0.2202 |
+| NDVI | 0.0742 |
+| Vegetation | 0.0340 |

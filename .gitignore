@@ -6,3 +6,10 @@ Machine Learning & Prediction/Models/heat_risk_model.pkl
 
 .vercel
 .env*
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# pytest
+.pytest_cache/

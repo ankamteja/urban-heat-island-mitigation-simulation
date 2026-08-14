@@ -78,11 +78,13 @@ The regression is deliberately *not* what drives the dashboard. There is no grou
 
 **Owns:** budget-constrained prioritisation — a different question from tiering.
 
-`member3_decision_support.py` reads the same source CSV, applies hard suitability rules per intervention type (nothing on a road, nothing on water), scores each cell's best option by **cooling per rupee**, sorts descending, walks down the list accumulating cost, and cuts at a ₹50 lakh budget.
+`member3_decision_support.py` reads the same source CSV, applies hard suitability rules per intervention type (nothing on a road, nothing on water), scores each cell's best option by **cooling per rupee**, sorts descending, walks down the list accumulating cost, and cuts at the budget in `shared/constants.json` — currently ₹10 crore, which funds 323 of 4,157 actionable cells.
 
 It is intentionally not an optimiser. No knapsack DP, no genetic algorithm — a greedy ratio sort is explainable to a stakeholder in one sentence, and that was judged worth more than the few percent a real optimiser would recover.
 
-**Relationship to ML:** the two modules overlap. Both independently answer "what intervention should this cell get." They were built in parallel without coordinating, and their cost models disagree by up to 67× for the same intervention. The project's resolution: **ML's area-based cost model is authoritative** for anything displayed or reported; Decision-Support's flat per-cell costs are retained only because its internal ranking depends on their ratios. See [`INTEGRATION_AUDIT.md`](../INTEGRATION_AUDIT.md) findings 2 and 3.
+**Relationship to ML:** the two modules used to overlap badly. Both independently answered "what intervention should this cell get", from separate copies of the same constants — and only one of them applied a land-cover suitability filter. The one that did not was the one feeding the dashboard.
+
+Both now call a single shared rule (`shared/uhi_shared.py`), so **their per-cell actions are identical by construction** and a test asserts it. The division of labour is clean: the ML module owns geometry and the dashboard contract; Decision-Support owns the budget question. See [05 — Decision-Support](./05-decision-support.md).
 
 ### frontend
 

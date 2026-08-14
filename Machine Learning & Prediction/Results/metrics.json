@@ -2,76 +2,78 @@
   "target": "LST",
   "random_state": 42,
   "canonical_model": "random_80_20|base|RandomForest",
-  "ndvi_corrected": false,
+  "ndvi_corrected": true,
   "results": [
     {
       "split": "random_80_20",
       "features": "base",
       "model": "LinearRegression",
-      "rmse": 1.4363411006387174,
-      "mae": 1.0916670517899398,
-      "r2": 0.24753331221870922
+      "rmse": 1.0515404382788442,
+      "mae": 0.8082584520379936,
+      "r2": 0.5953784438918833
     },
     {
       "split": "random_80_20",
       "features": "base",
       "model": "RandomForest",
-      "rmse": 0.5209185264908444,
-      "mae": 0.38435816203725515,
-      "r2": 0.9010281452320839
+      "rmse": 0.5354359332978964,
+      "mae": 0.4104211413552946,
+      "r2": 0.8950911598445588
     },
     {
       "split": "random_80_20",
       "features": "base+spatial_lag",
       "model": "LinearRegression",
-      "rmse": 0.4262332212615901,
-      "mae": 0.3194421348231061,
-      "r2": 0.9337376712420982
+      "rmse": 0.3971727583113617,
+      "mae": 0.3023444768358053,
+      "r2": 0.942276060257314
     },
     {
       "split": "random_80_20",
       "features": "base+spatial_lag",
       "model": "RandomForest",
-      "rmse": 0.4124825120704896,
-      "mae": 0.3088213027097936,
-      "r2": 0.9379440850050895
+      "rmse": 0.37248750806591485,
+      "mae": 0.2794281327734636,
+      "r2": 0.9492284427870897
     },
     {
       "split": "spatial_block",
       "features": "base",
       "model": "LinearRegression",
-      "rmse": 1.4809940721487216,
-      "mae": 1.3195813263385885,
-      "r2": -0.6136389277548413
+      "rmse": 0.9342498650750424,
+      "mae": 0.7407533421024576,
+      "r2": 0.3594045463957748
     },
     {
       "split": "spatial_block",
       "features": "base",
       "model": "RandomForest",
-      "rmse": 1.0742469622000572,
-      "mae": 0.7399196148709972,
-      "r2": 0.15099941322137256
+      "rmse": 0.8145564385697439,
+      "mae": 0.6411030845099325,
+      "r2": 0.5130323333162756
     },
     {
       "split": "spatial_block",
       "features": "base+spatial_lag",
       "model": "LinearRegression",
-      "rmse": 1.2016966709965784,
-      "mae": 0.8989741274905069,
-      "r2": -0.06240336614652664
+      "rmse": 1.0768643122578927,
+      "mae": 0.8313023174702944,
+      "r2": 0.14890167955655131
     },
     {
       "split": "spatial_block",
       "features": "base+spatial_lag",
       "model": "RandomForest",
-      "rmse": 1.1800816217161465,
-      "mae": 0.8892221696427267,
-      "r2": -0.02452796120386247
+      "rmse": 1.1032002457863284,
+      "mae": 0.8519967842741843,
+      "r2": 0.10676349349993242
     }
   ],
   "feature_importances": {
-    "NDVI": 0.2462196032515439,
-    "Longitude": 0.2653099304289864,
-    "Latitude": 0.4884704663194698
+    "Vegetation": 0.033954668092434526,
+    "NDVI": 0.07419487473601605,
+    "Longitude": 0.22022842497298806,
+    "Latitude": 0.2635243530429549,
+    "NDBI": 0.4080976791556065
   }
 }

@@ -1,0 +1,114 @@
+name: pipeline
+
+# Why this workflow exists
+# ------------------------
+# The failure this project actually suffered was not a crash. The dashboard
+# served a grid built from a superseded dataset for weeks while every script
+# reported success and every audit document said the work was outstanding.
+# Nothing was broken in a way anything checked.
+#
+# So this workflow does two things beyond running the tests:
+#   1. regenerates every derived artefact from dataset.csv, and
+#   2. fails if what it regenerates differs from what is committed.
+#
+# That makes stale committed data unmergeable rather than invisible.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r "Machine Learning & Prediction/requirements.txt"
+          pip install pytest
+
+      - name: Run tests
+        run: pytest tests/ -v
+
+  reproducibility:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r "Machine Learning & Prediction/requirements.txt"
+
+      - name: Regenerate the ML pipeline from the source dataset
+        working-directory: "Machine Learning & Prediction"
+        run: |
+          python scripts/preprocess.py
+          python scripts/tier_and_recommend.py
+          python scripts/export_grid_geojson.py
+
+      - name: Regenerate the Decision-Support outputs
+        working-directory: Decision-Support
+        run: python member3_decision_support.py
+
+      - name: Fail if any committed artefact is stale
+        run: |
+          # Plots are not byte-reproducible across matplotlib builds, and the
+          # trained model is gitignored for size, so neither is compared.
+          git diff --stat -- \
+            '*.csv' '*.geojson' '*.md' '*.json' \
+            ':!graphify-out' ':!**/metrics.json'
+          if ! git diff --quiet -- '*.csv' '*.geojson' ':!graphify-out'; then
+            echo ""
+            echo "::error::Committed data products do not match what the pipeline"
+            echo "::error::regenerates from dataset.csv. Re-run the pipeline and"
+            echo "::error::commit the outputs. See docs/07-data-contracts.md."
+            git diff --stat -- '*.csv' '*.geojson' ':!graphify-out'
+            exit 1
+          fi
+          echo "All committed data products are current."
+
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check relative links in Markdown resolve
+        run: |
+          python - <<'PY'
+          import os, re, sys, urllib.parse
+
+          broken = []
+          for dirpath, dirnames, filenames in os.walk("."):
+              dirnames[:] = [d for d in dirnames if d not in {".git", "graphify-out"}]
+              for name in filenames:
+                  if not name.endswith(".md"):
+                      continue
+                  path = os.path.join(dirpath, name)
+                  text = open(path, encoding="utf-8", errors="ignore").read()
+                  for match in re.finditer(r"\]\(([^)#][^)]*)\)", text):
+                      target = match.group(1).split()[0]
+                      if target.startswith(("http", "mailto", "#")):
+                          continue
+                      target = urllib.parse.unquote(target.split("#")[0])
+                      if not target:
+                          continue
+                      if not os.path.exists(os.path.normpath(os.path.join(dirpath, target))):
+                          broken.append(f"{path} -> {target}")
+
+          for item in sorted(set(broken)):
+              print(f"::error::broken link {item}")
+          sys.exit(1 if broken else 0)
+          PY
