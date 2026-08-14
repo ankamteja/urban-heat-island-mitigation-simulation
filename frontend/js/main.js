@@ -1,4 +1,8 @@
-loadGrid('mock_data/grid.geojson')
+// Real pipeline output: 8,144 Guwahati cells, produced by
+// `Machine Learning & Prediction/scripts/export_grid_geojson.py` and copied
+// here. Swap to 'mock_data/grid.geojson' for 900 synthetic cells if you want
+// to work offline — the dashboard handles both.
+loadGrid('data/grid.geojson')
   .then(geojson => {
     initCompareView(geojson);
     renderLegend('legend');

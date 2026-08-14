@@ -2,11 +2,22 @@ let mapBefore, mapAfter;
 let currentBeforeLayer = null;
 let currentAfterLayer = null;
 
+// Used when a feature carries no cooling_c, as in the legacy mock_data/grid.geojson,
+// which the dashboard must still load. Real cells supply their own per-cell value.
+const FALLBACK_COOLING_C = 3;
+
 function applyIntervention(geojson) {
   const transformed = JSON.parse(JSON.stringify(geojson));
   transformed.features.forEach(f => {
-    if (f.properties.recommended_action !== 'None') {
-      f.properties.temperature = +(f.properties.temperature - 3).toFixed(1);
+    const action = f.properties.recommended_action;
+    const temp = f.properties.temperature;
+    const rawCooling = f.properties.cooling_c;
+    const cooling = typeof rawCooling === 'number' && !isNaN(rawCooling)
+      ? rawCooling
+      : FALLBACK_COOLING_C;
+
+    if (action && action !== 'None' && typeof temp === 'number') {
+      f.properties.temperature = +(temp - cooling).toFixed(1);
     }
   });
   return transformed;
@@ -49,17 +60,4 @@ function syncMaps(mapA, mapB) {
 
 function addGeocoder(map) {
   L.Control.geocoder({ defaultMarkGeocode: true }).addTo(map);
-}
-
-function applyIntervention(geojson) {
-  const transformed = JSON.parse(JSON.stringify(geojson));
-  transformed.features.forEach(f => {
-    const action = f.properties.recommended_action;
-    const temp = f.properties.temperature;
-
-    if (action && action !== 'None' && typeof temp === 'number') {
-      f.properties.temperature = +(temp - 3).toFixed(1);
-    }
-  });
-  return transformed;
 }
