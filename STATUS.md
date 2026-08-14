@@ -106,7 +106,9 @@ costs below.
 | 7 | **One Landsat scene is one moment.** A pre/post-monsoon or summer/winter pair would turn a snapshot into a trend. | days |
 | 8 | **Make the budget interactive.** Decision-Support already computes the ranked, budget-capped shortlist offline; exposing it as a slider is the most compelling thing this dataset can do. | days |
 | 9 | **Both `SPEC_AUDIT.md` files still describe the pre-fix state** and should be folded into this document or deleted. | hour |
-| 10 | **Frontend has no linting or module system.** All scripts share global scope. ES modules would fix it without a build step. | hours |
+| 10 | **No linting or formatting config anywhere**, and no `package.json` for the frontend. All eleven JS files share global scope via `<script>` tags — `view`, `charts` and `INTERVENTIONS` are globals. ES modules plus ESLint would fix it without introducing a build step; `ruff` would cover the Python side. | hours |
+| 11 | **~12 MB of the repository is duplicated or regenerable.** `frontend/data/grid.geojson` and `Machine Learning & Prediction/Results/grid.geojson` are byte-identical copies at 3.7 MB each; `Remote Sensing & Data Engineering/Results/grid.geojson` is a third 4.4 MB variant with the raw schema; `preprocessed.csv` and `tiered.csv` add ~6 MB and regenerate exactly. Only `dataset.csv` genuinely cannot be rebuilt without an Earth Engine account. Committing just that one and generating the rest in CI would shrink the repo substantially — but it would also mean a clone no longer renders the dashboard without running Python first, so it is a real trade-off, not an obvious win. | hours |
+| 12 | **46% of the study area now receives no action by design.** The `already_green` rule excludes all 3,752 cells ESA WorldCover classifies as tree cover, including hot ones. This is the single largest behavioural change from the land-cover fix and is defensible for *planting*, but arguably wrong for a hot, sparsely-canopied cell that WorldCover still labels tree cover. Worth a deliberate decision rather than inheriting it. | decision |
 
 ---
 
