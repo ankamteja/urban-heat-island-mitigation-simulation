@@ -99,7 +99,7 @@ footer a { color: var(--muted); }
     <div><span>Resolution</span><b>100 m</b></div>
     <div><span>Mean LST</span><b>27.0 °C</b></div>
     <div><span>Peak hotspot</span><b>33.1 °C</b></div>
-    <div><span>Modelled drop</span><b>−1.51 °C</b></div>
+    <div><span>Modelled drop</span><b>−1.20 °C</b></div>
   </div>
 
   <div class="cards">
@@ -110,22 +110,15 @@ footer a { color: var(--muted); }
       <span class="go">Open dashboard →</span>
     </a>
 
-    <a class="card b" href="/presentation/deck.html">
-      <span class="tag">15 slides</span>
-      <h2>Presentation</h2>
-      <p>Problem, method, model results, decision support, dashboard walkthrough, and an honest account of the limitations.</p>
-      <span class="go">Open deck →</span>
-    </a>
-
-    <a class="card c" href="/presentation/architecture.html">
-      <span class="tag">Diagram</span>
-      <h2>System architecture</h2>
-      <p>How Earth Engine, the regression model, the cost engine and the dashboard connect through one shared data contract.</p>
-      <span class="go">Open diagram →</span>
+    <a class="card b" href="https://github.com/ankamteja/urban-heat-island-mitigation-simulation">
+      <span class="tag">Source</span>
+      <h2>How it works</h2>
+      <p>Earth Engine workflow, the regression and tiering scripts, the cost engine, and the data contract they share.</p>
+      <span class="go">View on GitHub →</span>
     </a>
   </div>
 
-  <p class="note"><b>Read the caveats:</b> NDVI is uncorrected upstream, model R² falls sharply under spatial block cross-validation, and all costs are planning placeholders. The deck states each of these plainly.</p>
+  <p class="note"><b>Read the caveats:</b> NDVI is uncorrected upstream, model R² falls sharply under spatial block cross-validation, and both the costs and the cooling figures are planning placeholders rather than measurements. <a href="https://github.com/ankamteja/urban-heat-island-mitigation-simulation/blob/main/docs/08-limitations.md">Full limitations →</a></p>
 </main>
 
 <footer>

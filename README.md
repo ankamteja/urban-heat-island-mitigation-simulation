@@ -18,8 +18,8 @@ python3 -m http.server 8000
 |---|---|
 | Landing page | `http://localhost:8000/` |
 | Dashboard | `http://localhost:8000/frontend/` |
-| Slide deck | `http://localhost:8000/presentation/deck.html` |
-| Architecture diagram | `http://localhost:8000/presentation/architecture.html` |
+
+Live at **[urban-heat-island-guwahati.vercel.app](https://urban-heat-island-guwahati.vercel.app)**.
 
 ## Modules
 
@@ -29,7 +29,6 @@ python3 -m http.server 8000
 | **[Machine Learning & Prediction](./Machine%20Learning%20%26%20Prediction/)** | LST regression, quantile-based priority tiering, the rule-based action/cost/cooling engine, and the `grid.geojson` the dashboard renders. | [README](./Machine%20Learning%20%26%20Prediction/README.md) · [spec audit](./Machine%20Learning%20%26%20Prediction/SPEC_AUDIT.md) · [guide](./docs/04-machine-learning.md) |
 | **[Decision-Support](./Decision-Support/)** | An independent cooling-per-rupee recommender with hard suitability rules and a budget-constrained greedy ranking. | [README](./Decision-Support/README.md) · [guide](./docs/05-decision-support.md) |
 | **[frontend](./frontend/)** | Leaflet dashboard rendering the grid as a continuous blended thermal surface, with a selection-gated prediction of post-mitigation temperature, ecology pointers and analytics. | [README](./frontend/README.md) · [guide](./docs/06-frontend.md) |
-| **[presentation](./presentation/)** | A 15-slide deck and a standalone system architecture diagram, both static HTML. | [README](./presentation/README.md) |
 
 ## Data flow
 
@@ -78,7 +77,11 @@ not yet transfer to an unseen district.
 
 The web layer is fully static. [`vercel.json`](./vercel.json) and
 [`.vercelignore`](./.vercelignore) configure a Vercel deployment that ships only
-`frontend/` and `presentation/` (~7 MB); no build step is required.
+the landing page and `frontend/` (~2.7 MB); no build step is required.
+
+The Vercel project is not connected to this repository (it is owned by another
+account), so pushes do not auto-deploy. Ship changes with `vercel deploy --prod`
+from the repository root.
 
 ## Licence
 
