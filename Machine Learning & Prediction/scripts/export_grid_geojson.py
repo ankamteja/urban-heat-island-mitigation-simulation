@@ -26,10 +26,12 @@ CSV, so no reprojection or precision loss is introduced.
 
 Input : Results/tiered.csv
 Output: Results/grid.geojson
+        ../frontend/data/grid.geojson   (the file the dashboard actually loads)
 
-This script deliberately does NOT touch frontend/mock_data/grid.geojson. See
-README section 7 for the one-line frontend change that switches the dashboard
-from mock to real data.
+Both destinations are written by this script. Previously only Results/ was
+written and somebody copied the file into frontend/data/ by hand - an
+undocumented manual step with nothing to detect it being skipped. The dashboard
+served a stale grid for weeks partly because of it.
 
 Run:  python scripts/export_grid_geojson.py
 """
@@ -37,6 +39,7 @@ Run:  python scripts/export_grid_geojson.py
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import pandas as pd
@@ -68,7 +71,13 @@ COOLING_DECIMALS = 1
 # when recommended_action === 'None', and filters.js/popup.js render them
 # verbatim. A typo or a mangled value does not crash anything - it silently
 # changes which cells get an intervention applied.
-VALID_ACTIONS = frozenset({"Tree cover", "Cool roof", "Green park", "None"})
+MODULE_DIR = Path(__file__).resolve().parent.parent
+REPO_DIR = MODULE_DIR.parent
+
+sys.path.insert(0, str(REPO_DIR / "shared"))
+import uhi_shared as shared  # noqa: E402  (path must be set before import)
+
+VALID_ACTIONS = shared.VALID_ACTIONS
 
 # pandas reads the bare string "None" as NaN by default, because "None" is in
 # its default na_values list. tiered.csv stores "None" as a real action label
@@ -85,10 +94,12 @@ VALID_ACTIONS = frozenset({"Tree cover", "Cool roof", "Green park", "None"})
 # how the numeric columns parse.
 STRING_COLUMNS = ["grid_id", "priority", "recommended_action"]
 
-MODULE_DIR = Path(__file__).resolve().parent.parent
 RESULTS_DIR = MODULE_DIR / "Results"
 INPUT_CSV = RESULTS_DIR / "tiered.csv"
 OUTPUT_GEOJSON = RESULTS_DIR / "grid.geojson"
+# The dashboard's copy. frontend/js/main.js loads 'data/grid.geojson' first and
+# falls back to the legacy mock only if that fetch fails.
+FRONTEND_GEOJSON = REPO_DIR / "frontend" / "data" / "grid.geojson"
 
 
 def build_feature(row: pd.Series) -> dict:
@@ -172,11 +183,16 @@ def main() -> None:
     print(f"Built and validated {len(features):,} features")
 
     collection = {"type": "FeatureCollection", "features": features}
-    OUTPUT_GEOJSON.write_text(json.dumps(collection), encoding="utf-8")
+    payload = json.dumps(collection)
+
+    OUTPUT_GEOJSON.write_text(payload, encoding="utf-8")
+    FRONTEND_GEOJSON.parent.mkdir(parents=True, exist_ok=True)
+    FRONTEND_GEOJSON.write_text(payload, encoding="utf-8")
 
     size_mb = OUTPUT_GEOJSON.stat().st_size / 1_048_576
     print(
-        f"Wrote {OUTPUT_GEOJSON.relative_to(MODULE_DIR)} "
+        f"Wrote {OUTPUT_GEOJSON.relative_to(MODULE_DIR)} and "
+        f"{FRONTEND_GEOJSON.relative_to(REPO_DIR)} "
         f"({size_mb:.2f} MB, {len(features):,} features)"
     )
     print(f"Properties per feature: {FRONTEND_PROPERTIES}")
@@ -185,14 +201,12 @@ def main() -> None:
     print(f"temperature range: {min(temps):.1f} to {max(temps):.1f} C")
     coolings = [f["properties"]["cooling_c"] for f in features]
     print(f"cooling range: {min(coolings):.1f} to {max(coolings):.1f} C (assumed)")
+    actions = pd.Series([f["properties"]["recommended_action"] for f in features])
+    print(f"action mix: {actions.value_counts().to_dict()}")
     print(
-        "NOTE: frontend/js/mapView.js TEMP_COLOR_SCALE buckets at 24/27/30 C, "
-        "retuned to this dataset's real LST range - all four legend bands are "
-        "now exercised. See README section 7."
-    )
-    print(
-        "NOTE: this file is NOT copied into frontend/mock_data/. "
-        "See README section 7 to switch the dashboard over."
+        "NOTE: frontend/js/config.js derives its colour domain from the 2nd/98th "
+        "percentiles of whatever it loads, so no legend retuning is needed when "
+        "this file changes."
     )
 
 

@@ -63,15 +63,18 @@ assumptions, not measurements — see the honesty notes below.
 
 This project documents its own weaknesses rather than hiding them. Before quoting any number from it:
 
-- [`INTEGRATION_AUDIT.md`](./INTEGRATION_AUDIT.md) — cross-module audit: what is wired to what, and where two modules disagree.
-- [`docs/08-limitations.md`](./docs/08-limitations.md) — consolidated list of which figures are measurements and which are planning assumptions.
-- [`IMPROVEMENTS.md`](./IMPROVEMENTS.md) — prioritized list of what's still worth doing, and a record of what was already fixed.
+- [`docs/08-limitations.md`](./docs/08-limitations.md) — which figures are measurements and which are planning assumptions.
+- [`STATUS.md`](./STATUS.md) — what works today, what is still open, and how to verify each claim.
 
-The headline caveat: **the NDVI in the committed dataset is uncorrected** and therefore compressed low, which biases `Heat_Risk` and everything derived from it. The fix is committed in the Earth Engine script; regenerating the data requires a run in an Earth Engine account. See [`docs/08-limitations.md`](./docs/08-limitations.md).
+The headline caveat: **the cooling figures behind the "after intervention" map
+are assumptions, not measurements.** They were never fitted to Guwahati or
+validated against a field trial, and they drive both that map and the
+cost-effectiveness ranking. Costs are planning placeholders on the same footing.
 
-Model performance also falls sharply under spatial block cross-validation
-(R² 0.901 → ~0.15): the model interpolates well inside the studied area but does
-not yet transfer to an unseen district.
+Model performance also falls under spatial-block cross-validation
+(R² 0.895 random split → 0.513 blocked): the model interpolates well inside the
+studied area and transfers less well to an unseen district. Quote the blocked
+figure.
 
 ## Deployment
 

@@ -2,28 +2,28 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102027+29098,26.13962729529328,91.65286265070468,tree_cover,Medium,28.63910774886367,already vegetated (tree cover) - no action needed
 +102028+29098,26.13962729513641,91.65376096577228,tree_cover,Medium,28.79614960889134,already vegetated (tree cover) - no action needed
 +102028+29099,26.14052561007416,91.653760965394,tree_cover,Low,27.400682145012503,already vegetated (tree cover) - no action needed
-+102029+29088,26.13064414196735,91.6546592815156,water,Medium,26.570509270771677,excluded (never-touch land cover: water/wetland)
-+102029+29089,26.13154245767416,91.65465928149328,water,Medium,24.85328570403556,excluded (never-touch land cover: water/wetland)
++102029+29088,26.13064414196735,91.6546592815156,water,Medium,26.570509270771677,never-touch land cover (water)
++102029+29089,26.13154245767416,91.65465928149328,water,Medium,24.85328570403556,never-touch land cover (water)
 +102029+29098,26.13962729490218,91.65465928106688,tree_cover,Medium,29.01165280183106,already vegetated (tree cover) - no action needed
 +102029+29099,26.14052561016733,91.65465928127011,tree_cover,Medium,27.719391243271687,already vegetated (tree cover) - no action needed
 +102029+29100,26.14142392600319,91.6546592814282,tree_cover,Low,26.77354073287013,already vegetated (tree cover) - no action needed
 +102029+29101,26.14232224083232,91.65465928131526,tree_cover,Low,26.808935419786582,already vegetated (tree cover) - no action needed
-+102030+29089,26.131542457507624,91.65555759598855,water,Medium,24.512075475083417,excluded (never-touch land cover: water/wetland)
-+102030+29090,26.132440772708406,91.65555759604906,water,Medium,24.59016171031776,excluded (never-touch land cover: water/wetland)
++102030+29089,26.131542457507624,91.65555759598855,water,Medium,24.512075475083417,never-touch land cover (water)
++102030+29090,26.132440772708406,91.65555759604906,water,Medium,24.59016171031776,never-touch land cover (water)
 +102030+29098,26.13962729495448,91.65555759604372,tree_cover,Medium,29.223126988114583,already vegetated (tree cover) - no action needed
 +102030+29099,26.140525610365355,91.65555759615106,tree_cover,Medium,28.50752531231496,already vegetated (tree cover) - no action needed
 +102030+29100,26.14142392580083,91.6555575959876,tree_cover,Medium,27.239040685719285,already vegetated (tree cover) - no action needed
 +102030+29101,26.142322240957725,91.65555759600504,tree_cover,Medium,26.86831383547862,already vegetated (tree cover) - no action needed
 +102030+29102,26.143220555953864,91.65555759620324,tree_cover,Low,26.8011020354682,already vegetated (tree cover) - no action needed
-+102031+29086,26.128847511884278,91.65645591166066,wetland,Medium,27.345909534026323,excluded (never-touch land cover: water/wetland)
-+102031+29089,26.13154245744416,91.6564559118173,water,Medium,24.594691560597845,excluded (never-touch land cover: water/wetland)
++102031+29086,26.128847511884278,91.65645591166066,wetland,Medium,27.345909534026323,never-touch land cover (wetland)
++102031+29089,26.13154245744416,91.6564559118173,water,Medium,24.594691560597845,never-touch land cover (water)
 +102031+29099,26.14052561030414,91.65645591191382,tree_cover,Medium,28.052367631861944,already vegetated (tree cover) - no action needed
 +102031+29100,26.141423925703485,91.65645591188054,tree_cover,Medium,27.66679459645399,already vegetated (tree cover) - no action needed
 +102031+29101,26.14232224100612,91.65645591180234,tree_cover,Medium,27.45139032213044,already vegetated (tree cover) - no action needed
 +102031+29102,26.143220556148,91.65645591190508,tree_cover,Medium,27.42656904785566,already vegetated (tree cover) - no action needed
 +102031+29103,26.14411887168264,91.65645591196332,tree_cover,Low,26.91717799959208,already vegetated (tree cover) - no action needed
 +102031+29104,26.14501718666759,91.65645591197683,tree_cover,Low,26.266424483616607,already vegetated (tree cover) - no action needed
-+102032+29092,26.134237403087425,91.657354226836,wetland,High,27.58050068691808,excluded (never-touch land cover: water/wetland)
++102032+29092,26.134237403087425,91.657354226836,wetland,High,27.58050068691808,never-touch land cover (wetland)
 +102032+29097,26.13872898006175,91.65735422685292,tree_cover,Medium,29.390337580604065,already vegetated (tree cover) - no action needed
 +102032+29102,26.143220556083428,91.6573542266591,tree_cover,Medium,28.34875923806916,already vegetated (tree cover) - no action needed
 +102032+29103,26.144118871764142,91.65735422662188,tree_cover,Low,27.034417171009093,already vegetated (tree cover) - no action needed
@@ -37,8 +37,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102033+29104,26.145017186682235,91.65825254221238,tree_cover,Low,26.098569658854277,already vegetated (tree cover) - no action needed
 +102033+29105,26.145915501707,91.65825254244336,tree_cover,Low,24.884668768076125,already vegetated (tree cover) - no action needed
 +102033+29106,26.14681381744756,91.65825254262988,tree_cover,Low,24.52687573546833,already vegetated (tree cover) - no action needed
-+102034+29085,26.12794919618892,91.65915085720918,wetland,Medium,27.21393674091006,excluded (never-touch land cover: water/wetland)
-+102034+29089,26.131542457689797,91.65915085745506,water,Medium,26.42136132623916,excluded (never-touch land cover: water/wetland)
++102034+29085,26.12794919618892,91.65915085720918,wetland,Medium,27.21393674091006,never-touch land cover (wetland)
++102034+29089,26.131542457689797,91.65915085745506,water,Medium,26.42136132623916,never-touch land cover (water)
 +102034+29097,26.138728979877964,91.65915085718466,tree_cover,Medium,29.14964083934101,already vegetated (tree cover) - no action needed
 +102034+29099,26.140525610203103,91.65915085735344,tree_cover,Medium,28.533738781861945,already vegetated (tree cover) - no action needed
 +102034+29103,26.144118871697398,91.65915085738732,tree_cover,Medium,27.548423010167397,already vegetated (tree cover) - no action needed
@@ -54,9 +54,9 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102035+29106,26.14681381756053,91.66004917296458,tree_cover,Low,25.6580900750524,already vegetated (tree cover) - no action needed
 +102035+29107,26.14771213253089,91.6600491729183,tree_cover,Low,25.01659902185644,already vegetated (tree cover) - no action needed
 +102035+29108,26.14861044785606,91.66004917305408,tree_cover,Low,24.95930930103733,already vegetated (tree cover) - no action needed
-+102036+29090,26.13244077274776,91.66094748773406,wetland,Medium,27.503034993009805,excluded (never-touch land cover: water/wetland)
-+102036+29091,26.1333390883066,91.66094748784106,wetland,Medium,28.51012045354748,excluded (never-touch land cover: water/wetland)
-+102036+29094,26.136034034284755,91.66094748789972,wetland,Medium,28.037551142643174,excluded (never-touch land cover: water/wetland)
++102036+29090,26.13244077274776,91.66094748773406,wetland,Medium,27.503034993009805,never-touch land cover (wetland)
++102036+29091,26.1333390883066,91.66094748784106,wetland,Medium,28.51012045354748,never-touch land cover (wetland)
++102036+29094,26.136034034284755,91.66094748789972,wetland,Medium,28.037551142643174,never-touch land cover (wetland)
 +102036+29100,26.141423926062718,91.66094748796688,tree_cover,Medium,28.63354093096021,already vegetated (tree cover) - no action needed
 +102036+29101,26.1423222406406,91.6609474878627,tree_cover,Medium,27.94571451281366,already vegetated (tree cover) - no action needed
 +102036+29102,26.14322055615041,91.66094748794082,tree_cover,Medium,28.116204986253504,already vegetated (tree cover) - no action needed
@@ -67,15 +67,15 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102036+29107,26.1477121325289,91.66094748790172,tree_cover,Low,25.127817897799154,already vegetated (tree cover) - no action needed
 +102036+29108,26.14861044800103,91.66094748794336,tree_cover,Low,24.7059137214211,already vegetated (tree cover) - no action needed
 +102036+29109,26.14950876331776,91.6609474879414,tree_cover,Low,24.95208094862388,already vegetated (tree cover) - no action needed
-+102037+29086,26.12884751193983,91.66184580320429,wetland,Medium,27.5758842701522,excluded (never-touch land cover: water/wetland)
-+102037+29087,26.12974582681242,91.66184580316134,wetland,Medium,26.48199361949792,excluded (never-touch land cover: water/wetland)
-+102037+29089,26.131542457588026,91.6618458033968,wetland,Medium,26.36267540893481,excluded (never-touch land cover: water/wetland)
-+102037+29090,26.132440772539105,91.66184580344952,wetland,High,26.01057381782429,excluded (never-touch land cover: water/wetland)
-+102037+29091,26.133339088426805,91.6618458032328,wetland,High,26.66999187016737,excluded (never-touch land cover: water/wetland)
-+102037+29092,26.134237403023928,91.66184580319832,wetland,Medium,26.947234229750013,excluded (never-touch land cover: water/wetland)
-+102037+29093,26.135135718832355,91.66184580334632,wetland,Medium,27.397145234822197,excluded (never-touch land cover: water/wetland)
-+102037+29094,26.13603403429977,91.66184580322528,wetland,Medium,27.45601431289752,excluded (never-touch land cover: water/wetland)
-+102037+29095,26.13693234893739,91.66184580328648,wetland,Medium,28.38676431307612,excluded (never-touch land cover: water/wetland)
++102037+29086,26.12884751193983,91.66184580320429,wetland,Medium,27.5758842701522,never-touch land cover (wetland)
++102037+29087,26.12974582681242,91.66184580316134,wetland,Medium,26.48199361949792,never-touch land cover (wetland)
++102037+29089,26.131542457588026,91.6618458033968,wetland,Medium,26.36267540893481,never-touch land cover (wetland)
++102037+29090,26.132440772539105,91.66184580344952,wetland,High,26.01057381782429,never-touch land cover (wetland)
++102037+29091,26.133339088426805,91.6618458032328,wetland,High,26.66999187016737,never-touch land cover (wetland)
++102037+29092,26.134237403023928,91.66184580319832,wetland,Medium,26.947234229750013,never-touch land cover (wetland)
++102037+29093,26.135135718832355,91.66184580334632,wetland,Medium,27.397145234822197,never-touch land cover (wetland)
++102037+29094,26.13603403429977,91.66184580322528,wetland,Medium,27.45601431289752,never-touch land cover (wetland)
++102037+29095,26.13693234893739,91.66184580328648,wetland,Medium,28.38676431307612,never-touch land cover (wetland)
 +102037+29100,26.141423925866835,91.66184580316656,tree_cover,Medium,28.74139541464436,already vegetated (tree cover) - no action needed
 +102037+29101,26.14232224077372,91.66184580319285,tree_cover,Medium,27.70425197417392,already vegetated (tree cover) - no action needed
 +102037+29102,26.14322055606644,91.66184580317572,tree_cover,Medium,27.639819291820128,already vegetated (tree cover) - no action needed
@@ -87,14 +87,14 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102037+29108,26.14861044788821,91.66184580328849,tree_cover,Low,24.925978151401683,already vegetated (tree cover) - no action needed
 +102037+29109,26.149508763351733,91.66184580319262,tree_cover,Low,24.996153629665304,already vegetated (tree cover) - no action needed
 +102037+29110,26.15040707807844,91.66184580327923,tree_cover,Low,25.46879699707081,already vegetated (tree cover) - no action needed
-+102038+29085,26.12794919621521,91.66274411886825,wetland,Medium,27.395181782664128,excluded (never-touch land cover: water/wetland)
-+102038+29086,26.12884751197398,91.66274411876996,wetland,Medium,26.85955872224804,excluded (never-touch land cover: water/wetland)
-+102038+29087,26.129745826811515,91.66274411885414,wetland,Medium,27.083168113390403,excluded (never-touch land cover: water/wetland)
-+102038+29090,26.132440772615578,91.6627441188476,wetland,Medium,26.54622629139319,excluded (never-touch land cover: water/wetland)
-+102038+29091,26.13333908828635,91.66274411898496,wetland,High,26.36905852357891,excluded (never-touch land cover: water/wetland)
-+102038+29092,26.13423740303045,91.66274411885324,wetland,Medium,27.01765949760336,excluded (never-touch land cover: water/wetland)
-+102038+29095,26.136932349203168,91.66274411887606,wetland,Medium,28.48326879854606,excluded (never-touch land cover: water/wetland)
-+102038+29096,26.13783066447204,91.6627441190232,wetland,Medium,28.271735040516784,excluded (never-touch land cover: water/wetland)
++102038+29085,26.12794919621521,91.66274411886825,wetland,Medium,27.395181782664128,never-touch land cover (wetland)
++102038+29086,26.12884751197398,91.66274411876996,wetland,Medium,26.85955872224804,never-touch land cover (wetland)
++102038+29087,26.129745826811515,91.66274411885414,wetland,Medium,27.083168113390403,never-touch land cover (wetland)
++102038+29090,26.132440772615578,91.6627441188476,wetland,Medium,26.54622629139319,never-touch land cover (wetland)
++102038+29091,26.13333908828635,91.66274411898496,wetland,High,26.36905852357891,never-touch land cover (wetland)
++102038+29092,26.13423740303045,91.66274411885324,wetland,Medium,27.01765949760336,never-touch land cover (wetland)
++102038+29095,26.136932349203168,91.66274411887606,wetland,Medium,28.48326879854606,never-touch land cover (wetland)
++102038+29096,26.13783066447204,91.6627441190232,wetland,Medium,28.271735040516784,never-touch land cover (wetland)
 +102038+29100,26.14142392595784,91.6627441189528,tree_cover,Medium,28.046269838561475,already vegetated (tree cover) - no action needed
 +102038+29101,26.142322240829994,91.66274411910928,tree_cover,Medium,27.46435245109502,already vegetated (tree cover) - no action needed
 +102038+29102,26.143220555905646,91.66274411899671,tree_cover,Medium,27.976646776145262,already vegetated (tree cover) - no action needed
@@ -114,12 +114,12 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102038+29121,26.160288547232355,91.66274411902532,tree_cover,Medium,27.22598487244507,already vegetated (tree cover) - no action needed
 +102038+29122,26.16118686173016,91.6627441189504,tree_cover,Medium,27.104152107328797,already vegetated (tree cover) - no action needed
 +102038+29123,26.16208517698956,91.66274411883232,tree_cover,Medium,26.81271750659328,already vegetated (tree cover) - no action needed
-+102039+29085,26.12794919638677,91.66364243385928,wetland,Medium,26.719894288379905,excluded (never-touch land cover: water/wetland)
-+102039+29090,26.13244077279512,91.66364243379851,wetland,Medium,27.14632928010477,excluded (never-touch land cover: water/wetland)
-+102039+29091,26.133339088249297,91.663642433838,wetland,Medium,27.03703498765363,excluded (never-touch land cover: water/wetland)
-+102039+29092,26.134237402958536,91.66364243383453,wetland,High,26.79745870224441,excluded (never-touch land cover: water/wetland)
-+102039+29093,26.13513571887973,91.66364243401397,wetland,Medium,28.03784413283521,excluded (never-touch land cover: water/wetland)
-+102039+29097,26.1387289797896,91.66364243384974,wetland,Medium,26.94386530002794,excluded (never-touch land cover: water/wetland)
++102039+29085,26.12794919638677,91.66364243385928,wetland,Medium,26.719894288379905,never-touch land cover (wetland)
++102039+29090,26.13244077279512,91.66364243379851,wetland,Medium,27.14632928010477,never-touch land cover (wetland)
++102039+29091,26.133339088249297,91.663642433838,wetland,Medium,27.03703498765363,never-touch land cover (wetland)
++102039+29092,26.134237402958536,91.66364243383453,wetland,High,26.79745870224441,never-touch land cover (wetland)
++102039+29093,26.13513571887973,91.66364243401397,wetland,Medium,28.03784413283521,never-touch land cover (wetland)
++102039+29097,26.1387289797896,91.66364243384974,wetland,Medium,26.94386530002794,never-touch land cover (wetland)
 +102039+29100,26.141423925972,91.66364243361336,tree_cover,Medium,27.82147296453912,already vegetated (tree cover) - no action needed
 +102039+29101,26.14232224080928,91.66364243344871,tree_cover,Medium,27.68971869509792,already vegetated (tree cover) - no action needed
 +102039+29102,26.14322055603224,91.66364243369269,tree_cover,Medium,28.224039101515377,already vegetated (tree cover) - no action needed
@@ -139,13 +139,13 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102039+29119,26.15849191597353,91.6636424339614,tree_cover,Medium,27.630514325467765,already vegetated (tree cover) - no action needed
 +102039+29121,26.160288547243773,91.6636424337588,tree_cover,Medium,27.348221601110343,already vegetated (tree cover) - no action needed
 +102039+29122,26.16118686170672,91.6636424338188,tree_cover,Low,26.939821466004386,already vegetated (tree cover) - no action needed
-+102039+29123,26.16208517693157,91.6636424338358,cropland,Low,26.53737392988829,Low priority - no action needed
-+102039+29124,26.162983492820896,91.66364243380984,cropland,Low,26.72312222373732,Low priority - no action needed
-+102040+29080,26.12345761994526,91.6645407491708,wetland,Medium,25.92793595724052,excluded (never-touch land cover: water/wetland)
-+102040+29092,26.13423740299022,91.6645407492012,wetland,High,26.701094064500012,excluded (never-touch land cover: water/wetland)
-+102040+29093,26.13513571887672,91.66454074905734,wetland,High,26.80563470674689,excluded (never-touch land cover: water/wetland)
-+102040+29094,26.1360340342395,91.66454074887054,wetland,Medium,27.982562796631825,excluded (never-touch land cover: water/wetland)
-+102040+29098,26.13962729504243,91.66454074905155,water,Medium,26.41032644681525,excluded (never-touch land cover: water/wetland)
++102039+29123,26.16208517693157,91.6636424338358,cropland,Low,26.53737392988829,low priority - no action needed
++102039+29124,26.162983492820896,91.66364243380984,cropland,Low,26.72312222373732,low priority - no action needed
++102040+29080,26.12345761994526,91.6645407491708,wetland,Medium,25.92793595724052,never-touch land cover (wetland)
++102040+29092,26.13423740299022,91.6645407492012,wetland,High,26.701094064500012,never-touch land cover (wetland)
++102040+29093,26.13513571887672,91.66454074905734,wetland,High,26.80563470674689,never-touch land cover (wetland)
++102040+29094,26.1360340342395,91.66454074887054,wetland,Medium,27.982562796631825,never-touch land cover (wetland)
++102040+29098,26.13962729504243,91.66454074905155,water,Medium,26.41032644681525,never-touch land cover (water)
 +102040+29099,26.140525610099164,91.66454074910284,tree_cover,Medium,28.23547124928873,already vegetated (tree cover) - no action needed
 +102040+29100,26.141423925909127,91.66454074933702,tree_cover,Medium,27.89603433321132,already vegetated (tree cover) - no action needed
 +102040+29101,26.14232224071172,91.6645407493026,tree_cover,Medium,27.888252907347848,already vegetated (tree cover) - no action needed
@@ -168,12 +168,12 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102040+29119,26.15849191598073,91.66454074903642,tree_cover,Medium,27.404980793326125,already vegetated (tree cover) - no action needed
 +102040+29121,26.16028854718176,91.66454074910354,tree_cover,Medium,27.45212494460253,already vegetated (tree cover) - no action needed
 +102040+29122,26.16118686179218,91.66454074907269,tree_cover,Medium,27.11375186678263,already vegetated (tree cover) - no action needed
-+102040+29123,26.162085176982345,91.66454074922478,cropland,Low,26.51988263338915,Low priority - no action needed
++102040+29123,26.162085176982345,91.66454074922478,cropland,Low,26.51988263338915,low priority - no action needed
 +102040+29124,26.16298349265514,91.664540749108,tree_cover,Low,26.73762886077407,already vegetated (tree cover) - no action needed
 +102040+29125,26.163881807779905,91.6645407491744,tree_cover,Medium,27.304286542417746,already vegetated (tree cover) - no action needed
-+102041+29085,26.12794919612604,91.66543906429592,wetland,Medium,27.106928364849875,excluded (never-touch land cover: water/wetland)
-+102041+29093,26.135135718613228,91.66543906446232,wetland,High,28.441330414162024,excluded (never-touch land cover: water/wetland)
-+102041+29094,26.136034034305904,91.6654390644046,wetland,Medium,28.687739342716498,excluded (never-touch land cover: water/wetland)
++102041+29085,26.12794919612604,91.66543906429592,wetland,Medium,27.106928364849875,never-touch land cover (wetland)
++102041+29093,26.135135718613228,91.66543906446232,wetland,High,28.441330414162024,never-touch land cover (wetland)
++102041+29094,26.136034034305904,91.6654390644046,wetland,Medium,28.687739342716498,never-touch land cover (wetland)
 +102041+29095,26.13693234916896,91.66543906453022,tree_cover,Medium,28.873415085050777,already vegetated (tree cover) - no action needed
 +102041+29100,26.14142392595095,91.66543906451896,tree_cover,Medium,28.47881346693786,already vegetated (tree cover) - no action needed
 +102041+29101,26.142322240719185,91.66543906461456,tree_cover,Medium,27.614090355181304,already vegetated (tree cover) - no action needed
@@ -200,9 +200,9 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102041+29123,26.162085176960208,91.66543906429789,tree_cover,Medium,26.53109880797489,already vegetated (tree cover) - no action needed
 +102041+29124,26.16298349259849,91.66543906431684,tree_cover,Low,26.35391910573325,already vegetated (tree cover) - no action needed
 +102041+29125,26.16388180787074,91.66543906429284,tree_cover,Medium,26.656886743016702,already vegetated (tree cover) - no action needed
-+102042+29085,26.12794919605817,91.66633737983632,wetland,Medium,26.5778805698394,excluded (never-touch land cover: water/wetland)
-+102042+29089,26.131542457718616,91.66633737986592,cropland,Low,27.45974345313273,Low priority - no action needed
-+102042+29090,26.132440772678912,91.66633737988036,wetland,Medium,27.619678505838003,excluded (never-touch land cover: water/wetland)
++102042+29085,26.12794919605817,91.66633737983632,wetland,Medium,26.5778805698394,never-touch land cover (wetland)
++102042+29089,26.131542457718616,91.66633737986592,cropland,Low,27.45974345313273,low priority - no action needed
++102042+29090,26.132440772678912,91.66633737988036,wetland,Medium,27.619678505838003,never-touch land cover (wetland)
 +102042+29092,26.134237403181995,91.66633737955652,tree_cover,Medium,28.961126088488072,already vegetated (tree cover) - no action needed
 +102042+29093,26.135135718635716,91.66633737966971,tree_cover,Medium,29.46502979104751,already vegetated (tree cover) - no action needed
 +102042+29094,26.136034034294216,91.66633737974088,tree_cover,Medium,28.815875112384788,already vegetated (tree cover) - no action needed
@@ -232,9 +232,9 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102042+29124,26.16298349265094,91.66633738000456,tree_cover,Medium,26.363127709895263,already vegetated (tree cover) - no action needed
 +102042+29125,26.16388180770703,91.66633737989042,tree_cover,Low,26.15877910978246,already vegetated (tree cover) - no action needed
 +102042+29126,26.16478012288613,91.66633737973396,tree_cover,Low,26.474767882653563,already vegetated (tree cover) - no action needed
-+102043+29084,26.127050880980715,91.66723569498087,wetland,Medium,26.248505193305466,excluded (never-touch land cover: water/wetland)
-+102043+29086,26.12884751204294,91.6672356949672,wetland,High,26.761539766739155,excluded (never-touch land cover: water/wetland)
-+102043+29087,26.12974582689076,91.66723569500998,wetland,Medium,27.19032940158997,excluded (never-touch land cover: water/wetland)
++102043+29084,26.127050880980715,91.66723569498087,wetland,Medium,26.248505193305466,never-touch land cover (wetland)
++102043+29086,26.12884751204294,91.6672356949672,wetland,High,26.761539766739155,never-touch land cover (wetland)
++102043+29087,26.12974582689076,91.66723569500998,wetland,Medium,27.19032940158997,never-touch land cover (wetland)
 +102043+29094,26.13603403420428,91.66723569526012,tree_cover,Medium,28.81554189801256,already vegetated (tree cover) - no action needed
 +102043+29095,26.136932348999,91.66723569519198,tree_cover,Medium,28.43556893270656,already vegetated (tree cover) - no action needed
 +102043+29096,26.13783066445968,91.66723569508156,tree_cover,Medium,28.48137144998956,already vegetated (tree cover) - no action needed
@@ -261,7 +261,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102043+29125,26.16388180765276,91.66723569499425,tree_cover,Medium,26.506727614152197,already vegetated (tree cover) - no action needed
 +102043+29126,26.164780122979533,91.66723569519928,tree_cover,Medium,26.797866100271992,already vegetated (tree cover) - no action needed
 +102043+29127,26.165678438247063,91.66723569513609,tree_cover,Medium,27.325634267212543,already vegetated (tree cover) - no action needed
-+102044+29087,26.129745826959635,91.6681340102215,wetland,Medium,26.71244601225561,excluded (never-touch land cover: water/wetland)
++102044+29087,26.129745826959635,91.6681340102215,wetland,Medium,26.71244601225561,never-touch land cover (wetland)
 +102044+29094,26.136034034218127,91.66813401023931,tree_cover,Medium,28.79780161556915,already vegetated (tree cover) - no action needed
 +102044+29095,26.136932348979027,91.66813401029988,tree_cover,Medium,28.55307423528284,already vegetated (tree cover) - no action needed
 +102044+29097,26.13872897994569,91.66813401052126,tree_cover,Medium,27.92559248928075,already vegetated (tree cover) - no action needed
@@ -318,8 +318,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102045+29125,26.163881807690046,91.6690323257054,tree_cover,Medium,27.15724248657727,already vegetated (tree cover) - no action needed
 +102045+29126,26.16478012294905,91.6690323257305,tree_cover,Medium,27.467170845307283,already vegetated (tree cover) - no action needed
 +102045+29128,26.166576753890716,91.6690323256554,tree_cover,Medium,28.040151257563487,already vegetated (tree cover) - no action needed
-+102046+29084,26.127050881070254,91.669930641224,cropland,Low,27.438177563828475,Low priority - no action needed
-+102046+29087,26.129745826677333,91.66993064104082,cropland,Low,27.346818227301277,Low priority - no action needed
++102046+29084,26.127050881070254,91.669930641224,cropland,Low,27.438177563828475,low priority - no action needed
++102046+29087,26.129745826677333,91.66993064104082,cropland,Low,27.346818227301277,low priority - no action needed
 +102046+29093,26.135135718852226,91.66993064113656,tree_cover,Medium,28.98249870791844,already vegetated (tree cover) - no action needed
 +102046+29094,26.13603403419359,91.66993064104496,tree_cover,Medium,29.041478025481197,already vegetated (tree cover) - no action needed
 +102046+29096,26.137830664429018,91.6699306409634,tree_cover,Medium,28.39857861547073,already vegetated (tree cover) - no action needed
@@ -333,7 +333,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102046+29108,26.14861044765437,91.66993064105428,tree_cover,High,28.182806568744805,already vegetated (tree cover) - no action needed
 +102046+29110,26.15040707832014,91.66993064116576,tree_cover,Medium,27.69111674622828,already vegetated (tree cover) - no action needed
 +102046+29111,26.15130539385413,91.66993064104634,tree_cover,Medium,27.406696741548124,already vegetated (tree cover) - no action needed
-+102046+29112,26.15220370874801,91.66993064111118,cropland,Low,27.243901621265703,Low priority - no action needed
++102046+29112,26.15220370874801,91.66993064111118,cropland,Low,27.243901621265703,low priority - no action needed
 +102046+29114,26.15400033939372,91.6699306408907,tree_cover,Medium,27.805468720993755,already vegetated (tree cover) - no action needed
 +102046+29115,26.154898654970506,91.6699306412829,tree_cover,Medium,26.985909042625543,already vegetated (tree cover) - no action needed
 +102046+29116,26.155796970083383,91.66993064118168,tree_cover,Medium,26.067238974076112,already vegetated (tree cover) - no action needed
@@ -344,7 +344,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102046+29124,26.162983492678908,91.66993064113508,tree_cover,Medium,27.62777875623431,already vegetated (tree cover) - no action needed
 +102046+29125,26.16388180759977,91.66993064111166,tree_cover,Medium,27.89054273306524,already vegetated (tree cover) - no action needed
 +102046+29126,26.164780123007148,91.6699306410466,tree_cover,High,28.16555677046027,already vegetated (tree cover) - no action needed
-+102047+29087,26.12974582687213,91.67082895590134,cropland,Low,27.09184861914109,Low priority - no action needed
++102047+29087,26.12974582687213,91.67082895590134,cropland,Low,27.09184861914109,low priority - no action needed
 +102047+29090,26.13244077266745,91.67082895595398,tree_cover,Medium,27.91307446840784,already vegetated (tree cover) - no action needed
 +102047+29091,26.13333908821378,91.67082895611482,tree_cover,Medium,28.02818381059709,already vegetated (tree cover) - no action needed
 +102047+29092,26.13423740319753,91.67082895600858,tree_cover,Medium,28.91089247221901,already vegetated (tree cover) - no action needed
@@ -418,7 +418,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102049+29128,26.166576753967696,91.67262558705802,tree_cover,Medium,27.362147801391338,already vegetated (tree cover) - no action needed
 +102049+29129,26.16747506861001,91.67262558705188,tree_cover,Medium,27.529679913744783,already vegetated (tree cover) - no action needed
 +102049+29130,26.16837338387757,91.67262558700472,tree_cover,Medium,27.96555492933057,already vegetated (tree cover) - no action needed
-+102050+29076,26.119864358981715,91.67352390206187,wetland,Medium,25.18050472432264,excluded (never-touch land cover: water/wetland)
++102050+29076,26.119864358981715,91.67352390206187,wetland,Medium,25.18050472432264,never-touch land cover (wetland)
 +102050+29097,26.138728979973365,91.67352390178556,tree_cover,Medium,28.80391323582753,already vegetated (tree cover) - no action needed
 +102050+29099,26.14052561029781,91.67352390204128,tree_cover,Medium,28.529869543966495,already vegetated (tree cover) - no action needed
 +102050+29101,26.142322240966127,91.67352390213463,tree_cover,Medium,27.292336690765065,already vegetated (tree cover) - no action needed
@@ -441,7 +441,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102050+29128,26.166576754034136,91.67352390205278,tree_cover,Medium,27.24133470161714,already vegetated (tree cover) - no action needed
 +102050+29131,26.16927169969363,91.67352390209584,tree_cover,Medium,28.0771744372154,already vegetated (tree cover) - no action needed
 +102050+29132,26.170170014869708,91.67352390187811,tree_cover,Medium,27.494203299125022,already vegetated (tree cover) - no action needed
-+102051+29077,26.120762673638826,91.67442221683542,wetland,Medium,25.864362169499664,excluded (never-touch land cover: water/wetland)
++102051+29077,26.120762673638826,91.67442221683542,wetland,Medium,25.864362169499664,never-touch land cover (wetland)
 +102051+29089,26.131542457596968,91.67442221680083,tree_cover,High,29.49229172552578,already vegetated (tree cover) - no action needed
 +102051+29092,26.134237403071,91.674422217014,tree_cover,Medium,28.0092744412872,already vegetated (tree cover) - no action needed
 +102051+29093,26.135135718952647,91.67442221692905,tree_cover,Medium,27.216094362206714,already vegetated (tree cover) - no action needed
@@ -494,7 +494,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102052+29130,26.168373383846426,91.6753205326159,tree_cover,Medium,27.240426991799183,already vegetated (tree cover) - no action needed
 +102052+29131,26.169271699960568,91.6753205327129,tree_cover,Medium,27.77232877758698,already vegetated (tree cover) - no action needed
 +102052+29132,26.170170014707224,91.6753205327696,tree_cover,Medium,27.81566974686195,already vegetated (tree cover) - no action needed
-+102052+29133,26.171068330031563,91.6753205327858,water,High,26.66214241153924,excluded (never-touch land cover: water/wetland)
++102052+29133,26.171068330031563,91.6753205327858,water,High,26.66214241153924,never-touch land cover (water)
 +102053+29075,26.118966043532208,91.67621884829488,tree_cover,Medium,27.776545812688564,already vegetated (tree cover) - no action needed
 +102053+29079,26.122559304844792,91.6762188480688,tree_cover,Medium,27.50801045578213,already vegetated (tree cover) - no action needed
 +102053+29080,26.12345761986462,91.67621884808176,tree_cover,Medium,27.168799062538096,already vegetated (tree cover) - no action needed
@@ -526,7 +526,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102053+29129,26.1674750686764,91.67621884814352,tree_cover,Medium,27.23815276432264,already vegetated (tree cover) - no action needed
 +102053+29130,26.16837338381372,91.67621884819155,tree_cover,Medium,27.809046838757,already vegetated (tree cover) - no action needed
 +102053+29131,26.16927169989549,91.67621884797312,tree_cover,Medium,27.805065096642508,already vegetated (tree cover) - no action needed
-+102053+29133,26.171068329901896,91.67621884786875,water,High,26.00659752604497,excluded (never-touch land cover: water/wetland)
++102053+29133,26.171068329901896,91.67621884786875,water,High,26.00659752604497,never-touch land cover (water)
 +102054+29079,26.12255930492212,91.6771171630361,tree_cover,Medium,27.98783052803772,already vegetated (tree cover) - no action needed
 +102054+29080,26.12345761990974,91.67711716317504,tree_cover,Medium,27.87411703223353,already vegetated (tree cover) - no action needed
 +102054+29081,26.12435593500682,91.67711716304828,tree_cover,Medium,27.73632858260128,already vegetated (tree cover) - no action needed
@@ -548,7 +548,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102054+29130,26.168373383709344,91.67711716307144,tree_cover,Medium,28.092781882367337,already vegetated (tree cover) - no action needed
 +102054+29131,26.16927169994074,91.67711716321644,tree_cover,Medium,27.46238070714288,already vegetated (tree cover) - no action needed
 +102054+29132,26.1701700148053,91.6771171633216,tree_cover,Medium,27.582076705509788,already vegetated (tree cover) - no action needed
-+102054+29133,26.171068329700933,91.67711716316076,water,High,26.587609515034934,excluded (never-touch land cover: water/wetland)
++102054+29133,26.171068329700933,91.67711716316076,water,High,26.587609515034934,never-touch land cover (water)
 +102055+29072,26.1162710976732,91.67801547857484,tree_cover,High,30.602022250899605,already vegetated (tree cover) - no action needed
 +102055+29079,26.12255930510057,91.67801547836814,tree_cover,Medium,28.229352659790823,already vegetated (tree cover) - no action needed
 +102055+29080,26.123457619874262,91.67801547840658,tree_cover,Medium,28.63829405189133,already vegetated (tree cover) - no action needed
@@ -572,11 +572,11 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102055+29130,26.1683733838973,91.67801547854314,tree_cover,Medium,28.20994574288704,already vegetated (tree cover) - no action needed
 +102055+29131,26.16927169991468,91.67801547859912,tree_cover,Medium,27.636871158891324,already vegetated (tree cover) - no action needed
 +102055+29132,26.17017001474705,91.67801547838928,tree_cover,Medium,28.00579889702931,already vegetated (tree cover) - no action needed
-+102055+29133,26.171068329792654,91.67801547859167,water,High,27.09837953894353,excluded (never-touch land cover: water/wetland)
++102055+29133,26.171068329792654,91.67801547859167,water,High,27.09837953894353,never-touch land cover (water)
 +102056+29071,26.1153727824012,91.6789137934679,tree_cover,High,29.820631840578883,already vegetated (tree cover) - no action needed
 +102056+29072,26.11627109762841,91.67891379326817,tree_cover,High,30.550646170593595,already vegetated (tree cover) - no action needed
 +102056+29073,26.1171694129634,91.67891379325503,tree_cover,High,30.240613616263992,already vegetated (tree cover) - no action needed
-+102056+29075,26.11896604317568,91.67891379356313,cropland,Low,27.468950268428785,Low priority - no action needed
++102056+29075,26.11896604317568,91.67891379356313,cropland,Low,27.468950268428785,low priority - no action needed
 +102056+29080,26.123457619940265,91.67891379364708,tree_cover,High,28.689523626153036,already vegetated (tree cover) - no action needed
 +102056+29086,26.128847511902805,91.67891379358264,tree_cover,Medium,27.94978441044961,already vegetated (tree cover) - no action needed
 +102056+29087,26.129745826870803,91.6789137936981,tree_cover,Medium,27.773849825544705,already vegetated (tree cover) - no action needed
@@ -597,8 +597,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102056+29116,26.15579697030196,91.67891379328933,tree_cover,Medium,29.35924176498914,already vegetated (tree cover) - no action needed
 +102056+29129,26.16747506842585,91.67891379356443,tree_cover,Medium,28.762364123645263,already vegetated (tree cover) - no action needed
 +102056+29130,26.16837338401324,91.6789137933444,tree_cover,Medium,27.95655636110336,already vegetated (tree cover) - no action needed
-+102056+29133,26.171068329813245,91.67891379335296,water,High,27.65608089621509,excluded (never-touch land cover: water/wetland)
-+102056+29134,26.171966645184884,91.6789137932016,water,High,25.843595761819387,excluded (never-touch land cover: water/wetland)
++102056+29133,26.171068329813245,91.67891379335296,water,High,27.65608089621509,never-touch land cover (water)
++102056+29134,26.171966645184884,91.6789137932016,water,High,25.843595761819387,never-touch land cover (water)
 +102057+29073,26.11716941298699,91.67981210933976,tree_cover,Medium,28.45878570763968,already vegetated (tree cover) - no action needed
 +102057+29078,26.121660989489143,91.67981210931048,tree_cover,Medium,27.79084206324024,already vegetated (tree cover) - no action needed
 +102057+29081,26.124355935109257,91.67981210905052,tree_cover,Medium,29.33243591603353,already vegetated (tree cover) - no action needed
@@ -621,8 +621,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102057+29116,26.1557969702429,91.6798121092729,tree_cover,High,30.0648757590138,already vegetated (tree cover) - no action needed
 +102057+29129,26.167475068501805,91.67981210927144,tree_cover,Medium,28.39651067215784,already vegetated (tree cover) - no action needed
 +102057+29130,26.168373383875384,91.67981210941464,tree_cover,Medium,27.650564803882688,already vegetated (tree cover) - no action needed
-+102057+29133,26.171068329762544,91.67981210915605,water,High,27.569330737074036,excluded (never-touch land cover: water/wetland)
-+102057+29134,26.17196664528451,91.67981210936816,water,High,24.74709659668505,excluded (never-touch land cover: water/wetland)
++102057+29133,26.171068329762544,91.67981210915605,water,High,27.569330737074036,never-touch land cover (water)
++102057+29134,26.17196664528451,91.67981210936816,water,High,24.74709659668505,never-touch land cover (water)
 +102058+29072,26.116271097474844,91.68071042429528,tree_cover,Medium,28.749195603242697,already vegetated (tree cover) - no action needed
 +102058+29073,26.11716941292873,91.68071042430478,tree_cover,Medium,27.872074227531407,already vegetated (tree cover) - no action needed
 +102058+29074,26.118067728555893,91.6807104242755,tree_cover,Medium,27.56693054384785,already vegetated (tree cover) - no action needed
@@ -649,7 +649,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102058+29116,26.15579697010952,91.68071042413536,tree_cover,High,29.773050066010885,already vegetated (tree cover) - no action needed
 +102058+29130,26.168373383848014,91.68071042413726,tree_cover,Medium,28.05039166353557,already vegetated (tree cover) - no action needed
 +102058+29133,26.17106832982254,91.68071042451652,tree_cover,High,27.509500724539755,already vegetated (tree cover) - no action needed
-+102058+29134,26.17196664531318,91.6807104244145,water,High,24.73211096267705,excluded (never-touch land cover: water/wetland)
++102058+29134,26.17196664531318,91.6807104244145,water,High,24.73211096267705,never-touch land cover (water)
 +102059+29071,26.115372782232534,91.68160873955516,tree_cover,High,29.435653969173337,already vegetated (tree cover) - no action needed
 +102059+29078,26.12166098934251,91.6816087397233,tree_cover,Medium,26.9823800840503,already vegetated (tree cover) - no action needed
 +102059+29079,26.122559304823664,91.68160873962518,tree_cover,Medium,27.461178569322648,already vegetated (tree cover) - no action needed
@@ -681,7 +681,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102059+29121,26.16028854717365,91.68160873973304,tree_cover,Medium,29.07254585831704,already vegetated (tree cover) - no action needed
 +102059+29122,26.161186861705595,91.68160873978115,tree_cover,High,28.918354364322,already vegetated (tree cover) - no action needed
 +102059+29133,26.171068329811405,91.68160873956424,tree_cover,Medium,27.202930688812863,already vegetated (tree cover) - no action needed
-+102059+29134,26.17196664527074,91.68160873959974,water,High,25.53263342691368,excluded (never-touch land cover: water/wetland)
++102059+29134,26.17196664527074,91.68160873959974,water,High,25.53263342691368,never-touch land cover (water)
 +102060+29070,26.11447446744451,91.68250705476392,tree_cover,Medium,28.48999184833799,already vegetated (tree cover) - no action needed
 +102060+29075,26.11896604325747,91.6825070546958,tree_cover,Medium,27.822983863044705,already vegetated (tree cover) - no action needed
 +102060+29077,26.12076267381344,91.68250705471657,tree_cover,Medium,27.499650509702708,already vegetated (tree cover) - no action needed
@@ -717,7 +717,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102060+29116,26.155796970166307,91.68250705459978,tree_cover,High,29.53506097106965,already vegetated (tree cover) - no action needed
 +102060+29122,26.16118686160111,91.68250705446856,tree_cover,Medium,28.57719928471358,already vegetated (tree cover) - no action needed
 +102060+29133,26.171068329910963,91.68250705462084,tree_cover,High,27.62531036211595,already vegetated (tree cover) - no action needed
-+102060+29134,26.17196664515718,91.68250705456796,water,High,25.81567335451055,excluded (never-touch land cover: water/wetland)
++102060+29134,26.17196664515718,91.68250705456796,water,High,25.81567335451055,never-touch land cover (water)
 +102061+29068,26.112677836208928,91.68340536997114,tree_cover,Medium,27.53464616369233,already vegetated (tree cover) - no action needed
 +102061+29069,26.11357615207677,91.68340537005314,tree_cover,Medium,28.291882880627625,already vegetated (tree cover) - no action needed
 +102061+29070,26.11447446741504,91.68340537009723,tree_cover,Medium,29.147558206861945,already vegetated (tree cover) - no action needed
@@ -751,7 +751,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102061+29130,26.168373384244543,91.68340537001156,tree_cover,Medium,27.98275705648537,already vegetated (tree cover) - no action needed
 +102061+29132,26.17017001471788,91.68340537014628,tree_cover,Medium,27.99881507652721,already vegetated (tree cover) - no action needed
 +102061+29133,26.171068329939068,91.68340537026924,tree_cover,Medium,27.851825915188314,already vegetated (tree cover) - no action needed
-+102061+29134,26.17196664515467,91.6834053703539,water,High,25.655573759847847,excluded (never-touch land cover: water/wetland)
++102061+29134,26.17196664515467,91.6834053703539,water,High,25.655573759847847,never-touch land cover (water)
 +102062+29067,26.1117795211182,91.68430368550148,tree_cover,Medium,27.762456410564848,already vegetated (tree cover) - no action needed
 +102062+29082,26.12525425109309,91.68430368562473,tree_cover,Medium,28.312430244420405,already vegetated (tree cover) - no action needed
 +102062+29084,26.127050881104115,91.68430368583984,tree_cover,Medium,27.99853153234291,already vegetated (tree cover) - no action needed
@@ -776,7 +776,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102062+29116,26.15579697028964,91.6843036853621,tree_cover,High,29.010003278763627,already vegetated (tree cover) - no action needed
 +102062+29125,26.16388180773893,91.68430368548938,tree_cover,Medium,28.054970319981884,already vegetated (tree cover) - no action needed
 +102062+29126,26.16478012281505,91.68430368556425,tree_cover,Medium,28.131753158236755,already vegetated (tree cover) - no action needed
-+102062+29134,26.17196664526285,91.68430368524528,water,High,26.476119587389437,excluded (never-touch land cover: water/wetland)
++102062+29134,26.17196664526285,91.68430368524528,water,High,26.476119587389437,never-touch land cover (water)
 +102063+29066,26.110881206390665,91.68520200086452,tree_cover,Medium,27.914631911180177,already vegetated (tree cover) - no action needed
 +102063+29072,26.11627109774711,91.68520200091604,tree_cover,Medium,28.702096458847773,already vegetated (tree cover) - no action needed
 +102063+29074,26.118067728520167,91.68520200078282,tree_cover,Medium,27.3849782933938,already vegetated (tree cover) - no action needed
@@ -804,7 +804,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102063+29111,26.151305394088237,91.685202000931,tree_cover,Medium,28.023482242932968,already vegetated (tree cover) - no action needed
 +102063+29116,26.15579697014897,91.68520200109046,tree_cover,Medium,28.66322420540612,already vegetated (tree cover) - no action needed
 +102063+29126,26.16478012291473,91.68520200105888,tree_cover,Medium,27.83810060547837,already vegetated (tree cover) - no action needed
-+102063+29134,26.17196664529992,91.6852020011564,water,High,26.696650039499676,excluded (never-touch land cover: water/wetland)
++102063+29134,26.17196664529992,91.6852020011564,water,High,26.696650039499676,never-touch land cover (water)
 +102064+29065,26.10998289025413,91.68610031600304,tree_cover,Medium,27.46212860163045,already vegetated (tree cover) - no action needed
 +102064+29066,26.110881206416543,91.68610031611524,tree_cover,Medium,27.81261045211299,already vegetated (tree cover) - no action needed
 +102064+29068,26.112677836353985,91.6861003157759,tree_cover,Medium,28.11495060702175,already vegetated (tree cover) - no action needed
@@ -932,7 +932,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102067+29132,26.17017001466487,91.68879526187992,tree_cover,Medium,27.478877982594167,already vegetated (tree cover) - no action needed
 +102067+29134,26.17196664510152,91.68879526192976,tree_cover,Medium,26.6632333009348,already vegetated (tree cover) - no action needed
 +102068+29068,26.11267783647965,91.68969357719824,tree_cover,Medium,26.93488714887965,already vegetated (tree cover) - no action needed
-+102068+29071,26.11537278256136,91.68969357698576,cropland,Low,27.03717988666064,Low priority - no action needed
++102068+29071,26.11537278256136,91.68969357698576,cropland,Low,27.03717988666064,low priority - no action needed
 +102068+29075,26.11896604332686,91.68969357716942,tree_cover,Medium,27.54577695120813,already vegetated (tree cover) - no action needed
 +102068+29076,26.119864359141037,91.68969357695474,tree_cover,Medium,27.62886562803073,already vegetated (tree cover) - no action needed
 +102068+29086,26.12884751202696,91.6896935770863,tree_cover,Medium,26.664330045453248,already vegetated (tree cover) - no action needed
@@ -963,7 +963,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102068+29113,26.15310202454017,91.6896935769302,tree_cover,Low,26.423998500322725,already vegetated (tree cover) - no action needed
 +102068+29114,26.154000339392237,91.6896935771308,tree_cover,Low,26.071270095013983,already vegetated (tree cover) - no action needed
 +102068+29115,26.154898655003493,91.68969357729486,tree_cover,Medium,27.81062755366272,already vegetated (tree cover) - no action needed
-+102068+29130,26.168373383991675,91.68969357738123,water,High,26.31672546282125,excluded (never-touch land cover: water/wetland)
++102068+29130,26.168373383991675,91.68969357738123,water,High,26.31672546282125,never-touch land cover (water)
 +102068+29133,26.17106832996174,91.68969357712972,tree_cover,Medium,27.521879453833822,already vegetated (tree cover) - no action needed
 +102068+29134,26.171966645147315,91.68969357704783,tree_cover,Medium,26.4409082805584,already vegetated (tree cover) - no action needed
 +102068+29135,26.172864960412785,91.68969357715534,tree_cover,Low,24.819829485501977,already vegetated (tree cover) - no action needed
@@ -1036,8 +1036,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102070+29129,26.16747506858084,91.69149020805732,tree_cover,Medium,26.9509345224268,already vegetated (tree cover) - no action needed
 +102070+29130,26.168373383922955,91.69149020771764,tree_cover,Medium,25.690371010805457,already vegetated (tree cover) - no action needed
 +102070+29131,26.16927169984603,91.69149020756774,tree_cover,Medium,26.007561707130463,already vegetated (tree cover) - no action needed
-+102070+29134,26.17196664538919,91.69149020780424,water,Medium,25.678174797891312,excluded (never-touch land cover: water/wetland)
-+102070+29135,26.17286496041414,91.69149020796092,water,High,23.79278167437949,excluded (never-touch land cover: water/wetland)
++102070+29134,26.17196664538919,91.69149020780424,water,Medium,25.678174797891312,never-touch land cover (water)
++102070+29135,26.17286496041414,91.69149020796092,water,High,23.79278167437949,never-touch land cover (water)
 +102071+29059,26.10459299861987,91.69238852296884,tree_cover,Medium,26.93910018694709,already vegetated (tree cover) - no action needed
 +102071+29060,26.105491314497176,91.69238852302436,tree_cover,Medium,26.547920383358942,already vegetated (tree cover) - no action needed
 +102071+29064,26.109084575473204,91.69238852288856,tree_cover,High,28.70792045940646,already vegetated (tree cover) - no action needed
@@ -1074,9 +1074,9 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102071+29131,26.169271699765996,91.69238852279452,tree_cover,Low,25.068465430493134,already vegetated (tree cover) - no action needed
 +102071+29132,26.170170014838376,91.69238852251948,tree_cover,Low,24.76894838320534,already vegetated (tree cover) - no action needed
 +102071+29133,26.171068329760164,91.69238852265995,tree_cover,Low,24.57072351173186,already vegetated (tree cover) - no action needed
-+102071+29134,26.17196664540364,91.69238852276474,water,Medium,23.961838699260348,excluded (never-touch land cover: water/wetland)
-+102071+29135,26.17286496039924,91.6923885226075,water,High,23.185445805432845,excluded (never-touch land cover: water/wetland)
-+102072+29072,26.116271097577,91.69328683837576,cropland,Low,27.462435264525148,Low priority - no action needed
++102071+29134,26.17196664540364,91.69238852276474,water,Medium,23.961838699260348,never-touch land cover (water)
++102071+29135,26.17286496039924,91.6923885226075,water,High,23.185445805432845,never-touch land cover (water)
++102072+29072,26.116271097577,91.69328683837576,cropland,Low,27.462435264525148,low priority - no action needed
 +102072+29086,26.128847512007628,91.6932868383445,tree_cover,Medium,27.430973465717944,already vegetated (tree cover) - no action needed
 +102072+29087,26.12974582703817,91.69328683846165,tree_cover,Medium,27.994192771270967,already vegetated (tree cover) - no action needed
 +102072+29088,26.130644142004293,91.69328683854312,tree_cover,Medium,27.945511048568445,already vegetated (tree cover) - no action needed
@@ -1114,8 +1114,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102072+29131,26.16927169961432,91.69328683825869,tree_cover,Low,25.26579535924949,already vegetated (tree cover) - no action needed
 +102072+29132,26.17017001483952,91.69328683834686,tree_cover,Low,24.327080983442745,already vegetated (tree cover) - no action needed
 +102072+29133,26.171068329914306,91.69328683839916,tree_cover,Low,23.85712471541203,already vegetated (tree cover) - no action needed
-+102072+29134,26.171966645347123,91.69328683841556,water,Medium,23.152406204474293,excluded (never-touch land cover: water/wetland)
-+102072+29135,26.1728649603134,91.69328683839608,water,High,22.907624771488155,excluded (never-touch land cover: water/wetland)
++102072+29134,26.171966645347123,91.69328683841556,water,Medium,23.152406204474293,never-touch land cover (water)
++102072+29135,26.1728649603134,91.69328683839608,water,High,22.907624771488155,never-touch land cover (water)
 +102073+29074,26.11806772832248,91.69418515337873,tree_cover,Medium,27.90057140189132,already vegetated (tree cover) - no action needed
 +102073+29083,26.12615256551391,91.69418515361522,tree_cover,Medium,26.437267503369597,already vegetated (tree cover) - no action needed
 +102073+29090,26.132440772555597,91.69418515329266,tree_cover,Medium,27.65758274652721,already vegetated (tree cover) - no action needed
@@ -1152,8 +1152,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102073+29131,26.16927169957281,91.69418515363915,tree_cover,Medium,25.4514027934348,already vegetated (tree cover) - no action needed
 +102073+29132,26.170170014951356,91.6941851536383,tree_cover,Low,24.12075616118204,already vegetated (tree cover) - no action needed
 +102073+29133,26.171068329815323,91.69418515360196,tree_cover,Low,23.74458387255233,already vegetated (tree cover) - no action needed
-+102073+29134,26.171966645401152,91.69418515352976,water,Medium,23.076848570847854,excluded (never-touch land cover: water/wetland)
-+102073+29135,26.17286496033877,91.69418515364782,water,High,22.864125592990064,excluded (never-touch land cover: water/wetland)
++102073+29134,26.171966645401152,91.69418515352976,water,Medium,23.076848570847854,never-touch land cover (water)
++102073+29135,26.17286496033877,91.69418515364782,water,High,22.864125592990064,never-touch land cover (water)
 +102074+29057,26.102796368133667,91.69508346905816,tree_cover,Medium,25.565398831102367,already vegetated (tree cover) - no action needed
 +102074+29063,26.10818625997214,91.69508346898311,tree_cover,Medium,27.38319902085896,already vegetated (tree cover) - no action needed
 +102074+29064,26.109084575478605,91.69508346903557,tree_cover,Medium,26.916467435104767,already vegetated (tree cover) - no action needed
@@ -1190,8 +1190,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102074+29131,26.16927169964164,91.6950834690082,tree_cover,Low,25.602161740786823,already vegetated (tree cover) - no action needed
 +102074+29132,26.170170014991708,91.69508346914462,tree_cover,Low,23.96425947322977,already vegetated (tree cover) - no action needed
 +102074+29133,26.171068329644893,91.69508346901948,tree_cover,Low,23.231610943935078,already vegetated (tree cover) - no action needed
-+102074+29134,26.171966645384227,91.69508346885908,water,Medium,23.07291183359684,excluded (never-touch land cover: water/wetland)
-+102074+29135,26.17286496047519,91.69508346888938,water,High,22.79473905030172,excluded (never-touch land cover: water/wetland)
++102074+29134,26.171966645384227,91.69508346885908,water,Medium,23.07291183359684,never-touch land cover (water)
++102074+29135,26.17286496047519,91.69508346888938,water,High,22.79473905030172,never-touch land cover (water)
 +102075+29057,26.10279636804489,91.69598178412176,tree_cover,Medium,25.274208643290866,already vegetated (tree cover) - no action needed
 +102075+29066,26.11088120612557,91.69598178428964,tree_cover,Medium,26.977074037639685,already vegetated (tree cover) - no action needed
 +102075+29079,26.12255930497357,91.69598178404618,tree_cover,Medium,29.261451135453918,already vegetated (tree cover) - no action needed
@@ -1234,7 +1234,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102075+29132,26.170170014960423,91.69598178393667,tree_cover,Low,24.04316274637224,already vegetated (tree cover) - no action needed
 +102075+29133,26.1710683297673,91.69598178417496,tree_cover,Low,23.08554011680869,already vegetated (tree cover) - no action needed
 +102075+29134,26.171966645296195,91.69598178437803,tree_cover,Low,23.125879989796974,already vegetated (tree cover) - no action needed
-+102075+29135,26.17286496054068,91.69598178431974,water,High,22.716812694163487,excluded (never-touch land cover: water/wetland)
++102075+29135,26.17286496054068,91.69598178431974,water,High,22.716812694163487,never-touch land cover (water)
 +102076+29057,26.10279636805351,91.69688009962704,tree_cover,Medium,25.11845152937241,already vegetated (tree cover) - no action needed
 +102076+29081,26.12435593531215,91.69688009921968,tree_cover,Medium,27.20640649008371,already vegetated (tree cover) - no action needed
 +102076+29082,26.12525425105074,91.69688009911596,tree_cover,Medium,26.48179220897489,already vegetated (tree cover) - no action needed
@@ -1273,7 +1273,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102076+29132,26.170170014857675,91.69688009939638,tree_cover,Low,24.350803327698777,already vegetated (tree cover) - no action needed
 +102076+29133,26.1710683300004,91.69688009931993,tree_cover,Low,23.535808755889143,already vegetated (tree cover) - no action needed
 +102076+29134,26.17196664513687,91.69688009920844,tree_cover,Low,23.3376422584348,already vegetated (tree cover) - no action needed
-+102076+29135,26.17286496053523,91.69688009906216,water,High,22.701294055809544,excluded (never-touch land cover: water/wetland)
++102076+29135,26.17286496053523,91.69688009906216,water,High,22.701294055809544,never-touch land cover (water)
 +102077+29056,26.101898053291237,91.69777841461516,tree_cover,Low,24.0872786571804,already vegetated (tree cover) - no action needed
 +102077+29057,26.102796367977103,91.69777841437208,tree_cover,Low,24.94584404607544,already vegetated (tree cover) - no action needed
 +102077+29067,26.11177952122679,91.69777841478518,tree_cover,Low,26.587240144507717,already vegetated (tree cover) - no action needed
@@ -1308,7 +1308,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102077+29111,26.15130539400512,91.69777841427832,tree_cover,Medium,28.07643947424233,already vegetated (tree cover) - no action needed
 +102077+29112,26.15220370867475,91.69777841439075,tree_cover,Medium,28.157595370551697,already vegetated (tree cover) - no action needed
 +102077+29114,26.15400033978253,91.69777841451167,tree_cover,Medium,27.536098727328945,already vegetated (tree cover) - no action needed
-+102077+29115,26.154898654771053,91.6977784145202,water,Medium,26.812153975918307,excluded (never-touch land cover: water/wetland)
++102077+29115,26.154898654771053,91.6977784145202,water,Medium,26.812153975918307,never-touch land cover (water)
 +102077+29116,26.155796970023875,91.69777841449412,tree_cover,High,27.10290241299494,already vegetated (tree cover) - no action needed
 +102077+29117,26.15669528557906,91.69777841465898,tree_cover,Medium,28.797743733596395,already vegetated (tree cover) - no action needed
 +102077+29121,26.160288547363912,91.69777841474576,tree_cover,Medium,28.436638394039825,already vegetated (tree cover) - no action needed
@@ -1322,8 +1322,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102077+29131,26.16927169978254,91.69777841445122,tree_cover,Medium,26.564627467860795,already vegetated (tree cover) - no action needed
 +102077+29132,26.17017001468361,91.69777841454685,tree_cover,Low,24.602944078757005,already vegetated (tree cover) - no action needed
 +102077+29133,26.17106832998005,91.69777841438196,tree_cover,Low,23.92158076749653,already vegetated (tree cover) - no action needed
-+102077+29134,26.171966645088588,91.69777841440823,water,Medium,23.349333976780315,excluded (never-touch land cover: water/wetland)
-+102077+29135,26.17286496064082,91.69777841462566,water,High,22.753342196993984,excluded (never-touch land cover: water/wetland)
++102077+29134,26.171966645088588,91.69777841440823,water,Medium,23.349333976780315,never-touch land cover (water)
++102077+29135,26.17286496064082,91.69777841462566,water,High,22.753342196993984,never-touch land cover (water)
 +102078+29056,26.101898053157736,91.69867672992989,tree_cover,Low,24.407448168292007,already vegetated (tree cover) - no action needed
 +102078+29057,26.102796367997755,91.69867673003304,tree_cover,Low,25.19085963023396,already vegetated (tree cover) - no action needed
 +102078+29058,26.103694684313503,91.69867673010184,tree_cover,Medium,26.099801730537724,already vegetated (tree cover) - no action needed
@@ -1376,8 +1376,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102078+29130,26.16837338386993,91.69867673011356,tree_cover,Medium,26.928272373942047,already vegetated (tree cover) - no action needed
 +102078+29132,26.17017001462008,91.6986767301621,tree_cover,Low,24.7491694567179,already vegetated (tree cover) - no action needed
 +102078+29133,26.17106832988858,91.69867673013454,tree_cover,Low,23.88825328233242,already vegetated (tree cover) - no action needed
-+102078+29134,26.171966645332997,91.69867673029816,water,Medium,23.274422578332143,excluded (never-touch land cover: water/wetland)
-+102078+29135,26.17286496049349,91.69867673020124,water,High,22.829163330782052,excluded (never-touch land cover: water/wetland)
++102078+29134,26.171966645332997,91.69867673029816,water,Medium,23.274422578332143,never-touch land cover (water)
++102078+29135,26.17286496049349,91.69867673020124,water,High,22.829163330782052,never-touch land cover (water)
 +102079+29056,26.101898053121115,91.69957504516294,tree_cover,Low,24.43435112782612,already vegetated (tree cover) - no action needed
 +102079+29057,26.102796368115783,91.69957504516076,tree_cover,Low,25.166036851046048,already vegetated (tree cover) - no action needed
 +102079+29058,26.103694684221864,91.69957504512465,tree_cover,Medium,26.603603863159023,already vegetated (tree cover) - no action needed
@@ -1427,8 +1427,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102079+29131,26.169271699821312,91.69957504532525,tree_cover,Low,25.46148347560872,already vegetated (tree cover) - no action needed
 +102079+29132,26.170170014667043,91.6995750452432,tree_cover,Low,24.44403673551255,already vegetated (tree cover) - no action needed
 +102079+29133,26.171068329907808,91.69957504535292,tree_cover,Low,24.04135929876572,already vegetated (tree cover) - no action needed
-+102079+29134,26.171966645324297,91.6995750452024,water,Medium,22.994035890630453,excluded (never-touch land cover: water/wetland)
-+102079+29135,26.17286496045705,91.69957504524326,water,High,22.849618049915883,excluded (never-touch land cover: water/wetland)
++102079+29134,26.171966645324297,91.6995750452024,water,Medium,22.994035890630453,never-touch land cover (water)
++102079+29135,26.17286496045705,91.69957504524326,water,High,22.849618049915883,never-touch land cover (water)
 +102080+29056,26.10189805318171,91.70047336086122,tree_cover,Low,24.251907711697648,already vegetated (tree cover) - no action needed
 +102080+29057,26.10279636796688,91.7004733607539,tree_cover,Medium,25.256117079116635,already vegetated (tree cover) - no action needed
 +102080+29059,26.104592998736187,91.70047336066318,tree_cover,Medium,27.492219600377094,already vegetated (tree cover) - no action needed
@@ -1476,7 +1476,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102080+29131,26.16927169982421,91.7004733605088,tree_cover,Low,23.724601094278487,already vegetated (tree cover) - no action needed
 +102080+29132,26.170170014642377,91.70047336056386,tree_cover,Low,23.1964861340084,already vegetated (tree cover) - no action needed
 +102080+29133,26.17106833003772,91.70047336058477,tree_cover,Low,23.12579852067042,already vegetated (tree cover) - no action needed
-+102080+29134,26.171966645062668,91.70047336057176,water,High,22.817126698767243,excluded (never-touch land cover: water/wetland)
++102080+29134,26.171966645062668,91.70047336057176,water,High,22.817126698767243,never-touch land cover (water)
 +102081+29056,26.101898053339355,91.70137167557488,tree_cover,Low,24.13593784993802,already vegetated (tree cover) - no action needed
 +102081+29057,26.10279636791503,91.7013716758134,tree_cover,Medium,25.02775837524443,already vegetated (tree cover) - no action needed
 +102081+29066,26.11088120632321,91.70137167577182,tree_cover,Medium,27.302561078697632,already vegetated (tree cover) - no action needed
@@ -1525,8 +1525,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102081+29130,26.168373383779542,91.7013716758363,tree_cover,Low,24.393541422604763,already vegetated (tree cover) - no action needed
 +102081+29131,26.16927169993746,91.70137167561047,tree_cover,Low,23.366974950562035,already vegetated (tree cover) - no action needed
 +102081+29132,26.170170014728228,91.7013716758026,tree_cover,Low,23.16826658376049,already vegetated (tree cover) - no action needed
-+102081+29133,26.171068329914185,91.70137167573488,water,Medium,22.96932624336593,excluded (never-touch land cover: water/wetland)
-+102081+29134,26.1719666450939,91.7013716756333,water,High,22.86224010124731,excluded (never-touch land cover: water/wetland)
++102081+29133,26.171068329914185,91.70137167573488,water,Medium,22.96932624336593,never-touch land cover (water)
++102081+29134,26.1719666450939,91.7013716756333,water,High,22.86224010124731,never-touch land cover (water)
 +102082+29057,26.10279636796057,91.70226999133943,tree_cover,Low,25.279684824267807,already vegetated (tree cover) - no action needed
 +102082+29058,26.10369468416751,91.70226999143956,tree_cover,Low,25.571140748295004,already vegetated (tree cover) - no action needed
 +102082+29060,26.105491314191752,91.70226999131349,tree_cover,Low,26.233116356746883,already vegetated (tree cover) - no action needed
@@ -1577,7 +1577,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102082+29131,26.169271699797065,91.70226999162976,tree_cover,Low,23.780901247021763,already vegetated (tree cover) - no action needed
 +102082+29132,26.17017001492459,91.70226999150712,tree_cover,Low,23.314321536600435,already vegetated (tree cover) - no action needed
 +102082+29133,26.17106832971936,91.70226999157674,tree_cover,Low,23.05826857705023,already vegetated (tree cover) - no action needed
-+102082+29134,26.171966645235987,91.70226999161288,water,High,22.36226628777176,excluded (never-touch land cover: water/wetland)
++102082+29134,26.171966645235987,91.70226999161288,water,High,22.36226628777176,never-touch land cover (water)
 +102083+29057,26.10279636792141,91.70316830610598,tree_cover,Medium,25.969121561067432,already vegetated (tree cover) - no action needed
 +102083+29058,26.10369468428339,91.70316830610098,tree_cover,Medium,25.79350047492669,already vegetated (tree cover) - no action needed
 +102083+29059,26.1045929987106,91.70316830606276,tree_cover,Medium,26.65498254151925,already vegetated (tree cover) - no action needed
@@ -1628,7 +1628,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102083+29131,26.169271699767176,91.70316830621177,tree_cover,Low,23.54267456312184,already vegetated (tree cover) - no action needed
 +102083+29132,26.17017001486749,91.7031683062264,tree_cover,Low,22.80733906717181,already vegetated (tree cover) - no action needed
 +102083+29133,26.171068329817214,91.7031683062074,tree_cover,Low,22.50199017886525,already vegetated (tree cover) - no action needed
-+102083+29134,26.171966645124986,91.70316830615492,water,Medium,21.837389932273407,excluded (never-touch land cover: water/wetland)
++102083+29134,26.171966645124986,91.70316830615492,water,Medium,21.837389932273407,never-touch land cover (water)
 +102084+29057,26.102796368161407,91.70406662201654,tree_cover,High,27.61708818807297,already vegetated (tree cover) - no action needed
 +102084+29058,26.10369468413249,91.70406662213202,tree_cover,High,27.502537327388268,already vegetated (tree cover) - no action needed
 +102084+29060,26.1054913144139,91.70406662203858,tree_cover,Medium,26.597393358596392,already vegetated (tree cover) - no action needed
@@ -1676,7 +1676,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102084+29131,26.169271699847457,91.70406662171206,tree_cover,Low,23.0585779614721,already vegetated (tree cover) - no action needed
 +102084+29132,26.170170014739096,91.70406662163768,tree_cover,Low,21.982575853631296,already vegetated (tree cover) - no action needed
 +102084+29133,26.171068330025747,91.70406662175618,tree_cover,Low,22.06618725837292,already vegetated (tree cover) - no action needed
-+102084+29134,26.171966645124684,91.7040666220672,water,Medium,21.09516094058014,excluded (never-touch land cover: water/wetland)
++102084+29134,26.171966645124684,91.7040666220672,water,Medium,21.09516094058014,never-touch land cover (water)
 +102085+29058,26.103694684078835,91.70496493670386,tree_cover,High,27.91328234382847,already vegetated (tree cover) - no action needed
 +102085+29059,26.104592998635407,91.7049649366814,tree_cover,High,27.659170024152203,already vegetated (tree cover) - no action needed
 +102085+29060,26.10549131448944,91.70496493662638,tree_cover,Medium,26.985838131820103,already vegetated (tree cover) - no action needed
@@ -1733,7 +1733,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102085+29131,26.169271699855923,91.70496493688158,tree_cover,Low,22.86512452328263,already vegetated (tree cover) - no action needed
 +102085+29132,26.170170014721048,91.70496493694408,tree_cover,Low,21.77091925353559,already vegetated (tree cover) - no action needed
 +102085+29133,26.17106832998102,91.7049649367476,tree_cover,Low,21.996597956903788,already vegetated (tree cover) - no action needed
-+102085+29134,26.171966645235248,91.70496493651834,water,Medium,21.21322641760872,excluded (never-touch land cover: water/wetland)
++102085+29134,26.171966645235248,91.70496493651834,water,Medium,21.21322641760872,never-touch land cover (water)
 +102086+29058,26.10369468412275,91.70586325224188,tree_cover,High,28.03085688662624,already vegetated (tree cover) - no action needed
 +102086+29059,26.1045929986528,91.70586325234036,tree_cover,Medium,27.494304121638887,already vegetated (tree cover) - no action needed
 +102086+29060,26.105491314480822,91.70586325240625,tree_cover,Medium,27.200881547632704,already vegetated (tree cover) - no action needed
@@ -1786,7 +1786,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102086+29131,26.169271699792905,91.70586325233964,tree_cover,Low,22.756721436686018,already vegetated (tree cover) - no action needed
 +102086+29132,26.170170014813337,91.70586325231348,tree_cover,Low,21.88960547094275,already vegetated (tree cover) - no action needed
 +102086+29133,26.17106832986499,91.70586325248048,tree_cover,Low,21.91604022757683,already vegetated (tree cover) - no action needed
-+102086+29134,26.171966645274534,91.70586325261448,water,Medium,21.32720273379625,excluded (never-touch land cover: water/wetland)
++102086+29134,26.171966645274534,91.70586325261448,water,Medium,21.32720273379625,never-touch land cover (water)
 +102087+29059,26.104592998767767,91.70676156744344,tree_cover,Medium,27.61084336011243,already vegetated (tree cover) - no action needed
 +102087+29062,26.107287945679595,91.70676156745628,tree_cover,Medium,29.55460552669328,already vegetated (tree cover) - no action needed
 +102087+29067,26.11177952129416,91.70676156735811,tree_cover,Medium,27.201119042737457,already vegetated (tree cover) - no action needed
@@ -1843,7 +1843,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102087+29131,26.16927169965824,91.70676156746748,tree_cover,Low,22.59320797012331,already vegetated (tree cover) - no action needed
 +102087+29132,26.17017001483416,91.70676156735227,tree_cover,Low,22.07741755453214,already vegetated (tree cover) - no action needed
 +102087+29133,26.17106832985966,91.70676156720452,tree_cover,Low,22.004549521312857,already vegetated (tree cover) - no action needed
-+102087+29134,26.17196664542468,91.70676156725033,water,Medium,21.629332614389472,excluded (never-touch land cover: water/wetland)
++102087+29134,26.17196664542468,91.70676156725033,water,Medium,21.629332614389472,never-touch land cover (water)
 +102088+29067,26.11177952129909,91.70765988299976,tree_cover,Medium,27.436805827071154,already vegetated (tree cover) - no action needed
 +102088+29068,26.11267783633384,91.7076598828255,tree_cover,Medium,27.72024979386959,already vegetated (tree cover) - no action needed
 +102088+29069,26.113576151983786,91.70765988284472,tree_cover,Medium,28.49678531389124,already vegetated (tree cover) - no action needed
@@ -1898,7 +1898,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102088+29131,26.16927169963374,91.70765988306152,tree_cover,Low,22.15418503217393,already vegetated (tree cover) - no action needed
 +102088+29132,26.17017001478368,91.70765988308364,tree_cover,Low,22.18281688265692,already vegetated (tree cover) - no action needed
 +102088+29133,26.171068329782862,91.7076598830734,tree_cover,Low,22.14072387101466,already vegetated (tree cover) - no action needed
-+102088+29134,26.17196664550389,91.7076598830306,water,Medium,21.40313298751751,excluded (never-touch land cover: water/wetland)
++102088+29134,26.17196664550389,91.7076598830306,water,Medium,21.40313298751751,never-touch land cover (water)
 +102089+29059,26.104592998562627,91.70855819805152,tree_cover,Medium,27.242911243712904,already vegetated (tree cover) - no action needed
 +102089+29060,26.10549131449458,91.70855819825498,tree_cover,Medium,27.10209909881288,already vegetated (tree cover) - no action needed
 +102089+29061,26.10638962921848,91.70855819820092,tree_cover,Medium,27.83133199499304,already vegetated (tree cover) - no action needed
@@ -1958,7 +1958,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102089+29131,26.169271699719747,91.70855819812442,tree_cover,Low,21.4168637932415,already vegetated (tree cover) - no action needed
 +102089+29132,26.17017001466156,91.70855819805747,tree_cover,Low,21.45779163280029,already vegetated (tree cover) - no action needed
 +102089+29133,26.171068329816755,91.7085581979582,tree_cover,Low,21.873939148128517,already vegetated (tree cover) - no action needed
-+102089+29134,26.171966645511976,91.70855819805313,water,Medium,21.30612947238624,excluded (never-touch land cover: water/wetland)
++102089+29134,26.171966645511976,91.70855819805313,water,Medium,21.30612947238624,never-touch land cover (water)
 +102090+29060,26.105491314512825,91.7094565134312,tree_cover,Medium,27.02399745197681,already vegetated (tree cover) - no action needed
 +102090+29061,26.106389629028826,91.7094565132727,tree_cover,Medium,27.35559767394903,already vegetated (tree cover) - no action needed
 +102090+29062,26.107287945285485,91.7094565133081,tree_cover,Medium,27.563901354111707,already vegetated (tree cover) - no action needed
@@ -2083,7 +2083,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102091+29131,26.16927169985812,91.71035482865304,tree_cover,Low,21.63655005222828,already vegetated (tree cover) - no action needed
 +102091+29132,26.170170014748862,91.71035482840844,tree_cover,Low,21.711133697991656,already vegetated (tree cover) - no action needed
 +102091+29133,26.17106832985281,91.71035482858396,tree_cover,Low,21.585457702855663,already vegetated (tree cover) - no action needed
-+102091+29134,26.17196664531431,91.71035482872765,water,Medium,21.262521055017537,excluded (never-touch land cover: water/wetland)
++102091+29134,26.17196664531431,91.71035482872765,water,Medium,21.262521055017537,never-touch land cover (water)
 +102092+29062,26.107287945331336,91.71125314422788,tree_cover,Medium,27.23185272786296,already vegetated (tree cover) - no action needed
 +102092+29063,26.108186260161155,91.71125314402376,tree_cover,Medium,27.01888033673188,already vegetated (tree cover) - no action needed
 +102092+29070,26.11447446744332,91.71125314420335,tree_cover,Medium,28.154643986662027,already vegetated (tree cover) - no action needed
@@ -2139,7 +2139,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102092+29131,26.16927169972884,91.7112531438946,tree_cover,Low,21.851482138734607,already vegetated (tree cover) - no action needed
 +102092+29132,26.170170014776307,91.7112531440128,tree_cover,Low,21.969627596651566,already vegetated (tree cover) - no action needed
 +102092+29133,26.17106833003663,91.71125314409952,tree_cover,Low,21.80117196082055,already vegetated (tree cover) - no action needed
-+102092+29134,26.171966645290876,91.71125314415497,water,Medium,21.064885542353597,excluded (never-touch land cover: water/wetland)
++102092+29134,26.171966645290876,91.71125314415497,water,Medium,21.064885542353597,never-touch land cover (water)
 +102093+29076,26.11986435911749,91.71215145913902,tree_cover,Medium,28.53597281012572,already vegetated (tree cover) - no action needed
 +102093+29077,26.12076267378743,91.712151459074,tree_cover,Medium,28.036691100986243,already vegetated (tree cover) - no action needed
 +102093+29078,26.12166098929128,91.7121514589777,tree_cover,Medium,27.65839438496159,already vegetated (tree cover) - no action needed
@@ -2190,7 +2190,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102093+29131,26.16927169989205,91.71215145928105,tree_cover,Low,21.855687121279924,already vegetated (tree cover) - no action needed
 +102093+29132,26.1701700147321,91.7121514593106,tree_cover,Low,22.417125659249315,already vegetated (tree cover) - no action needed
 +102093+29133,26.17106832996717,91.71215145908278,tree_cover,Low,22.31761103331006,already vegetated (tree cover) - no action needed
-+102093+29134,26.171966645196324,91.71215145882368,water,Medium,21.13895036564536,excluded (never-touch land cover: water/wetland)
++102093+29134,26.171966645196324,91.71215145882368,water,Medium,21.13895036564536,never-touch land cover (water)
 +102094+29067,26.111779521222285,91.71304977423344,tree_cover,Medium,27.471579774875654,already vegetated (tree cover) - no action needed
 +102094+29068,26.11267783646878,91.71304977434468,tree_cover,Medium,28.662644574203995,already vegetated (tree cover) - no action needed
 +102094+29069,26.113576151966853,91.71304977465095,tree_cover,High,29.26173404909576,already vegetated (tree cover) - no action needed
@@ -2244,7 +2244,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102094+29131,26.16927169998345,91.7130497744599,tree_cover,Low,22.30193823477176,already vegetated (tree cover) - no action needed
 +102094+29132,26.170170014616435,91.7130497744002,tree_cover,Low,23.301277523734328,already vegetated (tree cover) - no action needed
 +102094+29133,26.1710683300084,91.71304977453562,tree_cover,Low,23.04355845820085,already vegetated (tree cover) - no action needed
-+102094+29134,26.17196664503049,91.71304977464,water,High,21.787152386705525,excluded (never-touch land cover: water/wetland)
++102094+29134,26.17196664503049,91.71304977464,water,High,21.787152386705525,never-touch land cover (water)
 +102095+29074,26.118067728362792,91.71394808972371,tree_cover,Medium,28.05179272633432,already vegetated (tree cover) - no action needed
 +102095+29075,26.11896604324493,91.71394808974358,tree_cover,Medium,27.757892899423915,already vegetated (tree cover) - no action needed
 +102095+29076,26.119864359238484,91.71394808995848,tree_cover,Medium,28.38590991704261,already vegetated (tree cover) - no action needed
@@ -2299,8 +2299,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102095+29130,26.168373384027817,91.71394809015264,tree_cover,Low,22.941637178414812,already vegetated (tree cover) - no action needed
 +102095+29131,26.16927169982104,91.71394809003488,tree_cover,Low,22.85325633511967,already vegetated (tree cover) - no action needed
 +102095+29132,26.170170014611266,91.71394808988656,tree_cover,Low,24.27343095862432,already vegetated (tree cover) - no action needed
-+102095+29133,26.171068329978333,91.71394808970744,water,Medium,23.9070547792179,excluded (never-touch land cover: water/wetland)
-+102095+29134,26.171966645157333,91.7139480897232,water,Medium,23.87120415288505,excluded (never-touch land cover: water/wetland)
++102095+29133,26.171068329978333,91.71394808970744,water,Medium,23.9070547792179,never-touch land cover (water)
++102095+29134,26.171966645157333,91.7139480897232,water,Medium,23.87120415288505,never-touch land cover (water)
 +102096+29073,26.117169412962895,91.71484640528011,tree_cover,Medium,28.659764458614475,already vegetated (tree cover) - no action needed
 +102096+29074,26.118067728441336,91.71484640522895,tree_cover,Medium,28.01781970479895,already vegetated (tree cover) - no action needed
 +102096+29075,26.118966043298755,91.71484640537328,tree_cover,Medium,28.18737086272728,already vegetated (tree cover) - no action needed
@@ -2354,8 +2354,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102096+29129,26.167475068448457,91.71484640523568,tree_cover,Low,24.229731859350576,already vegetated (tree cover) - no action needed
 +102096+29130,26.168373384000468,91.71484640505948,tree_cover,Low,23.12451377956356,already vegetated (tree cover) - no action needed
 +102096+29131,26.169271699769137,91.71484640507884,tree_cover,Low,23.59859104041699,already vegetated (tree cover) - no action needed
-+102096+29133,26.17106832987681,91.714846405477,water,Medium,24.70783576094973,excluded (never-touch land cover: water/wetland)
-+102096+29134,26.171966645213065,91.71484640540436,water,Medium,25.32113324157811,excluded (never-touch land cover: water/wetland)
++102096+29133,26.17106832987681,91.714846405477,water,Medium,24.70783576094973,never-touch land cover (water)
++102096+29134,26.171966645213065,91.71484640540436,water,Medium,25.32113324157811,never-touch land cover (water)
 +102097+29077,26.12076267378699,91.71574472036365,tree_cover,Medium,28.229789930156983,already vegetated (tree cover) - no action needed
 +102097+29080,26.123457619946947,91.71574472013027,tree_cover,Medium,30.05582806194569,already vegetated (tree cover) - no action needed
 +102097+29081,26.124355935108145,91.71574472021798,tree_cover,Medium,28.44860887020923,already vegetated (tree cover) - no action needed
@@ -2405,8 +2405,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102097+29130,26.168373383901297,91.71574472023478,tree_cover,Low,23.162394838002108,already vegetated (tree cover) - no action needed
 +102097+29131,26.1692716998274,91.71574472016466,tree_cover,Low,24.30459763960872,already vegetated (tree cover) - no action needed
 +102097+29132,26.170170014932157,91.71574472029027,tree_cover,Medium,25.809413568242697,already vegetated (tree cover) - no action needed
-+102097+29133,26.171068329885976,91.71574472038576,water,High,26.14652234552302,excluded (never-touch land cover: water/wetland)
-+102097+29134,26.17196664519768,91.71574472045069,water,High,27.35065159211867,excluded (never-touch land cover: water/wetland)
++102097+29133,26.171068329885976,91.71574472038576,water,High,26.14652234552302,never-touch land cover (water)
++102097+29134,26.17196664519768,91.71574472045069,water,High,27.35065159211867,never-touch land cover (water)
 +102098+29080,26.123457620080355,91.71664303594608,tree_cover,Medium,30.00097935757798,already vegetated (tree cover) - no action needed
 +102098+29081,26.124355935035467,91.7166430359337,tree_cover,Medium,28.71189343027936,already vegetated (tree cover) - no action needed
 +102098+29082,26.125254251109904,91.71664303566558,tree_cover,Low,26.19720336611035,already vegetated (tree cover) - no action needed
@@ -2453,8 +2453,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102098+29130,26.168373383912275,91.71664303583162,tree_cover,Low,22.353026446543318,already vegetated (tree cover) - no action needed
 +102098+29131,26.169271699813844,91.71664303589856,tree_cover,Low,24.017862376965205,already vegetated (tree cover) - no action needed
 +102098+29132,26.1701700148944,91.71664303570924,tree_cover,Medium,25.77878293908871,already vegetated (tree cover) - no action needed
-+102098+29133,26.17106833000583,91.71664303571568,water,High,26.953891412465108,excluded (never-touch land cover: water/wetland)
-+102098+29134,26.171966645111187,91.71664303569216,water,High,27.7334935360792,excluded (never-touch land cover: water/wetland)
++102098+29133,26.17106833000583,91.71664303571568,water,High,26.953891412465108,never-touch land cover (water)
++102098+29134,26.171966645111187,91.71664303569216,water,High,27.7334935360792,never-touch land cover (water)
 +102099+29081,26.124355935063925,91.71754135066772,tree_cover,Medium,28.83497855028284,already vegetated (tree cover) - no action needed
 +102099+29082,26.12525425111449,91.71754135097684,tree_cover,Low,27.004490400925285,already vegetated (tree cover) - no action needed
 +102099+29083,26.12615256541861,91.71754135103065,tree_cover,Low,27.024558742469207,already vegetated (tree cover) - no action needed
@@ -2500,9 +2500,9 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102099+29129,26.16747506855401,91.71754135111613,tree_cover,Low,24.275863194923208,already vegetated (tree cover) - no action needed
 +102099+29130,26.16837338385127,91.7175413511235,tree_cover,Low,22.733123637101976,already vegetated (tree cover) - no action needed
 +102099+29131,26.169271699728807,91.71754135087524,tree_cover,Medium,24.12399759879625,already vegetated (tree cover) - no action needed
-+102099+29132,26.170170014785008,91.7175413508232,water,High,26.373540497779324,excluded (never-touch land cover: water/wetland)
-+102099+29133,26.171068330054226,91.71754135074104,water,High,27.94628320601957,excluded (never-touch land cover: water/wetland)
-+102099+29134,26.17196664513556,91.71754135085486,water,High,28.170711862830828,excluded (never-touch land cover: water/wetland)
++102099+29132,26.170170014785008,91.7175413508232,water,High,26.373540497779324,never-touch land cover (water)
++102099+29133,26.171068330054226,91.71754135074104,water,High,27.94628320601957,never-touch land cover (water)
++102099+29134,26.17196664513556,91.71754135085486,water,High,28.170711862830828,never-touch land cover (water)
 +102100+29081,26.12435593519385,91.7184396667751,tree_cover,Medium,29.132812930554422,already vegetated (tree cover) - no action needed
 +102100+29082,26.125254251038527,91.71843966653292,tree_cover,Medium,27.91716694501048,already vegetated (tree cover) - no action needed
 +102100+29083,26.12615256550085,91.71843966648689,tree_cover,Medium,27.90512009300003,already vegetated (tree cover) - no action needed
@@ -2545,8 +2545,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102100+29129,26.16747506862701,91.71843966628988,tree_cover,Low,25.465253039100443,already vegetated (tree cover) - no action needed
 +102100+29130,26.168373383900416,91.71843966643414,tree_cover,Low,23.92542072776153,already vegetated (tree cover) - no action needed
 +102100+29131,26.169271699571965,91.71843966654868,tree_cover,Medium,24.86164201863046,already vegetated (tree cover) - no action needed
-+102100+29132,26.170170014968104,91.71843966663332,water,High,27.724486793514664,excluded (never-touch land cover: water/wetland)
-+102100+29133,26.171068329849344,91.71843966668844,water,High,29.31251342520922,excluded (never-touch land cover: water/wetland)
++102100+29132,26.170170014968104,91.71843966663332,water,High,27.724486793514664,never-touch land cover (water)
++102100+29133,26.171068329849344,91.71843966668844,water,High,29.31251342520922,never-touch land cover (water)
 +102101+29082,26.12525425088234,91.71933798135828,tree_cover,Medium,29.80214335125349,already vegetated (tree cover) - no action needed
 +102101+29090,26.132440772705184,91.71933798163154,tree_cover,Medium,28.353986517259106,already vegetated (tree cover) - no action needed
 +102101+29091,26.133339088172196,91.7193379814772,tree_cover,Medium,28.061493990841495,already vegetated (tree cover) - no action needed
@@ -2583,8 +2583,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102101+29122,26.161186861595937,91.71933798133196,tree_cover,Low,24.45577728997101,already vegetated (tree cover) - no action needed
 +102101+29129,26.16747506844618,91.71933798141048,tree_cover,Medium,26.79964609930868,already vegetated (tree cover) - no action needed
 +102101+29131,26.16927169970726,91.71933798149072,tree_cover,Medium,26.3880256368238,already vegetated (tree cover) - no action needed
-+102101+29132,26.17017001489758,91.7193379814865,water,High,26.68223639624305,excluded (never-touch land cover: water/wetland)
-+102101+29133,26.171068329937142,91.7193379814528,water,High,28.7425535709253,excluded (never-touch land cover: water/wetland)
++102101+29132,26.17017001489758,91.7193379814865,water,High,26.68223639624305,never-touch land cover (water)
++102101+29133,26.171068329937142,91.7193379814528,water,High,28.7425535709253,never-touch land cover (water)
 +102102+29089,26.13154245759052,91.72023629673748,tree_cover,Medium,28.277773048984805,already vegetated (tree cover) - no action needed
 +102102+29090,26.132440772644213,91.7202362967402,tree_cover,Medium,28.397900436225576,already vegetated (tree cover) - no action needed
 +102102+29091,26.13333908808756,91.72023629671384,tree_cover,Medium,28.544457591267467,already vegetated (tree cover) - no action needed
@@ -2679,7 +2679,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102104+29123,26.16208517718551,91.72203292724592,tree_cover,Low,23.87328751040505,already vegetated (tree cover) - no action needed
 +102104+29124,26.16298349246667,91.72203292720556,tree_cover,Medium,25.476946949479768,already vegetated (tree cover) - no action needed
 +102104+29132,26.170170014984954,91.72203292719996,tree_cover,Medium,26.712026517133403,already vegetated (tree cover) - no action needed
-+102104+29133,26.17106832977226,91.72203292735205,water,High,26.918172268055173,excluded (never-touch land cover: water/wetland)
++102104+29133,26.17106832977226,91.72203292735205,water,High,26.918172268055173,never-touch land cover (water)
 +102105+29098,26.13962729485812,91.72293124269856,tree_cover,Medium,28.182566692044983,already vegetated (tree cover) - no action needed
 +102105+29100,26.141423925813207,91.722931242478,tree_cover,Medium,27.681343095359654,already vegetated (tree cover) - no action needed
 +102105+29101,26.14232224093294,91.72293124232496,tree_cover,Medium,27.72199407394492,already vegetated (tree cover) - no action needed
@@ -2706,7 +2706,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102105+29123,26.16208517721888,91.7229312423632,tree_cover,Low,23.47588480343227,already vegetated (tree cover) - no action needed
 +102105+29124,26.16298349265891,91.72293124268364,tree_cover,Low,24.37150987295043,already vegetated (tree cover) - no action needed
 +102105+29132,26.17017001481037,91.7229312426383,tree_cover,Medium,26.583852557297508,already vegetated (tree cover) - no action needed
-+102105+29133,26.17106832993851,91.72293124247584,water,Medium,26.77491199857543,excluded (never-touch land cover: water/wetland)
++102105+29133,26.17106832993851,91.72293124247584,water,Medium,26.77491199857543,never-touch land cover (water)
 +102106+29101,26.14232224066856,91.72382955828608,tree_cover,Medium,27.85394267397829,already vegetated (tree cover) - no action needed
 +102106+29102,26.14322055615103,91.72382955823484,tree_cover,Medium,28.62133686625525,already vegetated (tree cover) - no action needed
 +102106+29103,26.144118872025743,91.72382955815546,tree_cover,Medium,27.635547958598337,already vegetated (tree cover) - no action needed
@@ -2733,7 +2733,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102106+29124,26.16298349277808,91.72382955785902,tree_cover,Low,23.278922743347294,already vegetated (tree cover) - no action needed
 +102106+29125,26.163881807646973,91.72382955806049,tree_cover,Low,23.585867292043485,already vegetated (tree cover) - no action needed
 +102106+29133,26.171068330033304,91.72382955820022,tree_cover,Medium,27.610051054874504,already vegetated (tree cover) - no action needed
-+102106+29134,26.17196664513242,91.72382955814648,water,High,27.68677154241628,excluded (never-touch land cover: water/wetland)
++102106+29134,26.17196664513242,91.72382955814648,water,High,27.68677154241628,never-touch land cover (water)
 +102107+29101,26.14232224069122,91.72472787311406,tree_cover,Medium,27.775759107179145,already vegetated (tree cover) - no action needed
 +102107+29102,26.14322055615092,91.72472787319327,tree_cover,Medium,28.14295540849165,already vegetated (tree cover) - no action needed
 +102107+29103,26.144118872003038,91.72472787324432,tree_cover,Medium,27.132107023002813,already vegetated (tree cover) - no action needed
@@ -2757,7 +2757,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102107+29123,26.162085177066047,91.7247278735683,tree_cover,Low,24.79869554015714,already vegetated (tree cover) - no action needed
 +102107+29124,26.162983492642528,91.7247278734814,tree_cover,Low,23.256755588969995,already vegetated (tree cover) - no action needed
 +102107+29125,26.163881807852466,91.72472787336676,tree_cover,Low,22.69601688097536,already vegetated (tree cover) - no action needed
-+102107+29126,26.164780122821277,91.724727873224,built_up,Low,23.872465825080333,Low priority - no action needed
++102107+29126,26.164780122821277,91.724727873224,built_up,Low,23.872465825080333,low priority - no action needed
 +102108+29102,26.143220556073807,91.7256261888014,tree_cover,Medium,28.13927841141761,already vegetated (tree cover) - no action needed
 +102108+29103,26.144118871903505,91.72562618853117,tree_cover,Medium,27.003050512262583,already vegetated (tree cover) - no action needed
 +102108+29104,26.145017186637087,91.72562618845906,tree_cover,Medium,27.01788938981148,already vegetated (tree cover) - no action needed
@@ -2875,7 +2875,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102116+29123,26.16208517712456,91.73281271058976,tree_cover,Medium,28.12067323586245,already vegetated (tree cover) - no action needed
 +102116+29124,26.16298349268644,91.73281271059028,tree_cover,Medium,27.564215044780045,already vegetated (tree cover) - no action needed
 +102116+29125,26.163881807699948,91.73281271079033,tree_cover,Low,25.68470047936914,already vegetated (tree cover) - no action needed
-+102116+29126,26.164780123017803,91.7328127107385,built_up,Low,25.6633525608031,Low priority - no action needed
++102116+29126,26.164780123017803,91.7328127107385,built_up,Low,25.6633525608031,low priority - no action needed
 +102116+29127,26.165678438094588,91.73281271066072,tree_cover,Medium,26.31024148842879,already vegetated (tree cover) - no action needed
 +102117+29124,26.162983492730696,91.73371102616716,tree_cover,Medium,28.08558482593925,already vegetated (tree cover) - no action needed
 +102117+29125,26.16388180772321,91.73371102605093,tree_cover,Medium,26.287425178343035,already vegetated (tree cover) - no action needed
@@ -2904,29 +2904,29 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102128+29153,26.18903463548469,91.74359249402367,tree_cover,Medium,25.26034902706356,already vegetated (tree cover) - no action needed
 +102129+29152,26.188136320742007,91.74449080935108,tree_cover,Medium,26.683140309253105,already vegetated (tree cover) - no action needed
 +102129+29153,26.189034635561345,91.7444908093029,tree_cover,Medium,25.92077159533172,already vegetated (tree cover) - no action needed
-+102129+29154,26.189932950868577,91.7444908092314,water,Medium,24.61491952399787,excluded (never-touch land cover: water/wetland)
++102129+29154,26.189932950868577,91.7444908092314,water,Medium,24.61491952399787,never-touch land cover (water)
 +102130+29136,26.173763276183895,91.74538912494606,tree_cover,Medium,27.672777919121355,already vegetated (tree cover) - no action needed
 +102130+29137,26.17466159099331,91.74538912495768,tree_cover,Medium,27.49189881278263,already vegetated (tree cover) - no action needed
 +102130+29138,26.175559906285503,91.7453891249462,tree_cover,Medium,27.680050745847296,already vegetated (tree cover) - no action needed
-+102130+29154,26.18993295085884,91.74538912478042,water,Medium,24.734903325198765,excluded (never-touch land cover: water/wetland)
-+102130+29155,26.19083126632965,91.7453891248276,water,High,22.691754611298,excluded (never-touch land cover: water/wetland)
++102130+29154,26.18993295085884,91.74538912478042,water,Medium,24.734903325198765,never-touch land cover (water)
++102130+29155,26.19083126632965,91.7453891248276,water,High,22.691754611298,never-touch land cover (water)
 +102131+29137,26.174661591048896,91.74628743996122,tree_cover,Medium,27.66298923340103,already vegetated (tree cover) - no action needed
 +102131+29138,26.17555990632275,91.74628744008795,tree_cover,Medium,28.202033210879907,already vegetated (tree cover) - no action needed
 +102131+29153,26.18903463514776,91.74628743991892,tree_cover,Medium,26.06326030408172,already vegetated (tree cover) - no action needed
 +102131+29154,26.1899329511451,91.74628744013116,tree_cover,Medium,24.7880416768401,already vegetated (tree cover) - no action needed
-+102131+29155,26.190831266233523,91.74628744032012,water,High,22.427827481395948,excluded (never-touch land cover: water/wetland)
-+102131+29156,26.191729581815185,91.7462874400345,water,High,21.872214623372923,excluded (never-touch land cover: water/wetland)
-+102131+29157,26.19262789675947,91.74628743995218,water,High,22.362695133967232,excluded (never-touch land cover: water/wetland)
++102131+29155,26.190831266233523,91.74628744032012,water,High,22.427827481395948,never-touch land cover (water)
++102131+29156,26.191729581815185,91.7462874400345,water,High,21.872214623372923,never-touch land cover (water)
++102131+29157,26.19262789675947,91.74628743995218,water,High,22.362695133967232,never-touch land cover (water)
 +102132+29138,26.17555990647124,91.7471857551569,tree_cover,Medium,28.01159734343228,already vegetated (tree cover) - no action needed
 +102132+29139,26.176458222129984,91.74718575517306,tree_cover,Medium,28.43009713439596,already vegetated (tree cover) - no action needed
 +102132+29150,26.18633969004918,91.74718575521176,tree_cover,Medium,26.6574372528806,already vegetated (tree cover) - no action needed
 +102132+29152,26.188136320984697,91.7471857553555,tree_cover,Medium,26.506439952984085,already vegetated (tree cover) - no action needed
 +102132+29153,26.18903463520286,91.74718575550595,tree_cover,Medium,26.306028635565664,already vegetated (tree cover) - no action needed
 +102132+29154,26.18993295118188,91.7471857554078,tree_cover,Low,25.03748374011175,already vegetated (tree cover) - no action needed
-+102132+29155,26.190831266069857,91.74718575506128,water,Medium,22.748590316591766,excluded (never-touch land cover: water/wetland)
-+102132+29156,26.191729581815324,91.74718575514382,water,High,21.819947201965796,excluded (never-touch land cover: water/wetland)
-+102132+29157,26.19262789674129,91.7471857552037,water,High,22.027717228453216,excluded (never-touch land cover: water/wetland)
-+102132+29158,26.193526212071227,91.74718575524096,water,High,22.0992809063309,excluded (never-touch land cover: water/wetland)
++102132+29155,26.190831266069857,91.74718575506128,water,Medium,22.748590316591766,never-touch land cover (water)
++102132+29156,26.191729581815324,91.74718575514382,water,High,21.819947201965796,never-touch land cover (water)
++102132+29157,26.19262789674129,91.7471857552037,water,High,22.027717228453216,never-touch land cover (water)
++102132+29158,26.193526212071227,91.74718575524096,water,High,22.0992809063309,never-touch land cover (water)
 +102133+29139,26.17645822218992,91.74808407063392,tree_cover,Medium,27.31051606614019,already vegetated (tree cover) - no action needed
 +102133+29148,26.184543059618544,91.7480840707904,tree_cover,Medium,27.42295617211299,already vegetated (tree cover) - no action needed
 +102133+29150,26.18633968972708,91.74808407062837,tree_cover,Medium,26.741881721433074,already vegetated (tree cover) - no action needed
@@ -2935,9 +2935,9 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102133+29153,26.189034635190065,91.74808407044264,tree_cover,Medium,26.77658213263601,already vegetated (tree cover) - no action needed
 +102133+29154,26.189932951151103,91.74808407048668,tree_cover,Low,25.69349525746864,already vegetated (tree cover) - no action needed
 +102133+29155,26.190831266020776,91.74808407073408,tree_cover,Low,23.672657135750008,already vegetated (tree cover) - no action needed
-+102133+29156,26.19172958192988,91.74808407073284,water,High,22.12634089529292,excluded (never-touch land cover: water/wetland)
-+102133+29157,26.192627896655747,91.74808407070896,water,High,21.959903104811733,excluded (never-touch land cover: water/wetland)
-+102133+29158,26.19352621214949,91.74808407066269,water,High,22.606509204239163,excluded (never-touch land cover: water/wetland)
++102133+29156,26.19172958192988,91.74808407073284,water,High,22.12634089529292,never-touch land cover (water)
++102133+29157,26.192627896655747,91.74808407070896,water,High,21.959903104811733,never-touch land cover (water)
++102133+29158,26.19352621214949,91.74808407066269,water,High,22.606509204239163,never-touch land cover (water)
 +102134+29139,26.17645822217947,91.7489823857958,tree_cover,Medium,26.97596294245114,already vegetated (tree cover) - no action needed
 +102134+29140,26.1773565367074,91.74898238584088,tree_cover,Medium,26.71910263860772,already vegetated (tree cover) - no action needed
 +102134+29150,26.18633968951867,91.74898238597254,tree_cover,Medium,27.125349750223496,already vegetated (tree cover) - no action needed
@@ -2945,85 +2945,85 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102134+29152,26.188136320927665,91.74898238600298,tree_cover,Medium,26.502372533970288,already vegetated (tree cover) - no action needed
 +102134+29154,26.189932951234574,91.74898238594442,tree_cover,Medium,26.553853583928085,already vegetated (tree cover) - no action needed
 +102134+29155,26.190831266086096,91.74898238588185,tree_cover,Low,25.07387006617842,already vegetated (tree cover) - no action needed
-+102134+29156,26.191729581795112,91.74898238579684,water,Medium,23.03978292553425,excluded (never-touch land cover: water/wetland)
-+102134+29157,26.19262789686692,91.74898238591562,water,High,22.1755489803387,excluded (never-touch land cover: water/wetland)
-+102134+29158,26.19352621197899,91.7489823860124,water,High,22.773294743959408,excluded (never-touch land cover: water/wetland)
-+102134+29159,26.194424526997118,91.7489823858606,water,High,23.01290896993518,excluded (never-touch land cover: water/wetland)
++102134+29156,26.191729581795112,91.74898238579684,water,Medium,23.03978292553425,never-touch land cover (water)
++102134+29157,26.19262789686692,91.74898238591562,water,High,22.1755489803387,never-touch land cover (water)
++102134+29158,26.19352621197899,91.7489823860124,water,High,22.773294743959408,never-touch land cover (water)
++102134+29159,26.194424526997118,91.7489823858606,water,High,23.01290896993518,never-touch land cover (water)
 +102135+29150,26.18633968978787,91.74988070134368,tree_cover,Medium,27.00375524019905,already vegetated (tree cover) - no action needed
 +102135+29152,26.188136320797028,91.74988070120462,tree_cover,Medium,26.29759372587748,already vegetated (tree cover) - no action needed
 +102135+29153,26.189034635325022,91.74988070132817,tree_cover,Medium,26.44921431487433,already vegetated (tree cover) - no action needed
-+102135+29157,26.19262789701108,91.74988070137564,water,High,22.86506171533172,excluded (never-touch land cover: water/wetland)
-+102135+29158,26.193526211923245,91.74988070138866,water,High,23.02336603498553,excluded (never-touch land cover: water/wetland)
-+102135+29159,26.19442452692342,91.74988070137972,water,High,23.05193097915853,excluded (never-touch land cover: water/wetland)
-+102135+29160,26.195322843236244,91.7498807013488,water,High,22.975844060073097,excluded (never-touch land cover: water/wetland)
++102135+29157,26.19262789701108,91.74988070137564,water,High,22.86506171533172,never-touch land cover (water)
++102135+29158,26.193526211923245,91.74988070138866,water,High,23.02336603498553,never-touch land cover (water)
++102135+29159,26.19442452692342,91.74988070137972,water,High,23.05193097915853,never-touch land cover (water)
++102135+29160,26.195322843236244,91.7498807013488,water,High,22.975844060073097,never-touch land cover (water)
 +102136+29150,26.18633968998847,91.75077901641814,tree_cover,Medium,26.28637037163182,already vegetated (tree cover) - no action needed
 +102136+29151,26.187238005091533,91.75077901650076,tree_cover,Medium,25.523784843933075,already vegetated (tree cover) - no action needed
 +102136+29152,26.18813632059833,91.75077901656168,tree_cover,Medium,25.237911530456536,already vegetated (tree cover) - no action needed
 +102136+29153,26.189034635472616,91.75077901637464,tree_cover,Medium,25.897195186485387,already vegetated (tree cover) - no action needed
 +102136+29156,26.191729581687763,91.75077901658662,tree_cover,Medium,25.81520561050213,already vegetated (tree cover) - no action needed
-+102136+29157,26.192627896906128,91.75077901631234,water,Medium,24.13464931604604,excluded (never-touch land cover: water/wetland)
-+102136+29158,26.19352621198227,91.75077901624223,water,High,23.582587974304367,excluded (never-touch land cover: water/wetland)
-+102136+29159,26.194424526965182,91.75077901637638,water,High,23.12557008208161,excluded (never-touch land cover: water/wetland)
-+102136+29160,26.19532284325988,91.75077901648854,water,High,23.03141304612972,excluded (never-touch land cover: water/wetland)
-+102136+29161,26.1962211578318,91.75077901635277,water,High,23.0263980032757,excluded (never-touch land cover: water/wetland)
++102136+29157,26.192627896906128,91.75077901631234,water,Medium,24.13464931604604,never-touch land cover (water)
++102136+29158,26.19352621198227,91.75077901624223,water,High,23.582587974304367,never-touch land cover (water)
++102136+29159,26.194424526965182,91.75077901637638,water,High,23.12557008208161,never-touch land cover (water)
++102136+29160,26.19532284325988,91.75077901648854,water,High,23.03141304612972,never-touch land cover (water)
++102136+29161,26.1962211578318,91.75077901635277,water,High,23.0263980032757,never-touch land cover (water)
 +102137+29128,26.16657675389457,91.75167733198737,tree_cover,Medium,27.77085549257264,already vegetated (tree cover) - no action needed
 +102137+29129,26.167475068507688,91.75167733178152,tree_cover,Medium,28.073604451019577,already vegetated (tree cover) - no action needed
-+102137+29150,26.18633968993851,91.75167733197196,water,Medium,25.8029000299267,excluded (never-touch land cover: water/wetland)
-+102137+29151,26.18723800502432,91.75167733174376,water,Medium,25.19941959826817,excluded (never-touch land cover: water/wetland)
++102137+29150,26.18633968993851,91.75167733197196,water,Medium,25.8029000299267,never-touch land cover (water)
++102137+29151,26.18723800502432,91.75167733174376,water,Medium,25.19941959826817,never-touch land cover (water)
 +102137+29152,26.188136320695456,91.75167733172005,tree_cover,Medium,25.34984667702321,already vegetated (tree cover) - no action needed
 +102137+29153,26.1890346353702,91.75167733190048,tree_cover,Medium,25.777152099588008,already vegetated (tree cover) - no action needed
-+102137+29158,26.19352621197465,91.75167733180142,water,High,24.7908969245468,excluded (never-touch land cover: water/wetland)
-+102137+29159,26.194424527121896,91.75167733185243,water,High,23.420048391518865,excluded (never-touch land cover: water/wetland)
-+102137+29160,26.19532284321705,91.75167733188172,water,High,23.06817373481496,excluded (never-touch land cover: water/wetland)
-+102137+29161,26.19622115777154,91.75167733188944,water,High,23.017162043643967,excluded (never-touch land cover: water/wetland)
++102137+29158,26.19352621197465,91.75167733180142,water,High,24.7908969245468,never-touch land cover (water)
++102137+29159,26.194424527121896,91.75167733185243,water,High,23.420048391518865,never-touch land cover (water)
++102137+29160,26.19532284321705,91.75167733188172,water,High,23.06817373481496,never-touch land cover (water)
++102137+29161,26.19622115777154,91.75167733188944,water,High,23.017162043643967,never-touch land cover (water)
 +102138+29128,26.166576753792363,91.75257564690702,tree_cover,Medium,28.688843864017432,already vegetated (tree cover) - no action needed
 +102138+29130,26.16837338379077,91.7525756469722,tree_cover,Medium,28.027642584315664,already vegetated (tree cover) - no action needed
-+102138+29158,26.193526211900014,91.75257564706276,water,High,26.60170207892315,excluded (never-touch land cover: water/wetland)
-+102138+29159,26.19442452721161,91.75257564703048,water,High,24.14658768744065,excluded (never-touch land cover: water/wetland)
-+102138+29160,26.195322843107736,91.75257564697684,water,High,23.14781694245461,excluded (never-touch land cover: water/wetland)
-+102138+29161,26.19622115782674,91.75257564690192,water,High,23.027342984289383,excluded (never-touch land cover: water/wetland)
-+102138+29162,26.197119473219946,91.75257564680568,water,High,22.994282446460268,excluded (never-touch land cover: water/wetland)
++102138+29158,26.193526211900014,91.75257564706276,water,High,26.60170207892315,never-touch land cover (water)
++102138+29159,26.19442452721161,91.75257564703048,water,High,24.14658768744065,never-touch land cover (water)
++102138+29160,26.195322843107736,91.75257564697684,water,High,23.14781694245461,never-touch land cover (water)
++102138+29161,26.19622115782674,91.75257564690192,water,High,23.027342984289383,never-touch land cover (water)
++102138+29162,26.197119473219946,91.75257564680568,water,High,22.994282446460268,never-touch land cover (water)
 +102139+29128,26.16657675379977,91.75347396228248,tree_cover,Medium,28.3453090556522,already vegetated (tree cover) - no action needed
 +102139+29129,26.16747506856018,91.75347396212314,tree_cover,Medium,28.31706634667366,already vegetated (tree cover) - no action needed
 +102139+29130,26.16837338394584,91.75347396239458,tree_cover,Medium,28.248218509372396,already vegetated (tree cover) - no action needed
 +102139+29131,26.16927169973031,91.7534739626449,tree_cover,Medium,28.06187593921742,already vegetated (tree cover) - no action needed
 +102139+29143,26.180051483013536,91.75347396242216,tree_cover,Medium,27.78022613756524,already vegetated (tree cover) - no action needed
-+102139+29159,26.19442452705273,91.75347396221308,water,High,25.37754650288705,excluded (never-touch land cover: water/wetland)
-+102139+29160,26.19532284329549,91.75347396230256,water,High,23.42844562523015,excluded (never-touch land cover: water/wetland)
-+102139+29161,26.19622115781548,91.75347396259669,water,High,23.13005946408697,excluded (never-touch land cover: water/wetland)
-+102139+29162,26.19711947300966,91.7534739624178,water,High,22.99847527494772,excluded (never-touch land cover: water/wetland)
-+102139+29163,26.198017788790487,91.75347396244376,water,High,22.96233370227138,excluded (never-touch land cover: water/wetland)
++102139+29159,26.19442452705273,91.75347396221308,water,High,25.37754650288705,never-touch land cover (water)
++102139+29160,26.19532284329549,91.75347396230256,water,High,23.42844562523015,never-touch land cover (water)
++102139+29161,26.19622115781548,91.75347396259669,water,High,23.13005946408697,never-touch land cover (water)
++102139+29162,26.19711947300966,91.7534739624178,water,High,22.99847527494772,never-touch land cover (water)
++102139+29163,26.198017788790487,91.75347396244376,water,High,22.96233370227138,never-touch land cover (water)
 +102140+29128,26.16657675391664,91.7543722776364,tree_cover,Medium,27.349887199738955,already vegetated (tree cover) - no action needed
 +102140+29153,26.18903463538388,91.75437227734584,tree_cover,Medium,26.69244749230449,already vegetated (tree cover) - no action needed
-+102140+29159,26.194424526827017,91.75437227759949,water,High,26.739888631281428,excluded (never-touch land cover: water/wetland)
-+102140+29160,26.1953228434166,91.75437227738011,water,High,24.10623261471721,excluded (never-touch land cover: water/wetland)
-+102140+29161,26.196221157919695,91.75437227736582,water,High,23.263417495808586,excluded (never-touch land cover: water/wetland)
-+102140+29162,26.197119472914878,91.7543722775564,water,High,23.005130718931586,excluded (never-touch land cover: water/wetland)
-+102140+29163,26.198017788860916,91.75437227750017,water,High,23.011999309629388,excluded (never-touch land cover: water/wetland)
++102140+29159,26.194424526827017,91.75437227759949,water,High,26.739888631281428,never-touch land cover (water)
++102140+29160,26.1953228434166,91.75437227738011,water,High,24.10623261471721,never-touch land cover (water)
++102140+29161,26.196221157919695,91.75437227736582,water,High,23.263417495808586,never-touch land cover (water)
++102140+29162,26.197119472914878,91.7543722775564,water,High,23.005130718931586,never-touch land cover (water)
++102140+29163,26.198017788860916,91.75437227750017,water,High,23.011999309629388,never-touch land cover (water)
 +102141+29128,26.16657675396115,91.75527059322027,tree_cover,Medium,27.16135204216826,already vegetated (tree cover) - no action needed
 +102141+29129,26.167475068506302,91.75527059310744,tree_cover,Medium,28.021430714867336,already vegetated (tree cover) - no action needed
-+102141+29160,26.195322843289464,91.755270593366,water,High,25.72093617288409,excluded (never-touch land cover: water/wetland)
-+102141+29161,26.196221157775494,91.75527059304328,water,High,23.55649721941989,excluded (never-touch land cover: water/wetland)
-+102141+29162,26.197119473117656,91.75527059292548,water,High,23.03472809881985,excluded (never-touch land cover: water/wetland)
-+102141+29163,26.1980177886831,91.75527059301275,water,High,23.02109182210197,excluded (never-touch land cover: water/wetland)
-+102141+29164,26.198916103890085,91.7552705930794,water,High,22.93357420764371,excluded (never-touch land cover: water/wetland)
++102141+29160,26.195322843289464,91.755270593366,water,High,25.72093617288409,never-touch land cover (water)
++102141+29161,26.196221157775494,91.75527059304328,water,High,23.55649721941989,never-touch land cover (water)
++102141+29162,26.197119473117656,91.75527059292548,water,High,23.03472809881985,never-touch land cover (water)
++102141+29163,26.1980177886831,91.75527059301275,water,High,23.02109182210197,never-touch land cover (water)
++102141+29164,26.198916103890085,91.7552705930794,water,High,22.93357420764371,never-touch land cover (water)
 +102142+29126,26.164780122939263,91.75616890772244,tree_cover,Medium,27.26352305825316,already vegetated (tree cover) - no action needed
 +102142+29127,26.165678438256545,91.75616890756096,tree_cover,Low,26.43606010246864,already vegetated (tree cover) - no action needed
 +102142+29128,26.16657675393331,91.75616890760476,tree_cover,Medium,27.6089734282609,already vegetated (tree cover) - no action needed
 +102142+29129,26.167475068461915,91.75616890762794,tree_cover,Medium,28.081220583117183,already vegetated (tree cover) - no action needed
-+102142+29161,26.196221157564832,91.75616890797131,water,High,24.74997864894568,excluded (never-touch land cover: water/wetland)
-+102142+29162,26.19711947325433,91.75616890799724,water,High,23.22305635055441,excluded (never-touch land cover: water/wetland)
-+102142+29163,26.198017788620955,91.75616890800252,water,High,22.860529922803373,excluded (never-touch land cover: water/wetland)
-+102142+29164,26.198916103811563,91.75616890776116,water,High,22.7922256048525,excluded (never-touch land cover: water/wetland)
++102142+29161,26.196221157564832,91.75616890797131,water,High,24.74997864894568,never-touch land cover (water)
++102142+29162,26.19711947325433,91.75616890799724,water,High,23.22305635055441,never-touch land cover (water)
++102142+29163,26.198017788620955,91.75616890800252,water,High,22.860529922803373,never-touch land cover (water)
++102142+29164,26.198916103811563,91.75616890776116,water,High,22.7922256048525,never-touch land cover (water)
 +102143+29126,26.164780122871804,91.75706722344574,tree_cover,Medium,27.37664045629541,already vegetated (tree cover) - no action needed
 +102143+29127,26.165678438172893,91.75706722341964,tree_cover,Low,26.51571891141761,already vegetated (tree cover) - no action needed
 +102143+29128,26.1665767540151,91.7570672233735,tree_cover,Medium,27.43947452017406,already vegetated (tree cover) - no action needed
 +102143+29129,26.16747506852734,91.75706722353308,tree_cover,Medium,27.602079999231865,already vegetated (tree cover) - no action needed
 +102143+29130,26.168373384028783,91.75706722367248,tree_cover,Medium,27.93912016270952,already vegetated (tree cover) - no action needed
-+102143+29161,26.19622115765158,91.7570672231558,water,High,26.061837717309665,excluded (never-touch land cover: water/wetland)
-+102143+29162,26.197119473324708,91.75706722332502,water,High,23.832697329462302,excluded (never-touch land cover: water/wetland)
-+102143+29163,26.19801778867462,91.75706722347384,water,High,22.95601696995812,excluded (never-touch land cover: water/wetland)
-+102143+29164,26.198916103667287,91.75706722360265,water,High,22.88658388908631,excluded (never-touch land cover: water/wetland)
++102143+29161,26.19622115765158,91.7570672231558,water,High,26.061837717309665,never-touch land cover (water)
++102143+29162,26.197119473324708,91.75706722332502,water,High,23.832697329462302,never-touch land cover (water)
++102143+29163,26.19801778867462,91.75706722347384,water,High,22.95601696995812,never-touch land cover (water)
++102143+29164,26.198916103667287,91.75706722360265,water,High,22.88658388908631,never-touch land cover (water)
 +102144+29126,26.16478012291344,91.75796553909906,tree_cover,Medium,27.515205722046108,already vegetated (tree cover) - no action needed
 +102144+29127,26.16567843819852,91.75796553920868,tree_cover,Medium,26.645511776326824,already vegetated (tree cover) - no action needed
 +102144+29128,26.16657675384273,91.75796553907264,tree_cover,Low,26.60398179168241,already vegetated (tree cover) - no action needed
@@ -3031,10 +3031,10 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102144+29141,26.17825485195754,91.7579655393256,tree_cover,Medium,27.954474996969296,already vegetated (tree cover) - no action needed
 +102144+29158,26.19352621204568,91.7579655387927,tree_cover,Medium,26.33412489902468,already vegetated (tree cover) - no action needed
 +102144+29161,26.196221157671857,91.75796553939944,tree_cover,Medium,26.449965785696172,already vegetated (tree cover) - no action needed
-+102144+29162,26.197119473328637,91.75796553926024,water,High,25.00305530402236,excluded (never-touch land cover: water/wetland)
-+102144+29163,26.198017788662355,91.7579655391011,water,High,23.297190025635484,excluded (never-touch land cover: water/wetland)
-+102144+29164,26.198916103820768,91.75796553914768,water,High,22.8818125413706,excluded (never-touch land cover: water/wetland)
-+102144+29165,26.199814419014128,91.7579655391743,water,High,22.91510655022694,excluded (never-touch land cover: water/wetland)
++102144+29162,26.197119473328637,91.75796553926024,water,High,25.00305530402236,never-touch land cover (water)
++102144+29163,26.198017788662355,91.7579655391011,water,High,23.297190025635484,never-touch land cover (water)
++102144+29164,26.198916103820768,91.75796553914768,water,High,22.8818125413706,never-touch land cover (water)
++102144+29165,26.199814419014128,91.7579655391743,water,High,22.91510655022694,never-touch land cover (water)
 +102145+29123,26.16208517732296,91.75886385370065,tree_cover,Low,26.66055994302729,already vegetated (tree cover) - no action needed
 +102145+29124,26.16298349253079,91.7588638537794,tree_cover,Medium,26.96501895769876,already vegetated (tree cover) - no action needed
 +102145+29125,26.163881807736757,91.75886385383843,tree_cover,Medium,27.293165718043493,already vegetated (tree cover) - no action needed
@@ -3045,24 +3045,24 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102145+29153,26.189034635382757,91.75886385379307,tree_cover,Low,26.04009058956068,already vegetated (tree cover) - no action needed
 +102145+29158,26.19352621204752,91.75886385395816,tree_cover,Medium,26.064926856923925,already vegetated (tree cover) - no action needed
 +102145+29162,26.197119473266262,91.75886385364286,tree_cover,Medium,25.9867990336611,already vegetated (tree cover) - no action needed
-+102145+29163,26.198017788766094,91.7588638538534,water,High,24.491158455449813,excluded (never-touch land cover: water/wetland)
-+102145+29164,26.19891610372604,91.758863853818,water,High,23.14476438056525,excluded (never-touch land cover: water/wetland)
-+102145+29165,26.19981441908567,91.7588638537626,water,High,22.986187825401316,excluded (never-touch land cover: water/wetland)
++102145+29163,26.198017788766094,91.7588638538534,water,High,24.491158455449813,never-touch land cover (water)
++102145+29164,26.19891610372604,91.758863853818,water,High,23.14476438056525,never-touch land cover (water)
++102145+29165,26.19981441908567,91.7588638537626,water,High,22.986187825401316,never-touch land cover (water)
 +102146+29124,26.16298349264084,91.75976216934863,tree_cover,Medium,27.2646280980098,already vegetated (tree cover) - no action needed
 +102146+29141,26.178254851891342,91.7597621693189,tree_cover,Low,25.94178155800281,already vegetated (tree cover) - no action needed
 +102146+29142,26.17915316783642,91.7597621691812,tree_cover,Medium,27.190520077786317,already vegetated (tree cover) - no action needed
 +102146+29159,26.194424526980203,91.75976216926244,tree_cover,Medium,25.932867734196947,already vegetated (tree cover) - no action needed
-+102146+29163,26.198017788803543,91.75976216921492,water,High,25.08963480085197,excluded (never-touch land cover: water/wetland)
-+102146+29164,26.19891610356555,91.75976216909748,water,High,23.5329664196592,excluded (never-touch land cover: water/wetland)
-+102146+29165,26.19981441909129,91.7597621689605,water,High,23.06385884259779,excluded (never-touch land cover: water/wetland)
++102146+29163,26.198017788803543,91.75976216921492,water,High,25.08963480085197,never-touch land cover (water)
++102146+29164,26.19891610356555,91.75976216909748,water,High,23.5329664196592,never-touch land cover (water)
++102146+29165,26.19981441909129,91.7597621689605,water,High,23.06385884259779,never-touch land cover (water)
 +102147+29138,26.17555990623601,91.76066048509468,tree_cover,Medium,27.611970655918324,already vegetated (tree cover) - no action needed
 +102147+29141,26.178254851844176,91.76066048498858,tree_cover,Low,25.903594374011885,already vegetated (tree cover) - no action needed
 +102147+29142,26.179153167773595,91.76066048498974,tree_cover,Medium,26.708008195436477,already vegetated (tree cover) - no action needed
 +102147+29154,26.18993295088677,91.76066048462344,tree_cover,Medium,25.9787848467982,already vegetated (tree cover) - no action needed
 +102147+29160,26.19532284330831,91.76066048486176,tree_cover,Low,25.175681425499302,already vegetated (tree cover) - no action needed
 +102147+29163,26.19801778877471,91.76066048483229,tree_cover,High,25.96775206541202,already vegetated (tree cover) - no action needed
-+102147+29164,26.198916103702995,91.7606604850846,water,High,23.996494794720835,excluded (never-touch land cover: water/wetland)
-+102147+29165,26.199814418849225,91.76066048509162,water,High,23.166422118009795,excluded (never-touch land cover: water/wetland)
++102147+29164,26.198916103702995,91.7606604850846,water,High,23.996494794720835,never-touch land cover (water)
++102147+29165,26.199814418849225,91.76066048509162,water,High,23.166422118009795,never-touch land cover (water)
 +102148+29125,26.163881807800564,91.76155879981242,tree_cover,Medium,27.58673276841306,already vegetated (tree cover) - no action needed
 +102148+29127,26.16567843830364,91.76155880000776,tree_cover,High,28.73904046083684,already vegetated (tree cover) - no action needed
 +102148+29138,26.175559906347218,91.76155879982814,tree_cover,Medium,27.54584161849374,already vegetated (tree cover) - no action needed
@@ -3073,14 +3073,14 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102148+29155,26.19083126627776,91.76155880013322,tree_cover,Medium,25.968650769304364,already vegetated (tree cover) - no action needed
 +102148+29156,26.19172958193485,91.76155880000532,tree_cover,Low,25.1859657668201,already vegetated (tree cover) - no action needed
 +102148+29161,26.19622115763394,91.7615587999818,tree_cover,Low,25.149662216978275,already vegetated (tree cover) - no action needed
-+102148+29164,26.19891610395644,91.7615587996468,water,Medium,24.90487749480437,excluded (never-touch land cover: water/wetland)
-+102148+29165,26.19981441872315,91.761558799798,water,High,23.19317764602716,excluded (never-touch land cover: water/wetland)
++102148+29164,26.19891610395644,91.7615587996468,water,Medium,24.90487749480437,never-touch land cover (water)
++102148+29165,26.19981441872315,91.761558799798,water,High,23.19317764602716,never-touch land cover (water)
 +102149+29125,26.16388180785793,91.7624571150564,tree_cover,Medium,27.286603017984067,already vegetated (tree cover) - no action needed
 +102149+29127,26.16567843833041,91.7624571150708,tree_cover,High,28.81297086948325,already vegetated (tree cover) - no action needed
 +102149+29156,26.191729581881383,91.7624571150342,tree_cover,Low,25.323072797014685,already vegetated (tree cover) - no action needed
 +102149+29161,26.19622115768541,91.76245711504708,tree_cover,Low,25.049673136704147,already vegetated (tree cover) - no action needed
 +102149+29163,26.198017788518698,91.76245711528078,tree_cover,Low,25.74742344099862,already vegetated (tree cover) - no action needed
-+102149+29164,26.198916103962205,91.76245711514332,water,Medium,24.60400881142133,excluded (never-touch land cover: water/wetland)
++102149+29164,26.198916103962205,91.76245711514332,water,Medium,24.60400881142133,never-touch land cover (water)
 +102150+29123,26.1620851772194,91.76335543075032,tree_cover,High,27.34492053849861,already vegetated (tree cover) - no action needed
 +102150+29128,26.166576753835976,91.76335543049416,tree_cover,Medium,28.03947707232779,already vegetated (tree cover) - no action needed
 +102150+29160,26.195322843327546,91.76335543063388,tree_cover,Medium,25.73473237092879,already vegetated (tree cover) - no action needed
@@ -3107,7 +3107,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102153+29140,26.177356536835315,91.76605037647649,tree_cover,Low,25.00870584949241,already vegetated (tree cover) - no action needed
 +102153+29141,26.178254852091552,91.76605037620028,tree_cover,Low,25.493018446103378,already vegetated (tree cover) - no action needed
 +102153+29142,26.17915316774864,91.76605037635794,tree_cover,Medium,26.663701037088007,already vegetated (tree cover) - no action needed
-+102153+29156,26.19172958190348,91.76605037644552,built_up,Low,25.10663598936804,Low priority - no action needed
++102153+29156,26.19172958190348,91.76605037644552,built_up,Low,25.10663598936804,low priority - no action needed
 +102153+29157,26.192627896666536,91.76605037655824,tree_cover,Low,24.58859412328213,already vegetated (tree cover) - no action needed
 +102153+29158,26.193526212015687,91.76605037642724,tree_cover,Low,24.880009588832504,already vegetated (tree cover) - no action needed
 +102153+29159,26.194424527089147,91.766050376278,tree_cover,Low,25.059720561916908,already vegetated (tree cover) - no action needed
@@ -3141,15 +3141,15 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102156+29142,26.17915316788438,91.76874532213486,tree_cover,Low,25.73838012865575,already vegetated (tree cover) - no action needed
 +102156+29155,26.19083126608224,91.76874532237758,tree_cover,Medium,26.608083291751303,already vegetated (tree cover) - no action needed
 +102156+29157,26.192627896887792,91.7687453223453,tree_cover,Low,24.25782192106146,already vegetated (tree cover) - no action needed
-+102156+29158,26.19352621201214,91.7687453224158,built_up,Low,24.26691929186007,Low priority - no action needed
++102156+29158,26.19352621201214,91.7687453224158,built_up,Low,24.26691929186007,low priority - no action needed
 +102156+29159,26.19442452704256,91.768745322243,tree_cover,Low,24.49450548474861,already vegetated (tree cover) - no action needed
-+102156+29160,26.195322843202984,91.76874532227882,built_up,Low,24.527245199364536,Low priority - no action needed
++102156+29160,26.195322843202984,91.76874532227882,built_up,Low,24.527245199364536,low priority - no action needed
 +102156+29161,26.19622115782275,91.7687453222973,tree_cover,Low,24.371257512603368,already vegetated (tree cover) - no action needed
 +102157+29139,26.17645822215917,91.76964363709904,tree_cover,Medium,27.369955410104623,already vegetated (tree cover) - no action needed
 +102157+29140,26.1773565368687,91.76964363739545,tree_cover,Low,26.35459538303262,already vegetated (tree cover) - no action needed
 +102157+29141,26.17825485206802,91.7696436376747,tree_cover,Low,25.638406499979094,already vegetated (tree cover) - no action needed
 +102157+29142,26.17915316766855,91.76964363748498,tree_cover,Medium,26.226953075564875,already vegetated (tree cover) - no action needed
-+102157+29155,26.19083126604943,91.76964363729569,built_up,Low,26.34615993258698,Low priority - no action needed
++102157+29155,26.19083126604943,91.76964363729569,built_up,Low,26.34615993258698,low priority - no action needed
 +102157+29156,26.19172958193897,91.76964363754328,tree_cover,Low,25.424197470418424,already vegetated (tree cover) - no action needed
 +102157+29157,26.192627896827062,91.7696436375478,tree_cover,Low,24.084536828608808,already vegetated (tree cover) - no action needed
 +102157+29158,26.19352621193755,91.76964363730922,tree_cover,Low,23.927025317260902,already vegetated (tree cover) - no action needed
@@ -3180,22 +3180,22 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102159+29159,26.194424526940026,91.771440267574,tree_cover,Low,24.116807114092182,already vegetated (tree cover) - no action needed
 +102159+29160,26.195322843423067,91.77144026758714,tree_cover,Low,24.514369742391786,already vegetated (tree cover) - no action needed
 +102159+29161,26.196221157637357,91.77144026758316,tree_cover,Low,24.4516596788579,already vegetated (tree cover) - no action needed
-+102159+29162,26.197119473253583,91.7714402675625,built_up,Low,24.57938014862781,Low priority - no action needed
++102159+29162,26.197119473253583,91.7714402675625,built_up,Low,24.57938014862781,low priority - no action needed
 +102159+29163,26.19801778872869,91.77144026775116,tree_cover,Low,24.811090636428084,already vegetated (tree cover) - no action needed
 +102160+29156,26.191729581757805,91.77233858317202,tree_cover,Medium,26.747003984320106,already vegetated (tree cover) - no action needed
 +102160+29157,26.192627896969224,91.77233858315164,tree_cover,Low,25.845979708284528,already vegetated (tree cover) - no action needed
 +102160+29158,26.19352621185703,91.7723385831146,tree_cover,Low,24.551464134108716,already vegetated (tree cover) - no action needed
 +102160+29159,26.19442452701479,91.77233858328704,tree_cover,Low,24.166205220355668,already vegetated (tree cover) - no action needed
-+102160+29160,26.19532284330237,91.77233858321686,built_up,Low,24.52079261734311,Low priority - no action needed
++102160+29160,26.19532284330237,91.77233858321686,built_up,Low,24.52079261734311,low priority - no action needed
 +102160+29161,26.19622115768508,91.77233858313022,tree_cover,Low,24.39469590376088,already vegetated (tree cover) - no action needed
-+102160+29162,26.19711947328815,91.77233858325307,built_up,Low,24.539877754121367,Low priority - no action needed
++102160+29162,26.19711947328815,91.77233858325307,built_up,Low,24.539877754121367,low priority - no action needed
 +102160+29163,26.198017788749567,91.77233858313332,tree_cover,Low,24.24659900527198,already vegetated (tree cover) - no action needed
 +102161+29156,26.19172958180541,91.77323689859124,tree_cover,Medium,27.11013037171441,already vegetated (tree cover) - no action needed
 +102161+29157,26.19262789682154,91.77323689848733,tree_cover,Medium,26.171226294766065,already vegetated (tree cover) - no action needed
 +102161+29158,26.1935262120599,91.77323689859293,tree_cover,Low,25.05349827039885,already vegetated (tree cover) - no action needed
 +102161+29159,26.19442452702255,91.77323689868206,tree_cover,Low,23.79648111615225,already vegetated (tree cover) - no action needed
 +102161+29160,26.195322843296804,91.77323689875496,tree_cover,Low,23.870159496990237,already vegetated (tree cover) - no action needed
-+102161+29161,26.196221157666525,91.77323689881162,built_up,Low,23.970186698796248,Low priority - no action needed
++102161+29161,26.196221157666525,91.77323689881162,built_up,Low,23.970186698796248,low priority - no action needed
 +102161+29162,26.19711947325608,91.77323689862588,tree_cover,Low,24.12318606552376,already vegetated (tree cover) - no action needed
 +102161+29163,26.198017788704515,91.77323689864984,tree_cover,Low,24.086774394768447,already vegetated (tree cover) - no action needed
 +102162+29156,26.191729581785477,91.77413521386796,tree_cover,Medium,27.15314085452865,already vegetated (tree cover) - no action needed
@@ -3292,7 +3292,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102171+29152,26.188136320780853,91.7822200510964,tree_cover,Medium,26.459444036950703,already vegetated (tree cover) - no action needed
 +102171+29156,26.19172958184662,91.78222005131688,tree_cover,Medium,26.501552746124307,already vegetated (tree cover) - no action needed
 +102171+29159,26.19442452724178,91.78222005139074,tree_cover,Low,26.053314152307983,already vegetated (tree cover) - no action needed
-+102171+29160,26.1953228432119,91.78222005131184,built_up,Low,25.58035816595672,Low priority - no action needed
++102171+29160,26.1953228432119,91.78222005131184,built_up,Low,25.58035816595672,low priority - no action needed
 +102171+29161,26.19622115764066,91.7822200512189,tree_cover,Low,26.11283165093549,already vegetated (tree cover) - no action needed
 +102171+29162,26.19711947328961,91.78222005133767,tree_cover,Low,26.04650377132684,already vegetated (tree cover) - no action needed
 +102171+29163,26.198017788615516,91.78222005144248,tree_cover,Medium,25.328735682803785,already vegetated (tree cover) - no action needed
@@ -3327,7 +3327,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102178+29157,26.192627896756512,91.78850825845304,tree_cover,Low,25.644494103242707,already vegetated (tree cover) - no action needed
 +102178+29158,26.1935262119792,91.78850825849597,tree_cover,Low,25.87554625748915,already vegetated (tree cover) - no action needed
 +102178+29160,26.19532284318461,91.7885082580926,tree_cover,Medium,25.695037418514676,already vegetated (tree cover) - no action needed
-+102178+29162,26.197119473293423,91.78850825854276,built_up,Low,25.437564455188305,Low priority - no action needed
++102178+29162,26.197119473293423,91.78850825854276,built_up,Low,25.437564455188305,low priority - no action needed
 +102178+29163,26.19801778854409,91.78850825829706,tree_cover,Low,24.487191621569057,already vegetated (tree cover) - no action needed
 +102178+29165,26.199814418910787,91.78850825844548,tree_cover,Low,25.97575244112972,already vegetated (tree cover) - no action needed
 +102179+29145,26.18184811355005,91.7894065737534,tree_cover,Medium,27.93982071359637,already vegetated (tree cover) - no action needed
@@ -3344,7 +3344,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102181+29151,26.187238005058266,91.79120320385738,tree_cover,Low,25.52198764234312,already vegetated (tree cover) - no action needed
 +102181+29152,26.18813632068225,91.7912032039474,tree_cover,Medium,25.517207728119576,already vegetated (tree cover) - no action needed
 +102181+29158,26.193526211857147,91.79120320378593,tree_cover,Low,24.95874784298916,already vegetated (tree cover) - no action needed
-+102181+29159,26.194424527137773,91.79120320379278,built_up,Low,24.91393642403769,Low priority - no action needed
++102181+29159,26.194424527137773,91.79120320379278,built_up,Low,24.91393642403769,low priority - no action needed
 +102181+29160,26.195322843185256,91.79120320401378,tree_cover,Medium,25.69657838778245,already vegetated (tree cover) - no action needed
 +102181+29161,26.196221157872948,91.79120320399656,tree_cover,Low,24.77969994278262,already vegetated (tree cover) - no action needed
 +102181+29162,26.1971194732352,91.79120320396753,tree_cover,Medium,24.68738593488496,already vegetated (tree cover) - no action needed
@@ -3365,7 +3365,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102182+29165,26.199814419128455,91.79210151959296,tree_cover,Low,25.191602548338007,already vegetated (tree cover) - no action needed
 +102182+29166,26.200712734790223,91.79210151966062,tree_cover,Low,26.12017141118018,already vegetated (tree cover) - no action needed
 +102182+29167,26.201611049456197,91.79210151971644,tree_cover,Low,25.51740250739552,already vegetated (tree cover) - no action needed
-+102183+29150,26.18633968969222,91.79299983532908,built_up,Low,25.447742808973484,Low priority - no action needed
++102183+29150,26.18633968969222,91.79299983532908,built_up,Low,25.447742808973484,low priority - no action needed
 +102183+29151,26.187238005258227,91.79299983526096,tree_cover,Low,24.068355725837996,already vegetated (tree cover) - no action needed
 +102183+29152,26.188136320681053,91.79299983540744,tree_cover,Medium,24.50004486262874,already vegetated (tree cover) - no action needed
 +102183+29156,26.191729581981004,91.79299983520085,tree_cover,Low,25.635858623739548,already vegetated (tree cover) - no action needed
@@ -3394,7 +3394,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102186+29144,26.180949797872668,91.79569478083972,tree_cover,Medium,27.830879083474187,already vegetated (tree cover) - no action needed
 +102186+29155,26.19083126607101,91.79569478079306,tree_cover,Medium,26.681298692965942,already vegetated (tree cover) - no action needed
 +102186+29156,26.191729581815405,91.79569478086782,tree_cover,Low,25.986657391815648,already vegetated (tree cover) - no action needed
-+102186+29157,26.192627896740817,91.79569478093164,built_up,Low,25.599521872713,Low priority - no action needed
++102186+29157,26.192627896740817,91.79569478093164,built_up,Low,25.599521872713,low priority - no action needed
 +102186+29158,26.193526212069845,91.79569478098476,tree_cover,Low,24.94522957451778,already vegetated (tree cover) - no action needed
 +102186+29161,26.19622115776658,91.79569478085406,tree_cover,Medium,26.05925189470997,already vegetated (tree cover) - no action needed
 +102186+29164,26.1989161038034,91.79569478107732,tree_cover,Low,25.124891264648323,already vegetated (tree cover) - no action needed
@@ -3407,7 +3407,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102187+29156,26.19172958192848,91.79659309595976,tree_cover,Low,25.74093339452931,already vegetated (tree cover) - no action needed
 +102187+29158,26.19352621216568,91.7965930959096,tree_cover,Low,24.952594168576105,already vegetated (tree cover) - no action needed
 +102187+29159,26.194424527028715,91.79659309586866,tree_cover,Low,25.391718533859866,already vegetated (tree cover) - no action needed
-+102187+29163,26.198017788856767,91.79659309605128,built_up,Low,25.216196413723875,Low priority - no action needed
++102187+29163,26.198017788856767,91.79659309605128,built_up,Low,25.216196413723875,low priority - no action needed
 +102187+29164,26.198916103847463,91.79659309595766,tree_cover,Low,24.676471404336983,already vegetated (tree cover) - no action needed
 +102187+29165,26.199814418873448,91.79659309585313,tree_cover,Low,24.33491871139123,already vegetated (tree cover) - no action needed
 +102187+29166,26.200712734672145,91.796593095964,tree_cover,Low,24.066700675428898,already vegetated (tree cover) - no action needed
@@ -3420,7 +3420,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102188+29156,26.19172958179245,91.79749141109124,tree_cover,Medium,26.17683189530381,already vegetated (tree cover) - no action needed
 +102188+29158,26.193526212012756,91.79749141132636,tree_cover,Low,25.13600478689269,already vegetated (tree cover) - no action needed
 +102188+29159,26.194424527048827,91.79749141120232,tree_cover,Low,25.09927483456357,already vegetated (tree cover) - no action needed
-+102188+29163,26.19801778884344,91.79749141105384,built_up,Low,25.17658545837294,Low priority - no action needed
++102188+29163,26.19801778884344,91.79749141105384,built_up,Low,25.17658545837294,low priority - no action needed
 +102188+29164,26.1989161038256,91.79749141110378,tree_cover,Low,24.71156986066717,already vegetated (tree cover) - no action needed
 +102188+29165,26.199814418843044,91.7974914111434,tree_cover,Low,24.4458524046718,already vegetated (tree cover) - no action needed
 +102188+29166,26.200712734815312,91.79749141117252,tree_cover,Low,24.57789610258382,already vegetated (tree cover) - no action needed
@@ -3454,7 +3454,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102191+29157,26.19262789677193,91.80018635732378,tree_cover,Medium,26.090082332884084,already vegetated (tree cover) - no action needed
 +102191+29158,26.193526212060053,91.8001863571856,tree_cover,Low,25.823395501943462,already vegetated (tree cover) - no action needed
 +102191+29159,26.194424526890177,91.80018635726351,tree_cover,Low,25.452298776623618,already vegetated (tree cover) - no action needed
-+102191+29160,26.19532284339596,91.8001863573316,built_up,Low,25.31136810736733,Low priority - no action needed
++102191+29160,26.19532284339596,91.8001863573316,built_up,Low,25.31136810736733,low priority - no action needed
 +102191+29164,26.19891610372739,91.80018635728216,tree_cover,Medium,26.61214513386514,already vegetated (tree cover) - no action needed
 +102191+29166,26.200712734486792,91.80018635708556,tree_cover,Low,25.175042336913435,already vegetated (tree cover) - no action needed
 +102191+29167,26.201611049802565,91.80018635708574,tree_cover,Low,25.10767413526108,already vegetated (tree cover) - no action needed
@@ -3476,12 +3476,12 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102193+29161,26.19622115776824,91.80198298778424,tree_cover,Low,24.279857243032623,already vegetated (tree cover) - no action needed
 +102193+29162,26.1971194732098,91.80198298789377,tree_cover,Low,25.132634882238506,already vegetated (tree cover) - no action needed
 +102193+29166,26.20071273472732,91.80198298778734,tree_cover,Low,25.0587112614017,already vegetated (tree cover) - no action needed
-+102193+29169,26.203407680658376,91.80198298794888,built_up,Low,24.867275326391244,Low priority - no action needed
++102193+29169,26.203407680658376,91.80198298794888,built_up,Low,24.867275326391244,low priority - no action needed
 +102194+29152,26.18813632080339,91.80288130294647,tree_cover,Low,26.090692597534478,already vegetated (tree cover) - no action needed
 +102194+29157,26.19262789660182,91.80288130294603,tree_cover,Low,25.474614962370826,already vegetated (tree cover) - no action needed
 +102194+29160,26.195322843157708,91.80288130288208,tree_cover,Low,25.09390971273745,already vegetated (tree cover) - no action needed
 +102194+29161,26.19622115791794,91.80288130314408,tree_cover,Low,24.14335749706672,already vegetated (tree cover) - no action needed
-+102194+29162,26.197119473169916,91.80288130317092,built_up,Low,24.844250442887585,Low priority - no action needed
++102194+29162,26.197119473169916,91.80288130317092,built_up,Low,24.844250442887585,low priority - no action needed
 +102194+29163,26.198017788645164,91.8028813029631,tree_cover,Low,25.19189613525141,already vegetated (tree cover) - no action needed
 +102194+29164,26.198916103944043,91.80288130297208,tree_cover,Low,25.02043840762875,already vegetated (tree cover) - no action needed
 +102194+29166,26.200712734840195,91.80288130296248,tree_cover,Low,25.536293873205317,already vegetated (tree cover) - no action needed
@@ -3513,7 +3513,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102196+29164,26.19891610381888,91.80467793351956,tree_cover,Low,24.751216442782628,already vegetated (tree cover) - no action needed
 +102196+29165,26.19981441895707,91.80467793358156,tree_cover,Low,23.84228048988496,already vegetated (tree cover) - no action needed
 +102196+29166,26.20071273486832,91.8046779334086,tree_cover,Low,23.855756522364032,already vegetated (tree cover) - no action needed
-+102196+29168,26.202509364734677,91.8046779334894,built_up,Low,25.17843789955024,Low priority - no action needed
++102196+29168,26.202509364734677,91.8046779334894,built_up,Low,25.17843789955024,low priority - no action needed
 +102196+29169,26.20340768073426,91.80467793351649,tree_cover,Low,25.46409165120295,already vegetated (tree cover) - no action needed
 +102196+29170,26.20430599536754,91.80467793353482,tree_cover,Low,25.191767022043493,already vegetated (tree cover) - no action needed
 +102197+29143,26.18005148265218,91.80557624882572,tree_cover,Medium,28.41588621500001,already vegetated (tree cover) - no action needed
@@ -3671,8 +3671,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102206+29153,26.18903463524533,91.81366108601196,tree_cover,Low,25.050717229905747,already vegetated (tree cover) - no action needed
 +102206+29154,26.189932951085733,91.81366108600204,tree_cover,Low,24.308235329176,already vegetated (tree cover) - no action needed
 +102206+29155,26.19083126619883,91.81366108621177,tree_cover,Medium,24.48111252668603,already vegetated (tree cover) - no action needed
-+102206+29157,26.19262789677358,91.81366108638636,built_up,Low,24.74648540400141,Low priority - no action needed
-+102206+29158,26.19352621214632,91.813661086351,built_up,Low,24.457715572523583,Low priority - no action needed
++102206+29157,26.19262789677358,91.81366108638636,built_up,Low,24.74648540400141,low priority - no action needed
++102206+29158,26.19352621214632,91.813661086351,built_up,Low,24.457715572523583,low priority - no action needed
 +102206+29159,26.19442452687896,91.81366108630893,tree_cover,Low,24.549300617873623,already vegetated (tree cover) - no action needed
 +102206+29160,26.195322843287588,91.81366108626072,tree_cover,Low,24.66890565885477,already vegetated (tree cover) - no action needed
 +102206+29161,26.19622115779133,91.81366108620628,tree_cover,Low,24.655103748901396,already vegetated (tree cover) - no action needed
@@ -3688,12 +3688,12 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102206+29171,26.205204310763843,91.8136610862115,tree_cover,Low,22.85915357706008,already vegetated (tree cover) - no action needed
 +102206+29172,26.20610262651533,91.8136610863124,tree_cover,Low,23.240225810335215,already vegetated (tree cover) - no action needed
 +102207+29152,26.188136320676563,91.8145594019514,tree_cover,Low,24.239380329497827,already vegetated (tree cover) - no action needed
-+102207+29153,26.189034635296814,91.81455940208927,built_up,Low,24.99112632183545,Low priority - no action needed
++102207+29153,26.189034635296814,91.81455940208927,built_up,Low,24.99112632183545,low priority - no action needed
 +102207+29154,26.18993295095028,91.81455940199491,tree_cover,Low,24.406128066435077,already vegetated (tree cover) - no action needed
 +102207+29156,26.19172958165921,91.81455940178796,tree_cover,Medium,25.41143708745812,already vegetated (tree cover) - no action needed
 +102207+29157,26.19262789680512,91.81455940167538,tree_cover,Low,24.56457131442041,already vegetated (tree cover) - no action needed
 +102207+29158,26.193526212172515,91.81455940178245,tree_cover,Low,23.98857187889052,already vegetated (tree cover) - no action needed
-+102207+29159,26.194424526899997,91.81455940188324,built_up,Low,24.436450462786333,Low priority - no action needed
++102207+29159,26.194424526899997,91.81455940188324,built_up,Low,24.436450462786333,low priority - no action needed
 +102207+29160,26.19532284330401,91.81455940197792,tree_cover,Low,24.684367902960908,already vegetated (tree cover) - no action needed
 +102207+29161,26.19622115780242,91.81455940206654,tree_cover,Low,24.37519356464108,already vegetated (tree cover) - no action needed
 +102207+29162,26.197119473156608,91.81455940192266,tree_cover,Low,24.31812896946929,already vegetated (tree cover) - no action needed
@@ -3741,8 +3741,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102209+29171,26.20520431063229,91.81635603230532,tree_cover,Low,22.984753280911345,already vegetated (tree cover) - no action needed
 +102209+29172,26.206102626368832,91.8163560323906,tree_cover,Low,23.547832698479585,already vegetated (tree cover) - no action needed
 +102210+29156,26.191729581909044,91.81725434749666,tree_cover,Medium,25.6514730317947,already vegetated (tree cover) - no action needed
-+102210+29158,26.19352621203036,91.8172543474407,built_up,Low,24.7917136305584,Low priority - no action needed
-+102210+29159,26.194424527107827,91.81725434751746,built_up,Low,24.519265841222083,Low priority - no action needed
++102210+29158,26.19352621203036,91.8172543474407,built_up,Low,24.7917136305584,low priority - no action needed
++102210+29159,26.194424527107827,91.81725434751746,built_up,Low,24.519265841222083,low priority - no action needed
 +102210+29160,26.195322843133376,91.8172543475888,tree_cover,Low,24.66623592745112,already vegetated (tree cover) - no action needed
 +102210+29161,26.196221157799663,91.81725434742856,tree_cover,Low,24.505229520594654,already vegetated (tree cover) - no action needed
 +102210+29162,26.19711947332173,91.81725434748888,tree_cover,Low,23.912563710893863,already vegetated (tree cover) - no action needed
@@ -3756,8 +3756,8 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102210+29170,26.204305995159253,91.8172543475457,tree_cover,Low,23.28888038156639,already vegetated (tree cover) - no action needed
 +102210+29171,26.20520431058,91.81725434733016,tree_cover,Low,23.506563442440655,already vegetated (tree cover) - no action needed
 +102211+29155,26.190831266456644,91.81815266266254,tree_cover,Low,24.3656765770439,already vegetated (tree cover) - no action needed
-+102211+29156,26.19172958167544,91.818152662672,built_up,Low,24.95629818167366,Low priority - no action needed
-+102211+29157,26.192627896802477,91.81815266267628,built_up,Low,24.38198263008371,Low priority - no action needed
++102211+29156,26.19172958167544,91.818152662672,built_up,Low,24.95629818167366,low priority - no action needed
++102211+29157,26.192627896802477,91.81815266267628,built_up,Low,24.38198263008371,low priority - no action needed
 +102211+29158,26.193526211969797,91.81815266267516,tree_cover,Low,24.278250402108707,already vegetated (tree cover) - no action needed
 +102211+29159,26.194424527224736,91.81815266266835,tree_cover,Low,24.386158621046043,already vegetated (tree cover) - no action needed
 +102211+29160,26.195322843064265,91.81815266265636,tree_cover,Low,24.260696550104637,already vegetated (tree cover) - no action needed
@@ -3787,7 +3787,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102212+29168,26.202509364776468,91.81905097830598,tree_cover,Low,22.185698614099184,already vegetated (tree cover) - no action needed
 +102212+29169,26.203407680687267,91.81905097793928,tree_cover,Low,22.56173451902236,already vegetated (tree cover) - no action needed
 +102212+29170,26.204305995050557,91.81905097779334,tree_cover,Low,23.84808419281729,already vegetated (tree cover) - no action needed
-+102212+29171,26.20520431064432,91.81905097809418,grassland,Low,25.406169827936477,Low priority - no action needed
++102212+29171,26.20520431064432,91.81905097809418,grassland,Low,25.406169827936477,low priority - no action needed
 +102213+29156,26.19172958173283,91.81994929363393,tree_cover,Low,24.127052819993043,already vegetated (tree cover) - no action needed
 +102213+29157,26.192627896852045,91.81994929347044,tree_cover,Low,24.018990160446936,already vegetated (tree cover) - no action needed
 +102213+29158,26.19352621219311,91.81994929352796,tree_cover,Low,24.003458483763627,already vegetated (tree cover) - no action needed
@@ -3804,7 +3804,7 @@ grid_id,lat,lon,land_cover,priority,LST,exclusion_reason
 +102213+29169,26.203407680630324,91.81994929361431,tree_cover,Low,22.50058012627097,already vegetated (tree cover) - no action needed
 +102213+29170,26.20430599517125,91.81994929383946,tree_cover,Low,22.827261784902134,already vegetated (tree cover) - no action needed
 +102213+29171,26.205204310761097,91.81994929383364,tree_cover,Low,23.80218099866624,already vegetated (tree cover) - no action needed
-+102213+29172,26.20610262648037,91.8199492935973,grassland,Low,25.124864287919934,Low priority - no action needed
++102213+29172,26.20610262648037,91.8199492935973,grassland,Low,25.124864287919934,low priority - no action needed
 +102214+29156,26.191729581660496,91.82084760851636,tree_cover,Low,24.63218812968621,already vegetated (tree cover) - no action needed
 +102214+29157,26.192627896775612,91.82084760849509,tree_cover,Low,24.660793191066965,already vegetated (tree cover) - no action needed
 +102214+29158,26.19352621211276,91.82084760824286,tree_cover,Low,24.368804402260903,already vegetated (tree cover) - no action needed

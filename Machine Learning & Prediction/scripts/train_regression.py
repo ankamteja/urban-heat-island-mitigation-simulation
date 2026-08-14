@@ -26,6 +26,7 @@ Run:  python scripts/train_regression.py
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import joblib
@@ -50,7 +51,19 @@ SPATIAL_BLOCK_GRID = 6  # 6x6 = 36 contiguous blocks for the blocked split
 RF_N_ESTIMATORS = 300
 
 TARGET = "LST"
-BASE_FEATURES = ["NDVI", "Latitude", "Longitude"]
+# NDBI and Vegetation come from the corrected Earth Engine export and were
+# previously discarded by preprocess.py, so the model never saw them. Measured
+# on the current dataset, NDBI is the single strongest linear predictor of
+# surface temperature available:
+#
+#     NDBI        vs LST   +0.609
+#     Vegetation  vs LST   -0.455
+#     NDVI        vs LST   -0.398
+#
+# The module README used to explain the weak NDVI signal as an artifact of the
+# uncorrected export. That explanation expired when the corrected data landed;
+# the real gap was a missing feature.
+BASE_FEATURES = ["NDVI", "NDBI", "Vegetation", "Latitude", "Longitude"]
 LAG_FEATURE = "LST_lag_k8"
 
 # Degrees -> metres, for turning lon/lat into an approximately isotropic space
@@ -59,6 +72,11 @@ M_PER_DEG_LAT = 110_574.0
 M_PER_DEG_LON_EQUATOR = 111_320.0
 
 MODULE_DIR = Path(__file__).resolve().parent.parent
+REPO_DIR = MODULE_DIR.parent
+
+sys.path.insert(0, str(REPO_DIR / "shared"))
+import uhi_shared as shared  # noqa: E402  (path must be set before import)
+
 RESULTS_DIR = MODULE_DIR / "Results"
 MODELS_DIR = MODULE_DIR / "Models"
 INPUT_CSV = RESULTS_DIR / "preprocessed.csv"
@@ -158,10 +176,21 @@ def main() -> None:
         )
     df = pd.read_csv(INPUT_CSV)
     print(f"Loaded {len(df):,} preprocessed rows")
-    print(
-        "REMINDER: the NDVI feature is uncorrected (SPEC_AUDIT #3). Coefficients "
-        "and importances on NDVI are attenuated accordingly - see README section 6."
-    )
+
+    missing = set(BASE_FEATURES) - set(df.columns)
+    if missing:
+        raise ValueError(
+            f"preprocessed.csv is missing feature columns {sorted(missing)} - "
+            "it was produced by an older preprocess.py. Re-run it."
+        )
+
+    ndvi_corrected = shared.ndvi_looks_corrected(float(df["NDVI"].max()))
+    if not ndvi_corrected:
+        print(
+            "WARNING: NDVI looks uncorrected (max "
+            f"{df['NDVI'].max():.3f}). Coefficients and importances on NDVI are "
+            "attenuated accordingly."
+        )
 
     coords = to_metric_coords(df)
     y = df[TARGET].to_numpy()
@@ -243,10 +272,12 @@ def main() -> None:
             "trained_on": str(INPUT_CSV.name),
             "random_state": RANDOM_STATE,
             "config": canonical_key,
-            "ndvi_corrected": False,
+            "ndvi_corrected": ndvi_corrected,
             "caveat": (
-                "NDVI feature is uncorrected (raw-DN artifact, Remote Sensing "
-                "SPEC_AUDIT #3). Predictions inherit that bias."
+                ""
+                if ndvi_corrected
+                else "NDVI feature looks uncorrected (raw-DN artifact). "
+                "Predictions inherit that bias."
             ),
         },
         MODEL_PATH,
@@ -288,7 +319,7 @@ def main() -> None:
                 "target": TARGET,
                 "random_state": RANDOM_STATE,
                 "canonical_model": canonical_key,
-                "ndvi_corrected": False,
+                "ndvi_corrected": ndvi_corrected,
                 "results": rows,
                 "feature_importances": importances.to_dict(),
             },
@@ -303,8 +334,16 @@ def main() -> None:
         f"Target: **{TARGET}** (degrees C). Seed: `{RANDOM_STATE}`. "
         f"Rows: {len(df):,}. Test fraction: {TEST_FRACTION:.0%}.",
         "",
-        "> NDVI is uncorrected (Remote Sensing SPEC_AUDIT #3). Metrics are "
-        "internally valid but the NDVI-temperature relationship is attenuated.",
+        (
+            "> NDVI comes from the corrected surface-reflectance export."
+            if ndvi_corrected
+            else "> NDVI looks uncorrected. Metrics are internally valid but the "
+            "NDVI-temperature relationship is attenuated."
+        ),
+        "",
+        "> Quote the **spatial_block** R2, not the random_80_20 one. Adjacent "
+        "100 m cells are near-duplicates, so a random split leaks most test "
+        "answers through their neighbours and flatters the model badly.",
         "",
         "| Split | Features | Model | RMSE (C) | MAE (C) | R2 |",
         "|---|---|---|---|---|---|",

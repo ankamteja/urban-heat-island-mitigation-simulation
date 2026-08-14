@@ -2,57 +2,68 @@
 
 Everything needed to understand, build, run and modify this project.
 
-## Status
+## The shortest possible orientation
 
-Four of eight pages are written. The remaining four are tracked in
-[`../IMPROVEMENTS.md`](../IMPROVEMENTS.md) as the top priority.
+Guwahati is divided into 8,144 cells of roughly 100 m. Google Earth Engine
+measures each cell's surface temperature, vegetation and land cover. A Python
+rule engine ranks each cell by heat risk and assigns it a costed mitigation
+action, refusing to place work on water, wetland or already-forested land. A
+Leaflet page draws the result twice — as it is, and as it would be after every
+recommendation was carried out.
 
-| Page | Status |
+The largest remaining caveat: the cooling figures behind the "after" map are
+planning assumptions, not measurements. See [08 — Limitations](./08-limitations.md).
+
+---
+
+## Pages
+
+| Page | What it covers |
 |---|---|
-| [01 — Architecture](./01-architecture.md) | Written |
-| [02 — Setup and build](./02-setup-and-build.md) | Written |
-| [03 — Remote Sensing](./03-remote-sensing.md) | Written |
-| 04 — Machine Learning | **Not yet written** — see the module's own [README](../Machine%20Learning%20%26%20Prediction/README.md), which is thorough |
-| 05 — Decision-Support | **Not yet written** — see the module's own [README](../Decision-Support/README.md) |
-| 06 — Frontend | **Not yet written** — see [`frontend/README.md`](../frontend/README.md), which was updated alongside these docs |
-| 07 — Data contracts | **Not yet written** — the schemas are described in [01-architecture](./01-architecture.md#the-three-contracts) and enforced by `validate()` in `export_grid_geojson.py` |
-| [08 — Limitations](./08-limitations.md) | Written |
-
-Nothing below links to a page that does not exist.
+| [00 — Repository map](./00-repository-map.md) | **What every folder and file is**, who writes it, who reads it, and which files are generated. |
+| [01 — Architecture](./01-architecture.md) | The four modules, what each owns, how data flows, and where the seams are. |
+| [02 — Setup and build](./02-setup-and-build.md) | Clean clone to a running dashboard, in dependency order. |
+| [03 — Remote Sensing](./03-remote-sensing.md) | The Earth Engine script section by section, and how to run it. |
+| [04 — Machine Learning](./04-machine-learning.md) | The four ML scripts, every threshold, and which model score to quote. |
+| [05 — Decision-Support](./05-decision-support.md) | Budget-constrained ranking, and why there are two modules. |
+| [06 — Frontend](./06-frontend.md) | The dashboard's files and how the heat surface is actually drawn. |
+| [07 — Data contracts](./07-data-contracts.md) | Every schema, who writes it, who reads it, what breaks if it changes. |
+| [08 — Limitations](./08-limitations.md) | Which numbers are measurements and which are assumptions. |
 
 ## Reading order
 
-**New to the project — read these three, in order:**
+**New to the project:**
 
-1. **[Architecture](./01-architecture.md)** — the four modules, what each owns, how data actually flows between them, and where the seams are.
-2. **[Setup and build](./02-setup-and-build.md)** — clean clone to a running dashboard. Exact commands, in dependency order, every one of them executed before being written down.
-3. **[Limitations](./08-limitations.md)** — which numbers in this repo are measurements and which are assumptions. Read before quoting anything.
+1. [00 — Repository map](./00-repository-map.md) — get oriented in the file tree.
+2. [01 — Architecture](./01-architecture.md) — how the pieces relate.
+3. [02 — Setup and build](./02-setup-and-build.md) — get it running.
+4. [08 — Limitations](./08-limitations.md) — read before quoting any number.
 
-**Working on the satellite stage:**
+**Changing the pipeline:** [07 — Data contracts](./07-data-contracts.md) first.
+It is the page that would have prevented this project's two worst defects.
 
-- **[03 — Remote Sensing](./03-remote-sensing.md)** — `urban_heat_analysis.js` walked section by section: the Landsat collection, the scale and offset arithmetic, cloud-mask bit twiddling, how the grid is built, what each export produces. Includes the step-by-step for running it in the Earth Engine Code Editor.
+**Changing the dashboard:** [06 — Frontend](./06-frontend.md), then the contract
+section of [07](./07-data-contracts.md#contract-4--gridgeojson-the-frontend-contract).
 
-**Working on the other three modules:** their own READMEs are the current best source, and all four are unusually candid about their own limitations.
+---
 
-| Module | Its README |
+## Status
+
+Project status lives in one place: [`../STATUS.md`](../STATUS.md) — what works,
+what is assumed, what is still open, and how to verify each claim.
+
+It replaced `IMPROVEMENTS.md` and `INTEGRATION_AUDIT.md`. Those were honest when
+written, but five overlapping hand-maintained audit documents drifted out of
+sync with a codebase that kept moving, and each stayed individually plausible
+while collectively describing a repository that no longer existed. The guides
+above describe how the project works; `STATUS.md` plus `tests/` describe how
+well, and the tests fail when the claims stop being true.
+
+Each module also carries its own `README.md`:
+
+| Module | README |
 |---|---|
-| Machine Learning & Prediction | [README](../Machine%20Learning%20%26%20Prediction/README.md) · [SPEC_AUDIT](../Machine%20Learning%20%26%20Prediction/SPEC_AUDIT.md) |
+| Remote Sensing & Data Engineering | [README](../Remote%20Sensing%20%26%20Data%20Engineering/README.md) |
+| Machine Learning & Prediction | [README](../Machine%20Learning%20%26%20Prediction/README.md) |
 | Decision-Support | [README](../Decision-Support/README.md) |
 | frontend | [README](../frontend/README.md) |
-
-## Audits
-
-Separate from the guides. The guides describe how the project works; the audits describe how well.
-
-| Document | Question it answers |
-|---|---|
-| [`INTEGRATION_AUDIT.md`](../INTEGRATION_AUDIT.md) | Does the project work as one system? What is wired to what, and where do two modules disagree? |
-| [`Remote Sensing & Data Engineering/SPEC_AUDIT.md`](../Remote%20Sensing%20%26%20Data%20Engineering/SPEC_AUDIT.md) | Does the satellite-data module meet its spec, item by item? |
-| [`Machine Learning & Prediction/SPEC_AUDIT.md`](../Machine%20Learning%20%26%20Prediction/SPEC_AUDIT.md) | Same, for the modelling module. |
-| [`IMPROVEMENTS.md`](../IMPROVEMENTS.md) | What is still worth doing, in priority order. |
-
-## The shortest possible orientation
-
-Guwahati is divided into 8,144 cells of roughly 100 m. Google Earth Engine measures each cell's temperature and vegetation. A Python rule engine ranks each cell by heat risk and assigns it a costed mitigation action. A Leaflet page draws the result twice — as it is, and as it would be after every recommendation was carried out.
-
-The largest known problem: the vegetation index in the committed data was computed without a required rescale, so it is systematically too low, and everything derived from it is biased. The fix is in the source; the data has not been regenerated because that needs a Google Earth Engine account. [Details](./08-limitations.md).
