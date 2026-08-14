@@ -41,14 +41,19 @@ function normTemp(t) {
   return (t - TEMP_DOMAIN.min) / (TEMP_DOMAIN.max - TEMP_DOMAIN.min);
 }
 
-/* Planning-grade cooling model. Values are indicative mean LST reductions for a
-   fully implemented measure at 100 m cell scale, not calibrated field results. */
+/* Labels, glyph colours, and a cooling fallback per measure.
+
+   Cooling normally comes from the pipeline's per-cell `cooling_c` — see
+   dataLoader.normalize(). The values below are only used for data that predates
+   that field (the legacy mock grid), and for the two derived measures the
+   pipeline does not emit directly, which inherit the cooling of the cell they
+   were derived from. They are planning assumptions, not measurements. */
 const INTERVENTIONS = {
-  'Tree cover':  { cooling: 2.4, color: '#34D399', label: 'Urban tree canopy',   unit: 'per 100 m cell' },
-  'Green park':  { cooling: 1.8, color: '#4ADE80', label: 'Green park / lawn',   unit: 'per 100 m cell' },
-  'Cool roof':   { cooling: 2.9, color: '#60A5FA', label: 'High-albedo roof',    unit: 'per rooftop cluster' },
-  'Green roof':  { cooling: 1.5, color: '#A3E635', label: 'Vegetated roof',      unit: 'per rooftop cluster' },
-  'Water body':  { cooling: 2.2, color: '#22D3EE', label: 'Retention pond',      unit: 'per water feature' },
+  'Tree cover':  { cooling: 0.8, color: '#34D399', label: 'Urban tree canopy',   unit: 'per 100 m cell' },
+  'Green park':  { cooling: 2.0, color: '#4ADE80', label: 'Green park / lawn',   unit: 'per 100 m cell' },
+  'Cool roof':   { cooling: 1.0, color: '#60A5FA', label: 'High-albedo roof',    unit: 'per rooftop cluster' },
+  'Green roof':  { cooling: 1.0, color: '#A3E635', label: 'Vegetated roof',      unit: 'per rooftop cluster' },
+  'Water body':  { cooling: 2.0, color: '#22D3EE', label: 'Retention pond',      unit: 'per water feature' },
   'None':        { cooling: 0,   color: '#64748B', label: 'No action',           unit: '' }
 };
 

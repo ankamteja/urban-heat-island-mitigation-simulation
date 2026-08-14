@@ -41,6 +41,14 @@ function normalize(geojson, source) {
     let action = p.recommended_action;
     if (!action || action === 'nan' || action === 'NaN') action = 'None';
 
+    /* The pipeline emits a per-cell cooling_c; the table in INTERVENTIONS is a
+       fallback for data that predates it (the legacy mock grid). A cooling_c of
+       0 is a real zero, not a missing value. */
+    const rawCooling = p.cooling_c;
+    const cooling = typeof rawCooling === 'number' && isFinite(rawCooling)
+      ? rawCooling
+      : (INTERVENTIONS[action] || INTERVENTIONS.None).cooling;
+
     const lon = sx / 4, lat = sy / 4;
     if (lat < minLat) minLat = lat;
     if (lat > maxLat) maxLat = lat;
@@ -56,7 +64,7 @@ function normalize(geojson, source) {
       priority: p.priority || 'Unknown',
       action,
       cost: typeof p.cost_estimate === 'number' ? p.cost_estimate : 0,
-      cooling: (INTERVENTIONS[action] || INTERVENTIONS.None).cooling
+      cooling: action === 'None' ? 0 : cooling
     });
   }
 

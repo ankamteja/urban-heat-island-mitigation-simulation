@@ -73,7 +73,9 @@ function deriveEcologySites(cells, opts) {
         sites.push({
           type: q.type,
           cell: c,
-          cooling: meta.cooling,
+          /* The cell carries the pipeline's own cooling_c; a derived measure
+             inherits it from the cell it was refined out of. */
+          cooling: c.cooling,
           color: meta.color,
           label: meta.label,
           catchment: q.total

@@ -393,23 +393,24 @@ tr.is-focus td b, tr.is-focus td.num { color: var(--accent); }
         <h2>Five measures, placed where they work.</h2>
         <p class="sub">The coarse action from the model is refined into distinct ecological measures using temperature and vegetation cover, then thinned to representative sites so a pointer marks a project, not a pixel.</p>
         <table style="margin-top:4px">
-          <thead><tr><th>Measure</th><th class="num">Modelled cooling</th></tr></thead>
+          <thead><tr><th>Measure</th><th class="num">Assumed cooling</th><th class="num">Cells</th></tr></thead>
           <tbody>
-            <tr class="is-focus"><td><b>High-albedo roof</b></td><td class="num">−2.9 °C</td></tr>
-            <tr><td><b>Urban tree canopy</b></td><td class="num">−2.4 °C</td></tr>
-            <tr><td><b>Retention pond</b></td><td class="num">−2.2 °C</td></tr>
-            <tr><td><b>Green park / lawn</b></td><td class="num">−1.8 °C</td></tr>
-            <tr><td><b>Vegetated roof</b></td><td class="num">−1.5 °C</td></tr>
+            <tr class="is-focus"><td><b>Green park / lawn</b></td><td class="num">−2.0 °C</td><td class="num">4,072</td></tr>
+            <tr><td><b>Retention pond</b> <span class="pill med">derived</span></td><td class="num">−2.0 °C</td><td class="num">—</td></tr>
+            <tr><td><b>High-albedo roof</b></td><td class="num">−1.0 °C</td><td class="num">81</td></tr>
+            <tr><td><b>Vegetated roof</b> <span class="pill med">derived</span></td><td class="num">−1.0 °C</td><td class="num">—</td></tr>
+            <tr><td><b>Urban tree canopy</b></td><td class="num">−0.8 °C</td><td class="num">1,955</td></tr>
           </tbody>
         </table>
+        <p class="split-note">Derived measures are refined from a parent cell by NDVI and inherit its cooling.</p>
       </div>
       <div>
         <div class="grid-2" style="grid-template-columns:1fr 1fr;gap:14px">
-          <div class="card cool metric"><b>−1.51<span style="font-size:.45em">°C</span></b><span>Mean drop, all cells</span></div>
+          <div class="card cool metric"><b>−1.20<span style="font-size:.45em">°C</span></b><span>Mean drop, all cells</span></div>
           <div class="card blue metric"><b>6,108</b><span>Actionable cells</span></div>
         </div>
         <div class="callout" style="margin-top:16px">
-          <b>Cooling values are a planning model,</b> not field measurements — indicative mean LST reductions for a fully implemented measure at 100&nbsp;m cell scale. They set relative priority; they are not a performance guarantee.
+          <b>These are assumptions, not predictions.</b> The per-action degrees come from the Decision-Support catalogue, which labels them placeholder engineering estimates — not measured, fitted or validated for Guwahati. They set relative priority; they are not a performance guarantee.
         </div>
       </div>
     </div>
@@ -431,7 +432,7 @@ tr.is-focus td b, tr.is-focus td.num { color: var(--accent); }
     <p class="eyebrow">12 · What it adds up to</p>
     <div style="display:flex;flex-direction:column;justify-content:center;flex:1;width:100%">
       <div style="display:flex;align-items:baseline;gap:20px;flex-wrap:wrap">
-        <span class="big-number hl-cool">−1.51</span>
+        <span class="big-number hl-cool">−1.20</span>
         <div style="max-width:46ch">
           <h2 style="font-size:clamp(22px,2.4vw,34px);margin-bottom:8px">degrees, city-wide mean</h2>
           <p class="lead">if every recommended intervention is implemented across the 6,108 actionable cells — for a notional ₹160.5 Cr programme.</p>

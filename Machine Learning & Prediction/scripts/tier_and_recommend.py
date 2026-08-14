@@ -91,6 +91,45 @@ COST_HEURISTICS: dict[str, dict[str, float]] = {
     "None": {"inr_per_m2": 0.0, "coverage_fraction": 0.0},
 }
 
+# ---------------------------------------------------------------------------
+# Rule 5 - expected cooling per action, in degrees C.
+#
+# THESE ARE ASSUMPTIONS, NOT MEASUREMENTS, AND THEY ARE NOT THIS MODULE'S OWN.
+# A cross-module audit claimed this module already computed a per-intervention
+# cooling value; it did not. This block is where such a number enters the ML
+# module for the first time. The values are copied from the Decision-Support
+# module (Decision-Support/member3_decision_support.py, INTERVENTIONS), whose
+# own comment calls them "placeholder engineering estimates for a hackathon
+# demo ... assumptions, not measured field data". Nothing here is fitted to
+# Guwahati LST, validated against a field trial, or adjusted for canopy age,
+# albedo, humidity or local wind. A single flat number per action also ignores
+# that cooling scales with treated area and with how hot the cell already is.
+#
+# Why carry them anyway: frontend/js/compareView.js currently subtracts a flat
+# 3 C from every treated cell, which is worse - it is both invented and
+# uniform. A per-action figure that is honestly labelled as borrowed is an
+# improvement on an unlabelled constant, and it keeps the ML module and the
+# Decision-Support module telling the same story. Replace with measured or
+# modelled cooling before any figure here is quoted as an outcome.
+#
+# Name mapping to the Decision-Support catalogue (this module's four action
+# names are fixed by ACTION_TABLE / the dashboard, and do not match theirs):
+#   Tree cover  <- trees       0.8 C
+#   Cool roof   <- cool_roof   1.0 C
+#   Green park  <- pocket_park 2.0 C
+#   None        <- (no action) 0.0 C
+# Their catalogue also carries green_roof at 1.5 C. This module has no action
+# it maps onto - ACTION_TABLE never recommends a roof-greening treatment - so
+# that option is unrepresented here rather than silently folded into another
+# action. If a "Green roof" action is ever added to Rule 3, 1.5 C is its value.
+# ---------------------------------------------------------------------------
+COOLING_C: dict[str, float] = {
+    "Tree cover": 0.8,
+    "Cool roof": 1.0,
+    "Green park": 2.0,
+    "None": 0.0,
+}
+
 # Degrees -> metres for cell area. The .geo polygons are axis-aligned
 # rectangles in EPSG:4326, so a local equirectangular conversion is exact for
 # their width/height (see Remote Sensing SPEC_AUDIT item #6: ~89.8 m x 99.3 m).
@@ -160,6 +199,13 @@ def main() -> None:
     )
     df["cost_estimate"] = (df["cell_area_m2"] * rates * coverage).round().astype("int64")
 
+    # --- expected cooling ---------------------------------------------------
+    # Appended last so the pre-existing column order in tiered.csv is untouched.
+    # Looked up through a lambda rather than .map(COOLING_C) so an action name
+    # missing from Rule 5 raises a KeyError instead of quietly becoming NaN -
+    # same failure mode as the cost lookups above.
+    df["cooling_c"] = df["recommended_action"].map(lambda a: COOLING_C[a])
+
     print(
         f"Cell area: mean {df['cell_area_m2'].mean():,.0f} m2 "
         f"(min {df['cell_area_m2'].min():,.0f}, max {df['cell_area_m2'].max():,.0f})"
@@ -178,12 +224,31 @@ def main() -> None:
     print("\n" + counts.to_string(index=False))
     print(f"\nTotal notional programme cost: INR {df['cost_estimate'].sum():,}")
 
+    # Mean cooling is merged in AFTER the console print above, deliberately:
+    # widening `counts` itself would change the printed frame, and the printed
+    # output of this script is treated as a stable contract. Only the markdown
+    # report gains the column.
+    summary = counts.merge(
+        df.groupby(["priority", "recommended_action"], as_index=False).agg(
+            mean_cooling_c=("cooling_c", "mean"),
+        ),
+        on=["priority", "recommended_action"],
+        how="left",
+    )
+
     lines = [
         "# Tiering and recommendation summary",
         "",
         "> Heat_Risk is biased high by the uncorrected NDVI "
         "(Remote Sensing SPEC_AUDIT #3). Tiers are indicative ranks, not "
         "calibrated risk levels. Costs are planning placeholders.",
+        ">",
+        "> Expected cooling is a placeholder assumption too, and not even this "
+        "module's own: the per-action degrees C are copied from the "
+        "Decision-Support INTERVENTIONS catalogue, which labels them "
+        "\"placeholder engineering estimates for a hackathon demo\". They are "
+        "not measured, fitted or validated for Guwahati - see Rule 5 in "
+        "scripts/tier_and_recommend.py.",
         "",
         "## Thresholds actually applied",
         "",
@@ -195,13 +260,15 @@ def main() -> None:
         "",
         "## Outcome",
         "",
-        "| Priority | Action | Cells | Mean LST (C) | Mean NDVI | Total cost (INR) |",
-        "|---|---|---|---|---|---|",
+        "| Priority | Action | Cells | Mean LST (C) | Mean NDVI | "
+        "Total cost (INR) | Mean cooling (C, assumed) |",
+        "|---|---|---|---|---|---|---|",
     ]
-    for _, r in counts.iterrows():
+    for _, r in summary.iterrows():
         lines.append(
             f"| {r['priority']} | {r['recommended_action']} | {r['cells']:,} | "
-            f"{r['mean_lst']:.2f} | {r['mean_ndvi']:.3f} | {r['total_cost_inr']:,} |"
+            f"{r['mean_lst']:.2f} | {r['mean_ndvi']:.3f} | {r['total_cost_inr']:,} | "
+            f"{r['mean_cooling_c']:.2f} |"
         )
     lines += [
         "",
