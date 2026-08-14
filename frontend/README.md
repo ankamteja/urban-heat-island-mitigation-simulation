@@ -74,8 +74,8 @@ directories — the ML module's path contains a space and an ampersand, which is
 fragile to URL-encode from the browser. It also means **regenerating the file
 does not update the dashboard until you copy it across.**
 
-`mock_data/grid.geojson` (900 synthetic cells) is a fallback for offline
-development. It is excluded from production deploys via `.vercelignore`, so a
+There is no synthetic fallback: the dashboard loads
+`data/grid.geojson` or shows an error. It is excluded from production deploys via `.vercelignore`, so a
 data failure in production surfaces as an error rather than silently rendering
 mock values.
 
@@ -109,7 +109,7 @@ The predicted surface subtracts each cell's own **`cooling_c`** from its
 temperature, wherever `recommended_action` is present and not `"None"`. A
 `cooling_c` of `0` is respected as a real zero, not treated as missing.
 
-If a feature carries no `cooling_c` — as in the legacy `mock_data/grid.geojson` —
+If a feature carries no `cooling_c` —
 `dataLoader.js` falls back to the per-measure table in `INTERVENTIONS`
 (`js/config.js`). That table also supplies the label and glyph for each measure,
 and covers the two derived measures the pipeline does not emit directly.
@@ -155,7 +155,6 @@ frontend/
 ├── style.css
 ├── data/
 │   └── grid.geojson    real pipeline output, 8,144 cells
-├── mock_data/
 │   ├── generate_mock.py
 │   └── grid.geojson    900 synthetic cells, offline development only
 └── js/

@@ -12,12 +12,9 @@ Consumers of those keys (do not rename without updating both sides):
   - frontend/js/popup.js       -> grid_id, temperature, ndvi, priority,
                                   recommended_action, cost_estimate, rendered
                                   verbatim in the popup
-  - frontend/js/compareView.js -> applyIntervention() subtracts cooling_c from
+  - frontend/js/dataLoader.js  -> applyIntervention() subtracts cooling_c from
                                   temperature to build the "After Intervention"
-                                  map. It falls back to a flat 3 C only for
-                                  features carrying no cooling_c, which means
-                                  the legacy mock_data/grid.geojson and nothing
-                                  this script produces.
+                                  map.
 
 Column renames applied here: LST -> temperature, NDVI -> ndvi.
 
@@ -25,13 +22,15 @@ Geometry is the original .geo polygon carried through verbatim from the source
 CSV, so no reprojection or precision loss is introduced.
 
 Input : Results/tiered.csv
-Output: Results/grid.geojson
-        ../frontend/data/grid.geojson   (the file the dashboard actually loads)
+Output: ../frontend/data/grid.geojson   (the file the dashboard loads)
 
-Both destinations are written by this script. Previously only Results/ was
-written and somebody copied the file into frontend/data/ by hand - an
-undocumented manual step with nothing to detect it being skipped. The dashboard
-served a stale grid for weeks partly because of it.
+There is deliberately ONE output. This script used to write only Results/, and
+somebody copied the file into frontend/data/ by hand - an undocumented manual
+step with nothing to detect it being skipped, which is part of why the dashboard
+served a stale grid for weeks. It was then briefly changed to write both, which
+fixed the staleness but committed the same 3.7 MB twice.
+
+The dashboard's copy is the real artifact, so it is the only one written.
 
 Run:  python scripts/export_grid_geojson.py
 """
@@ -96,10 +95,8 @@ STRING_COLUMNS = ["grid_id", "priority", "recommended_action"]
 
 RESULTS_DIR = MODULE_DIR / "Results"
 INPUT_CSV = RESULTS_DIR / "tiered.csv"
-OUTPUT_GEOJSON = RESULTS_DIR / "grid.geojson"
-# The dashboard's copy. frontend/js/main.js loads 'data/grid.geojson' first and
-# falls back to the legacy mock only if that fetch fails.
-FRONTEND_GEOJSON = REPO_DIR / "frontend" / "data" / "grid.geojson"
+# The dashboard's copy, and the only one. frontend/js/main.js loads it.
+OUTPUT_GEOJSON = REPO_DIR / "frontend" / "data" / "grid.geojson"
 
 
 def build_feature(row: pd.Series) -> dict:
@@ -110,9 +107,7 @@ def build_feature(row: pd.Series) -> dict:
             "grid_id": str(row["grid_id"]),
             # LST -> temperature
             "temperature": round(float(row["LST"]), TEMPERATURE_DECIMALS),
-            # NDVI -> ndvi. Still the UNCORRECTED value (SPEC_AUDIT #3); the
-            # dashboard displays it as-is, so the caveat must reach the reader
-            # through the module README, not silently through this field.
+            # NDVI -> ndvi.
             "ndvi": round(float(row["NDVI"]), NDVI_DECIMALS),
             "priority": str(row["priority"]),
             "recommended_action": str(row["recommended_action"]),
@@ -183,16 +178,13 @@ def main() -> None:
     print(f"Built and validated {len(features):,} features")
 
     collection = {"type": "FeatureCollection", "features": features}
-    payload = json.dumps(collection)
 
-    OUTPUT_GEOJSON.write_text(payload, encoding="utf-8")
-    FRONTEND_GEOJSON.parent.mkdir(parents=True, exist_ok=True)
-    FRONTEND_GEOJSON.write_text(payload, encoding="utf-8")
+    OUTPUT_GEOJSON.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT_GEOJSON.write_text(json.dumps(collection), encoding="utf-8")
 
     size_mb = OUTPUT_GEOJSON.stat().st_size / 1_048_576
     print(
-        f"Wrote {OUTPUT_GEOJSON.relative_to(MODULE_DIR)} and "
-        f"{FRONTEND_GEOJSON.relative_to(REPO_DIR)} "
+        f"Wrote {OUTPUT_GEOJSON.relative_to(REPO_DIR)} "
         f"({size_mb:.2f} MB, {len(features):,} features)"
     )
     print(f"Properties per feature: {FRONTEND_PROPERTIES}")

@@ -157,17 +157,6 @@ def test_no_action_cells_carry_no_cost_and_no_cooling(frontend_cells):
     assert (idle["cost_estimate"] == 0).all()
 
 
-def test_frontend_grid_matches_the_ml_export():
-    """
-    export_grid_geojson.py writes both copies. If they diverge, somebody
-    reintroduced the manual copy step.
-    """
-    ml_copy = ML_RESULTS / "grid.geojson"
-    if not (ml_copy.exists() and FRONTEND_GEOJSON.exists()):
-        pytest.skip("grid.geojson not built")
-    assert ml_copy.read_bytes() == FRONTEND_GEOJSON.read_bytes()
-
-
 # --------------------------------------------------------------------------
 # The two recommendation engines must agree
 # --------------------------------------------------------------------------

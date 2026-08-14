@@ -64,6 +64,7 @@ costs below.
 | Two diverged copies of the Earth Engine script | Ambiguous provenance for every number | Fixed — one canonical copy |
 | `leaflet-control-geocoder` unpinned | An upstream release could break the live site | Fixed — pinned to 2.4.0 |
 | Four documentation pages referenced but never written | Eight broken links | Fixed — written |
+| ~12 MB of duplicated and fabricated committed data | Two byte-identical 3.7 MB grids, an unused 4.4 MB variant, a 3.3 MB regenerable intermediate, and a 900-cell fake grid that would have rendered as real if a fetch failed | Fixed — removed; the export now writes one file |
 
 ---
 
@@ -108,9 +109,9 @@ costs below.
 | 6 | **No mobile layout, no keyboard map navigation.** | days |
 | 7 | **One Landsat scene is one moment.** A pre/post-monsoon or summer/winter pair would turn a snapshot into a trend. | days |
 | 8 | **Make the budget interactive.** Decision-Support already computes the ranked, budget-capped shortlist offline; exposing it as a slider is the most compelling thing this dataset can do. | days |
-| 9 | **Both `SPEC_AUDIT.md` files still describe the pre-fix state** and should be folded into this document or deleted. | hour |
+| 9 | **Both `SPEC_AUDIT.md` files still describe the pre-fix state.** They now carry a superseded banner pointing here, but were left in place rather than deleted — they are other contributors' module documentation and may hold detail worth folding in first. | hour |
+| 13 | **Three top-level directories contain spaces and an ampersand** (`Machine Learning & Prediction`, `Remote Sensing & Data Engineering`). Every cross-reference is URL-encoded (`%20%26%20`), scripts quote paths defensively, and CI needs quoted `working-directory` keys. Renaming to `ml/`, `remote-sensing/` would be cleaner but touches ~40 files, the CI workflows, `.vercelignore` and `shared/uhi_shared.py` for a cosmetic payoff. **Deliberately not done** — it needs a decision, not a drive-by. | decision |
 | 10 | **No linting or formatting config anywhere**, and no `package.json` for the frontend. All eleven JS files share global scope via `<script>` tags — `view`, `charts` and `INTERVENTIONS` are globals. ES modules plus ESLint would fix it without introducing a build step; `ruff` would cover the Python side. | hours |
-| 11 | **~12 MB of the repository is duplicated or regenerable.** `frontend/data/grid.geojson` and `Machine Learning & Prediction/Results/grid.geojson` are byte-identical copies at 3.7 MB each; `Remote Sensing & Data Engineering/Results/grid.geojson` is a third 4.4 MB variant with the raw schema; `preprocessed.csv` and `tiered.csv` add ~6 MB and regenerate exactly. Only `dataset.csv` genuinely cannot be rebuilt without an Earth Engine account. Committing just that one and generating the rest in CI would shrink the repo substantially — but it would also mean a clone no longer renders the dashboard without running Python first, so it is a real trade-off, not an obvious win. | hours |
 | 12 | **46% of the study area now receives no action by design.** The `already_green` rule excludes all 3,752 cells ESA WorldCover classifies as tree cover, including hot ones. This is the single largest behavioural change from the land-cover fix and is defensible for *planting*, but arguably wrong for a hot, sparsely-canopied cell that WorldCover still labels tree cover. Worth a deliberate decision rather than inheriting it. | decision |
 
 ---

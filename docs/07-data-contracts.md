@@ -120,9 +120,8 @@ pd.read_csv(path, keep_default_na=False,
 
 ## Contract 4 — `grid.geojson` (the frontend contract)
 
-**Written by** `export_grid_geojson.py`, to **both**
-`Machine Learning & Prediction/Results/grid.geojson` and
-`frontend/data/grid.geojson`. **Read by** the browser.
+**Written by** `export_grid_geojson.py`, to `frontend/data/grid.geojson`.
+**Read by** the browser. One file, one writer.
 
 A `FeatureCollection`. Each feature has a `Polygon` geometry and **exactly**
 these seven properties — no more, no fewer. `validate()` enforces this and
@@ -138,10 +137,10 @@ refuses to write a file that violates it.
 | `cost_estimate` | **int** | `popup.js` | Must be `int`: `.toLocaleString()` is called on it. |
 | `cooling_c` | **numeric** | `dataLoader.js`, `compareView.js` | Must be numeric: the after-map computes `temperature − cooling_c`. A string silently produces string concatenation, not arithmetic. |
 
-**Both copies are written by the same run.** Previously only the `Results/` copy
-was written and somebody copied it into `frontend/data/` by hand — an
-undocumented step with nothing to detect it being skipped. A test asserts the
-two files are byte-identical.
+**There is one copy.** Previously only a `Results/` copy was written and somebody
+moved it into `frontend/data/` by hand — an undocumented step with nothing to
+detect it being skipped. It then briefly wrote both, duplicating 3.7 MB in the
+repository. The dashboard's copy is the artifact, so it is the only one.
 
 ### What the browser does with it
 

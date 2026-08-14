@@ -1,6 +1,11 @@
 /* Bootstrap. */
 
-const DATA_SOURCES = ['data/grid.geojson', 'mock_data/grid.geojson'];
+/* One source. There used to be a fallback to a hand-written mock grid of 900
+   synthetic cells spanning a fabricated 28-42 C. If the real fetch ever failed
+   the dashboard would quietly render invented numbers as though they were
+   measurements, which is worse than showing nothing. The mock is gone; a failed
+   fetch now surfaces the error below. */
+const DATA_SOURCES = ['data/grid.geojson'];
 
 initChartDefaults();
 

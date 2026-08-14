@@ -22,7 +22,7 @@ flowchart TB
         PREP --> TIER["tier_and_recommend.py"]
         TIER --> TIERED["tiered.csv"]
         TIERED --> EXPORT["export_grid_geojson.py"]
-        EXPORT --> GRID["Results/grid.geojson"]
+        EXPORT --> GRID["frontend/data/grid.geojson"]
     end
 
     subgraph DS["Decision-Support"]

@@ -186,8 +186,8 @@ priority.
 
 ## Step 4 — `export_grid_geojson.py`
 
-Reads `Results/tiered.csv`, writes `Results/grid.geojson` **and**
-`frontend/data/grid.geojson`.
+Reads `Results/tiered.csv`, writes `frontend/data/grid.geojson` - the single
+copy the dashboard loads.
 
 Renames `LST → temperature` and `NDVI → ndvi`, rounds temperature and cooling to
 1 dp and NDVI to 3, and carries the source polygon through verbatim so no

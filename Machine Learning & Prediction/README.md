@@ -30,7 +30,8 @@ fixed and CI re-runs it on every push, failing if the committed outputs drift.
 
 # 1. Preprocessing
 
-`scripts/preprocess.py` - reads `dataset.csv`, writes `Results/preprocessed.csv`.
+`scripts/preprocess.py` - reads `dataset.csv`, writes `Results/preprocessed.csv`
+(gitignored: a pure intermediate, regenerated in seconds).
 
 - Resolves the source dataset through `shared.source_dataset_path()` rather than
   a hardcoded filename. The file was renamed once (`Guwahati_Urban_Heat_Dataset.csv`
@@ -363,8 +364,8 @@ is a real action label, and pandas' default `na_values` turns it into `NaN`. See
 
 # 7. Frontend Integration
 
-`scripts/export_grid_geojson.py` writes 8,144 features, 3.64 MB, to **both**
-`Results/grid.geojson` and `frontend/data/grid.geojson`.
+`scripts/export_grid_geojson.py` writes 8,144 features, 3.64 MB, to
+`frontend/data/grid.geojson` - the single copy the dashboard loads.
 
 Feature properties are exactly these seven keys, no more and no fewer:
 
@@ -377,10 +378,11 @@ grid_id, temperature, ndvi, priority, recommended_action, cost_estimate, cooling
 computes `temperature - cooling_c`), and an action from the known four. It fails
 loudly rather than shipping a file the dashboard cannot render.
 
-**Both copies are written by the same run.** Previously only the `Results/` copy
-was written and somebody copied it into `frontend/data/` by hand - an
-undocumented step with nothing to detect it being skipped. A test asserts the two
-files are byte-identical.
+**There is deliberately one output.** This script used to write only `Results/`
+and somebody copied it into `frontend/data/` by hand - an undocumented step with
+nothing to detect it being skipped. It then briefly wrote both, which fixed the
+staleness but committed the same 3.7 MB twice. The dashboard's copy is the real
+artifact, so it is the only one written.
 
 No legend retuning is needed when this output changes: `frontend/js/config.js`
 derives its colour domain from the 2nd/98th percentiles of whatever it loads.
