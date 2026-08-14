@@ -1,4 +1,5 @@
 """
+<<<<<<< HEAD
 Member 3 - Decision Support
 Urban Heat Island cooling-intervention recommender for Guwahati.
 
@@ -27,17 +28,93 @@ import json
 from pathlib import Path
 
 import numpy as np
+=======
+Decision Support (v3)
+Urban Heat Island priority ranking for Guwahati - now on real land cover.
+
+WHY THIS VERSION EXISTS:
+v2 consumed the ML module's tiered.csv, which had real per-cell cost but no
+real land-cover suitability filtering (land cover didn't exist upstream yet).
+The satellite processing pipeline has since been re-run with the NDVI
+rescale fix applied - the committed dataset now has genuine ESA WorldCover
+land-cover codes, corrected NDVI (max 0.78, previously capped at 0.39), and
+real Latitude/Longitude. That finally makes the suitability filter
+meaningful instead of a documented no-op.
+
+tiered.csv is NOT used here. Its tiers and actions were computed against the
+old, uncorrected NDVI - Heat_Risk quartile thresholds shifted completely
+after the fix (old: 0.006 / 0.241, new: -0.325 / 0.040), so every tier and
+action assignment in it is now stale. This module computes tiering directly
+from the corrected dataset instead of waiting on a rerun of that pipeline,
+since it doesn't depend on anything else changing.
+
+INPUT PATH: resolves relative to this file's own location in the repo
+(../Remote Sensing & Data Engineering/Dataset/Guwahati_Urban_Heat_Dataset.csv),
+not a hardcoded absolute path - runs correctly from any clean clone, verified
+against the actual committed repo structure.
+
+PIPELINE:
+  1. Load dataset.csv (grid_id, LST, NDVI, Heat_Risk, LandCover, Latitude,
+     Longitude, NDBI, Vegetation)
+  2. Map real ESA WorldCover land-cover codes to suitability categories
+  3. Apply hard suitability rules (never-touch water/wetland; roof-type
+     interventions only on built-up; ground interventions only on open land)
+  4. Tier by Heat_Risk quartile (High/Medium/Low), same convention as
+     the ML module's original approach, recomputed on corrected data
+  5. Score cooling_c / cost_estimate using real cell-area-based cost
+  6. Greedy, budget-capped ranking
+  7. Export recommendation.csv, ranking.csv, excluded.csv
+
+KNOWN LIMITATION, STATED HONESTLY:
+ESA WorldCover has no dedicated road class - roads are folded into the
+generic "built-up" category alongside buildings. This module cannot fully
+guarantee "no interventions on roads" as a result. The mitigation: ground-
+level interventions (tree cover, park) are restricted to open-land classes
+only and never placed on built-up cells; built-up cells are only ever
+assigned roof-type interventions (cool roof), which are moot rather than
+harmful if a given built-up cell actually turns out to be a road. This is
+the same defensive principle used in earlier revisions, now applied to real
+data instead of a coarse NDVI proxy.
+"""
+
+import os
+>>>>>>> 42cdcdaa5d037a606c1f3926dfa7bfc538e252eb
 import pandas as pd
-from shapely.geometry import shape
 
 # ------------------------------------------------------------------
 # CONFIG
 # ------------------------------------------------------------------
+<<<<<<< HEAD
 USE_SYNTHETIC = False
 USE_PROXY_LANDCOVER = True   # flip to False once Member 1 adds real land_cover column
 GRID_CELL_AREA_M2 = 100 * 100
+=======
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATASET_CSV = os.path.join(
+    SCRIPT_DIR, "..", "Remote Sensing & Data Engineering", "Dataset",
+    "Guwahati_Urban_Heat_Dataset.csv"
+)
+>>>>>>> 42cdcdaa5d037a606c1f3926dfa7bfc538e252eb
 
-BUDGET_RUPEES = 5_000_000
+# Grid cells are ~100m defined in degrees, not a projected CRS, so they are
+# not exactly square in metres. Verified in the Remote Sensing audit:
+# 0.00089832 deg square -> 89.8m x 99.3m at this latitude = ~8,918 sq m.
+# Matches cell_area_m2 previously computed by the ML module's own export.
+CELL_AREA_M2 = 8918.0
+
+# Per-square-metre unit rates (INR), same rates the ML module used - these
+# don't depend on NDVI or land cover, so they remain valid unchanged.
+RATE_COOL_ROOF = 60.0
+RATE_TREE_COVER = 37.5
+RATE_GREEN_PARK = 25.0
+
+# Cooling estimates (deg C) - stated engineering assumptions, not measured
+# or fitted for Guwahati. Unchanged from all earlier revisions.
+COOLING_COOL_ROOF = 1.0
+COOLING_TREE_COVER = 0.8
+COOLING_GREEN_PARK = 2.0
+
+BUDGET_RUPEES = 100_000_000  # INR 10 crore demo default
 
 # ------------------------------------------------------------------
 # PATHS (resolved relative to this file, so the script runs from anywhere)
@@ -60,15 +137,10 @@ RANKING_CSV = MODULE_DIR / "ranking.csv"
 # ------------------------------------------------------------------
 # STEP 0: LOAD DATA
 # ------------------------------------------------------------------
-def extract_centroid(geo_str):
-    """Parse the .geo GeoJSON string GEE exports and return (lat, lon) centroid."""
-    try:
-        geom = shape(json.loads(geo_str))
-        c = geom.centroid
-        return pd.Series([c.y, c.x], index=["lat", "lon"])
-    except Exception:
-        return pd.Series([np.nan, np.nan], index=["lat", "lon"])
+df = pd.read_csv(DATASET_CSV)
+df = df.rename(columns={"Latitude": "lat", "Longitude": "lon"})
 
+<<<<<<< HEAD
 
 def proxy_land_cover(row, ndvi_q1, ndvi_q3):
     """
@@ -165,123 +237,139 @@ print(df["land_cover"].value_counts())
 # So: for any reported, displayed, or pitched cost, use COST_HEURISTICS. The
 # two models must NEVER be quoted side by side - they are different units on
 # different bases, and presenting both invites a false comparison.
+=======
+print(f"Loaded {len(df)} grid cells from dataset.csv")
+print(f"NDVI range: {df['NDVI'].min():.3f} to {df['NDVI'].max():.3f} "
+      f"(confirms corrected data - buggy version capped at 0.386)")
+
 # ------------------------------------------------------------------
-INTERVENTIONS = {
-    "trees": {
-        "cost_per_cell": 5_000,
-        "cooling_c": 0.8,
-        # works on proxy categories now; add "hillslope" back once real land cover lands
-        "allowed_land_cover": ["moderate", "bare_or_built_hot",
-                                "vacant", "residential", "park", "hillslope"],
-    },
-    "pocket_park": {
-        "cost_per_cell": 400_000,
-        "cooling_c": 2.0,
-        # deliberately NOT enabled on proxy data - proxy can't confirm a cell is
-        # actually open/vacant land vs. a road or building. Real land_cover required.
-        "allowed_land_cover": [] if USE_PROXY_LANDCOVER else ["vacant"],
-        "min_cell_area_m2": GRID_CELL_AREA_M2,
-    },
-    "green_roof": {
-        "cost_per_cell": 150_000,
-        "cooling_c": 1.5,
-        # same reasoning - needs confirmed building footprints, not proxy
-        "allowed_land_cover": [] if USE_PROXY_LANDCOVER else ["building_dense"],
-    },
-    "cool_roof": {
-        "cost_per_cell": 30_000,
-        "cooling_c": 1.0,
-        # safe on proxy: even if we can't tell building vs bare ground, a reflective
-        # coating recommendation just becomes moot (not harmful) if it's not a roof -
-        # unlike a pond, which would be actively wrong if placed on a road
-        "allowed_land_cover": ["moderate", "bare_or_built_hot",
-                                "building_dense", "residential"],
-    },
+# STEP 1: MAP REAL LAND COVER TO SUITABILITY CATEGORIES
+# ESA WorldCover v200 class codes:
+#   10 tree cover, 20 shrubland, 30 grassland, 40 cropland, 50 built-up,
+#   60 bare/sparse vegetation, 80 water, 90 herbaceous wetland
+>>>>>>> 42cdcdaa5d037a606c1f3926dfa7bfc538e252eb
+# ------------------------------------------------------------------
+LANDCOVER_LABELS = {
+    10: "tree_cover", 20: "shrubland", 30: "grassland", 40: "cropland",
+    50: "built_up", 60: "bare_sparse", 70: "snow_ice", 80: "water",
+    90: "wetland", 95: "mangroves", 100: "moss_lichen",
 }
+df["land_cover"] = df["LandCover"].map(LANDCOVER_LABELS).fillna("unknown")
 
-NEVER_TOUCH = ["road", "highway", "water", "wetland"]
+print(f"\nLand cover distribution:\n{df['land_cover'].value_counts()}")
+
+NEVER_TOUCH = ["water", "wetland"]
+ALREADY_GREEN = ["tree_cover"]
+# built_up: roof-type only (could be a road, WorldCover has no road class - see module docstring)
+ROOF_ELIGIBLE = ["built_up"]
+# open land: ground-type only, never built_up
+GROUND_ELIGIBLE = ["bare_sparse", "grassland", "cropland"]
 
 # ------------------------------------------------------------------
-# STEP 2: RULE-BASED SUITABILITY FILTER
+# STEP 2: TIER BY HEAT_RISK (recomputed on corrected data)
 # ------------------------------------------------------------------
-def suitable_interventions_for_cell(land_cover):
-    """Return list of intervention names legally/physically valid for this cell."""
-    if land_cover in NEVER_TOUCH:
-        return []
-    return [
-        name for name, spec in INTERVENTIONS.items()
-        if land_cover in spec["allowed_land_cover"]
-    ]
+q1, q3 = df["Heat_Risk"].quantile([0.25, 0.75])
+print(f"\nHeat_Risk quartiles (corrected data): Low <{q1:.4f}, High >={q3:.4f}")
 
 
-def best_intervention_for_cell(row):
-    """
-    Among suitable options for a cell, pick the one with highest cooling_per_rupee.
-    Returns (intervention_name, cost, cooling_c, cooling_per_rupee, exclusion_reason).
-    """
-    options = suitable_interventions_for_cell(row["land_cover"])
-    if not options:
-        reason = ("already vegetated - no action needed"
-                   if row["land_cover"] == "vegetated"
-                   else "excluded (never-touch land cover)")
-        return pd.Series([None, None, None, None, reason],
-                          index=["intervention", "cost_rupees", "cooling_c",
-                                 "cooling_per_rupee", "exclusion_reason"])
-
-    best = None
-    for name in options:
-        spec = INTERVENTIONS[name]
-        cpr = spec["cooling_c"] / spec["cost_per_cell"]
-        # Slightly favor cells that are already hotter and low-NDVI (more room to improve)
-        heat_priority_boost = 1 + max(0, (row["predicted_temp"] - 35)) * 0.02
-        adjusted_cpr = cpr * heat_priority_boost
-        if best is None or adjusted_cpr > best[3]:
-            best = (name, spec["cost_per_cell"], spec["cooling_c"], adjusted_cpr)
-
-    return pd.Series(best + (None,), index=["intervention", "cost_rupees", "cooling_c",
-                                             "cooling_per_rupee", "exclusion_reason"])
+def assign_tier(heat_risk):
+    if heat_risk >= q3:
+        return "High"
+    elif heat_risk <= q1:
+        return "Low"
+    return "Medium"
 
 
-result = df.join(df.apply(best_intervention_for_cell, axis=1))
+df["priority"] = df["Heat_Risk"].apply(assign_tier)
 
-# Cells with no valid intervention (roads/water/etc.) are recorded, not silently dropped -
-# transparency matters for the demo.
-excluded = result[result["intervention"].isna()].copy()
-recommendation = result[result["intervention"].notna()].copy()
+# ------------------------------------------------------------------
+# STEP 3: SUITABILITY FILTER + ACTION ASSIGNMENT
+# ------------------------------------------------------------------
+def assign_action(row):
+    lc = row["land_cover"]
+    tier = row["priority"]
 
-print(f"Excluded: {len(excluded)} cells")
+    if lc in NEVER_TOUCH:
+        return None, "excluded (never-touch land cover: water/wetland)"
+    if lc in ALREADY_GREEN:
+        return None, "already vegetated (tree cover) - no action needed"
+    if tier == "Low":
+        return None, "Low priority - no action needed"
+
+    if lc in ROOF_ELIGIBLE:
+        return "Cool roof", None
+    if lc in GROUND_ELIGIBLE:
+        # High-priority open land gets the larger intervention (park);
+        # Medium-priority open land gets the lighter one (tree cover)
+        return ("Green park" if tier == "High" else "Tree cover"), None
+
+    return None, f"excluded (unclassified land cover: {lc})"
+
+
+actions = df.apply(assign_action, axis=1, result_type="expand")
+df["recommended_action"] = actions[0]
+df["exclusion_reason"] = actions[1]
+
+ACTION_SPEC = {
+    "Cool roof": (RATE_COOL_ROOF, COOLING_COOL_ROOF),
+    "Tree cover": (RATE_TREE_COVER, COOLING_TREE_COVER),
+    "Green park": (RATE_GREEN_PARK, COOLING_GREEN_PARK),
+}
+df["cost_estimate"] = df["recommended_action"].map(
+    lambda a: ACTION_SPEC[a][0] * CELL_AREA_M2 if a in ACTION_SPEC else None
+)
+df["cooling_c"] = df["recommended_action"].map(
+    lambda a: ACTION_SPEC[a][1] if a in ACTION_SPEC else None
+)
+
+excluded = df[df["recommended_action"].isna()].copy()
+recommendation = df[df["recommended_action"].notna()].copy()
+
+print(f"\nExcluded: {len(excluded)} cells")
 print(excluded["exclusion_reason"].value_counts())
-print(f"Recommendable cells: {len(recommendation)}")
+print(f"\nActionable cells: {len(recommendation)}")
+print(recommendation["recommended_action"].value_counts())
 
 # ------------------------------------------------------------------
-# STEP 3: GREEDY RANKING (cooling-per-rupee, budget-constrained)
-# This is intentionally NOT an optimizer (no knapsack DP, no RL/GA).
-# Sort descending by cooling_per_rupee, walk down, stop at budget.
-# Simple, explainable, defensible in a 5-hour hackathon.
+# STEP 4: SCORE + GREEDY BUDGET-CAPPED RANKING
 # ------------------------------------------------------------------
+recommendation["cooling_per_rupee"] = (
+    recommendation["cooling_c"] / recommendation["cost_estimate"]
+)
+
 ranking = recommendation.sort_values("cooling_per_rupee", ascending=False).reset_index(drop=True)
 ranking["rank"] = ranking.index + 1
+ranking["cumulative_cost"] = ranking["cost_estimate"].cumsum()
+ranking["within_budget"] = ranking["cumulative_cost"] <= BUDGET_RUPEES
 
-if BUDGET_RUPEES is not None:
-    ranking["cumulative_cost"] = ranking["cost_rupees"].cumsum()
-    ranking["within_budget"] = ranking["cumulative_cost"] <= BUDGET_RUPEES
-    n_selected = ranking["within_budget"].sum()
-    print(f"Budget INR {BUDGET_RUPEES:,}: funds top {n_selected} of {len(ranking)} recommended cells")
-else:
-    ranking["within_budget"] = True
+n_selected = ranking["within_budget"].sum()
+print(f"\nBudget INR {BUDGET_RUPEES:,}: funds top {n_selected} of {len(ranking)} actionable cells")
+print(ranking.loc[ranking["within_budget"], "recommended_action"].value_counts())
 
 # ------------------------------------------------------------------
-# STEP 4: EXPORT DELIVERABLES
+# STEP 5: EXPORT DELIVERABLES
 # ------------------------------------------------------------------
+<<<<<<< HEAD
 recommendation_cols = ["grid_id", "lat", "lon", "land_cover", "predicted_temp",
                         "intervention", "cost_rupees", "cooling_c"]
 recommendation.to_csv(RECOMMENDATION_CSV, index=False, columns=recommendation_cols)
 
 excluded_cols = ["grid_id", "lat", "lon", "land_cover", "predicted_temp", "exclusion_reason"]
 excluded.to_csv(EXCLUDED_CSV, index=False, columns=excluded_cols)
+=======
+recommendation_cols = ["grid_id", "lat", "lon", "land_cover", "priority", "LST",
+                        "NDVI", "recommended_action", "cost_estimate", "cooling_c",
+                        "cooling_per_rupee"]
+recommendation.to_csv("recommendation.csv", index=False, columns=recommendation_cols)
 
-ranking_cols = ["rank", "grid_id", "lat", "lon", "intervention", "cost_rupees",
+excluded_cols = ["grid_id", "lat", "lon", "land_cover", "priority", "LST",
+                  "exclusion_reason"]
+excluded.to_csv("excluded.csv", index=False, columns=excluded_cols)
+>>>>>>> 42cdcdaa5d037a606c1f3926dfa7bfc538e252eb
+
+ranking_cols = ["rank", "grid_id", "lat", "lon", "recommended_action", "cost_estimate",
                  "cooling_c", "cooling_per_rupee", "cumulative_cost", "within_budget"]
+<<<<<<< HEAD
 ranking.to_csv(RANKING_CSV, index=False, columns=[c for c in ranking_cols if c in ranking.columns])
 
 # Outputs land next to this script (MODULE_DIR), not in whatever directory you
@@ -292,3 +380,11 @@ print(f"  {EXCLUDED_CSV}")
 print(f"  {RANKING_CSV}")
 print("\nTop 5 priority interventions:")
 print(ranking[["rank", "grid_id", "intervention", "cost_rupees", "cooling_c", "cooling_per_rupee"]].head())
+=======
+ranking.to_csv("ranking.csv", index=False, columns=ranking_cols)
+
+print("\nSaved recommendation.csv, ranking.csv, excluded.csv")
+print("\nTop 5 priority cells:")
+print(ranking[["rank", "grid_id", "recommended_action", "cost_estimate",
+                "cooling_c", "cooling_per_rupee"]].head())
+>>>>>>> 42cdcdaa5d037a606c1f3926dfa7bfc538e252eb
