@@ -6,7 +6,7 @@ GeoJSON geometry, derives per-cell centroid Latitude/Longitude (closing gaps
 #7/#8 in the Remote Sensing SPEC_AUDIT without needing a GEE re-run), and
 writes a tidy table for the downstream steps.
 
-Input : ../Remote Sensing & Data Engineering/Dataset/Guwahati_Urban_Heat_Dataset.csv
+Input : ../Remote Sensing & Data Engineering/Dataset/dataset.csv
 Output: Results/preprocessed.csv
 
 Run:  python scripts/preprocess.py
@@ -15,6 +15,7 @@ Run:  python scripts/preprocess.py
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -26,12 +27,15 @@ from shapely.geometry import shape
 # ---------------------------------------------------------------------------
 MODULE_DIR = Path(__file__).resolve().parent.parent
 REPO_DIR = MODULE_DIR.parent
-SOURCE_CSV = (
-    REPO_DIR
-    / "Remote Sensing & Data Engineering"
-    / "Dataset"
-    / "Guwahati_Urban_Heat_Dataset.csv"
-)
+
+sys.path.insert(0, str(REPO_DIR / "shared"))
+import uhi_shared as shared  # noqa: E402  (path must be set before import)
+
+# Resolved through the shared helper rather than hardcoded here. The dataset
+# was renamed once (Guwahati_Urban_Heat_Dataset.csv -> dataset.csv) and both
+# this module and Decision-Support kept the old name, so both crashed on a
+# clean clone. One definition now, in shared/constants.json.
+SOURCE_CSV = shared.source_dataset_path()
 RESULTS_DIR = MODULE_DIR / "Results"
 OUTPUT_CSV = RESULTS_DIR / "preprocessed.csv"
 
@@ -43,6 +47,17 @@ NDVI_SCALE_MIN, NDVI_SCALE_MAX = -0.2, 0.8
 DROP_COLUMNS = ["system:index", "count"]
 
 
+# Columns the corrected Earth Engine export added. LandCover is not optional:
+# without it the downstream rule engine has no way to tell a lake from a car
+# park, and it previously recommended planting trees on open water. NDBI and
+# Vegetation are carried because they are the two strongest predictors of LST
+# in this dataset (NDBI +0.61, Vegetation -0.46, versus NDVI -0.40).
+REQUIRED_COLUMNS = {
+    "Heat_Risk", "LST", "NDVI", "grid_id", ".geo",
+    "LandCover", "NDBI", "Vegetation",
+}
+
+
 def load_source(path: Path) -> pd.DataFrame:
     if not path.exists():
         raise FileNotFoundError(
@@ -50,9 +65,14 @@ def load_source(path: Path) -> pd.DataFrame:
             "Expected the Remote Sensing & Data Engineering module's exported CSV."
         )
     df = pd.read_csv(path)
-    missing = {"Heat_Risk", "LST", "NDVI", "grid_id", ".geo"} - set(df.columns)
+    missing = REQUIRED_COLUMNS - set(df.columns)
     if missing:
-        raise ValueError(f"Source CSV missing expected columns: {sorted(missing)}")
+        raise ValueError(
+            f"Source CSV missing expected columns: {sorted(missing)}\n"
+            "LandCover / NDBI / Vegetation come from the corrected Earth Engine "
+            "export. If they are absent you are reading the pre-fix dataset; "
+            "re-run Remote Sensing & Data Engineering/GEE/urban_heat_analysis.js."
+        )
     return df
 
 
@@ -88,41 +108,33 @@ def main() -> None:
     print(f"Loaded {len(df):,} rows from {SOURCE_CSV.name}")
 
     # -----------------------------------------------------------------------
-    # NDVI CAVEAT - READ BEFORE TRUSTING ANY OUTPUT OF THIS MODULE
+    # NDVI PROVENANCE CHECK
     #
-    # The source NDVI column is computed in GEE from *raw DN* values without
-    # the Landsat C2 L2 surface-reflectance rescale (x 0.0000275 - 0.2). See
-    # Remote Sensing & Data Engineering/SPEC_AUDIT.md item #3 / "Fix A".
+    # An earlier Earth Engine script computed NDVI from *raw DN* values without
+    # the Landsat C2 L2 surface-reflectance rescale (x 0.0000275 - 0.2), which
+    # compressed the whole city below ~0.39 and biased Heat_Risk high, since
+    # Heat_Risk subtracts NDVI. That correction is NOT recoverable from the
+    # exported CSV - NDVI_wrong depends only on the DN ratio while NDVI_correct
+    # depends on the DN sum, and the sum is not exported. It needs a GEE re-run.
     #
-    # We do NOT correct it here, and it is not a matter of preference: the
-    # correction is mathematically NON-INVERTIBLE from this CSV. NDVI_wrong
-    # depends only on the DN *ratio*, while NDVI_correct depends on the DN
-    # *sum* as well - and the sum is not in the exported data. Worked example,
-    # three band pairs that all produce the same wrong NDVI of 0.3333:
-    #
-    #     nir=20000 red=10000 -> wrong 0.3333, correct 0.6471
-    #     nir=40000 red=20000 -> wrong 0.3333, correct 0.4400
-    #
-    # Recovering true NDVI therefore requires re-running the GEE script with
-    # Fix A applied and re-exporting. Until then every NDVI value below is
-    # compressed toward zero, and Heat_Risk (which subtracts NDVI) is
-    # correspondingly biased HIGH - vegetation is systematically
-    # under-credited.
-    #
-    # NOTE FOR FUTURE CONTRIBUTORS: because this module applies no NDVI
-    # correction, fixing item A upstream in the GEE script and re-exporting is
-    # safe - there is no double-correction hazard. This pipeline simply reads
-    # whatever NDVI column it is given.
+    # That re-run has since happened. Rather than hardcode a caveat about the
+    # data - which is how every script in this repo ended up printing
+    # "NDVI is UNCORRECTED" for weeks after the corrected export landed - the
+    # warning is now DERIVED from the data actually in hand.
     # -----------------------------------------------------------------------
-    print(
-        "WARNING: NDVI is passed through UNCORRECTED (raw-DN artifact, "
-        "SPEC_AUDIT #3). Correction is non-invertible from this CSV - it needs "
-        "a GEE re-run. Heat_Risk inherits an upward bias."
-    )
-    print(
-        f"         NDVI observed range: {df['NDVI'].min():.3f} to "
-        f"{df['NDVI'].max():.3f} (healthy vegetation should reach ~0.8)"
-    )
+    ndvi_min, ndvi_max = float(df["NDVI"].min()), float(df["NDVI"].max())
+    if shared.ndvi_looks_corrected(ndvi_max):
+        print(
+            f"NDVI range {ndvi_min:.3f} to {ndvi_max:.3f} - consistent with the "
+            "corrected (surface-reflectance) export."
+        )
+    else:
+        print(
+            f"WARNING: NDVI range {ndvi_min:.3f} to {ndvi_max:.3f} - too "
+            "compressed to be surface reflectance. This looks like the pre-fix "
+            "raw-DN export; Heat_Risk inherits an upward bias and every tier "
+            "below is suspect. Re-run the GEE script and re-export."
+        )
 
     geometries = parse_geometry(df[".geo"])
     print(f"Parsed {len(geometries):,} polygon geometries from the .geo column")
@@ -144,11 +156,24 @@ def main() -> None:
 
     # Keep the original .geo string verbatim so the export step reproduces the
     # source polygons exactly rather than round-tripping through a reprojection.
+    # Human-readable land-cover label alongside the raw WorldCover code, so
+    # every downstream file is auditable without a lookup table to hand.
+    df["land_cover"] = df["LandCover"].map(shared.land_cover_label)
+    print("\nLand cover distribution:")
+    print(df["land_cover"].value_counts().to_string())
+
     out = df.drop(columns=[c for c in DROP_COLUMNS if c in df.columns]).rename(
         columns={".geo": "geo_json"}
     )
+    # LandCover / NDBI / Vegetation are carried forward from here on. They were
+    # previously dropped at this exact line, which is why the rule engine had no
+    # land-cover input and recommended tree planting on open water.
     out = out[
-        ["grid_id", "LST", "NDVI", "Heat_Risk", "Latitude", "Longitude", "geo_json"]
+        [
+            "grid_id", "LST", "NDVI", "Heat_Risk",
+            "LandCover", "land_cover", "NDBI", "Vegetation",
+            "Latitude", "Longitude", "geo_json",
+        ]
     ]
 
     if out.isna().to_numpy().any():

@@ -18,6 +18,7 @@ Run:  python scripts/tier_and_recommend.py
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import matplotlib
@@ -28,107 +29,81 @@ import numpy as np
 import pandas as pd
 from shapely.geometry import shape
 
+MODULE_DIR = Path(__file__).resolve().parent.parent
+REPO_DIR = MODULE_DIR.parent
+
+sys.path.insert(0, str(REPO_DIR / "shared"))
+import uhi_shared as shared  # noqa: E402  (path must be set before import)
+
 # ---------------------------------------------------------------------------
 # Rule 1 - priority tiers: quantile bins on Heat_Risk.
 #
-# Quantiles, not absolute Heat_Risk cutoffs, because Heat_Risk is biased high
-# by the uncorrected NDVI (SPEC_AUDIT #3) - an absolute threshold would be
-# calibrated to a biased scale. Quantiles at least keep the tiers as *relative*
-# ranks within this city.
+# Quantiles rather than absolute Heat_Risk cutoffs, because Heat_Risk is a
+# unit-scaled composite whose absolute value carries no physical meaning across
+# cities. Quantiles keep the tiers as relative ranks within Guwahati, which is
+# what a municipal prioritisation actually needs.
 #
-# Caveat that survives the quantile trick: a perfectly uniform bias would
-# cancel out of a ranking, but this one does not. The NDVI error is
-# brightness-dependent, so it compresses the NDVI term's variance unevenly and
-# leaves Heat_Risk over-weighted toward LST. Tier boundaries are therefore
-# approximate even as ranks.
+# Cut points live in shared/constants.json so this module and Decision-Support
+# tier identically - they previously computed the same quartiles from two
+# separate hardcoded copies.
 # ---------------------------------------------------------------------------
-HIGH_QUANTILE = 0.75  # top 25% of Heat_Risk -> High
-LOW_QUANTILE = 0.25  # bottom 25% of Heat_Risk -> Low
+HIGH_QUANTILE = shared.TIERING["high_quantile"]
+LOW_QUANTILE = shared.TIERING["low_quantile"]
 #                      the middle 50% -> Medium
 
 # ---------------------------------------------------------------------------
-# Rule 2 - vegetation split for the action table.
+# Rule 2 - vegetation class (reported, not decisive).
 #
-# The literature threshold for "vegetated" is NDVI ~0.3, but the uncorrected
-# NDVI here has a p95 of only ~0.295, so an absolute 0.3 would label virtually
-# the whole city as sparse and collapse the decision table. We therefore split
-# at the dataset MEDIAN - a within-city relative measure. Once Fix A lands
-# upstream and NDVI is physically correct, switch this to an absolute 0.3.
+# This used to split at the dataset MEDIAN, as a deliberate workaround: the
+# pre-fix export's NDVI had a p95 of only ~0.295, so the literature threshold
+# of 0.3 would have labelled the entire city "sparse" and collapsed the
+# decision table.
+#
+# The corrected export reaches NDVI 0.78, so that workaround is retired and the
+# absolute literature threshold is back (IMPROVEMENTS.md P0 item 2). Note the
+# median is now ~0.45 - continuing to split there would have mislabelled every
+# genuinely vegetated cell in the 0.30-0.45 band as sparse.
+#
+# vegetation_class is now DESCRIPTIVE only. Since the corrected export carries
+# real ESA WorldCover land cover, suitability is decided by land cover (Rule 3)
+# rather than inferred from a vegetation index.
 # ---------------------------------------------------------------------------
-VEGETATION_SPLIT_QUANTILE = 0.50
+VEGETATION_NDVI_THRESHOLD = shared.TIERING["vegetation_ndvi_threshold"]
 
 # ---------------------------------------------------------------------------
-# Rule 3 - decision table, keyed on (priority, vegetation class).
+# Rule 3 - action assignment, by LAND COVER and priority.
 #
-# Action names are fixed by the dashboard: frontend/js/popup.js renders
-# recommended_action verbatim, and only these four values are expected.
+# This module previously keyed its action table on (priority, vegetation_class)
+# with no land-cover input at all, because land cover did not exist upstream
+# when it was written. The corrected export added it, but this module kept
+# dropping the column in preprocess.py - so the deployed dashboard recommended
+# planting trees on 148 water and wetland cells and building parks on 3,433
+# built-up cells.
+#
+# The Decision-Support module already had the correct suitability rule. Rather
+# than maintain a second copy here, both modules now call the same function.
+# See shared/uhi_shared.py:assign_action for the rule and its ordering.
+#
+# Action names remain a hard contract with the dashboard: frontend/js/config.js
+# keys INTERVENTIONS on these exact four strings.
 # ---------------------------------------------------------------------------
-ACTION_TABLE: dict[tuple[str, str], str] = {
-    ("High", "sparse"): "Tree cover",  # hot + little vegetation -> plant
-    ("High", "vegetated"): "Cool roof",  # hot but already green -> treat surfaces
-    ("Medium", "sparse"): "Green park",
-    ("Medium", "vegetated"): "Green park",
-    ("Low", "sparse"): "None",
-    ("Low", "vegetated"): "None",
-}
+assign_action = shared.assign_action
 
 # ---------------------------------------------------------------------------
-# Rule 4 - cost heuristics.
+# Rules 4 and 5 - cost and expected cooling.
 #
-# THESE ARE PLANNING PLACEHOLDERS, NOT FITTED OR PROCURED COSTS. They are
-# order-of-magnitude figures chosen so the dashboard can rank cells by relative
-# investment; they have no tender or survey behind them. Replace with real
-# municipal unit rates before any figure here informs a budget.
+# Both now live in shared/constants.json, read by this module and by
+# Decision-Support. THEY REMAIN PLANNING PLACEHOLDERS, NOT PROCURED COSTS OR
+# MEASURED COOLING. The cooling figures in particular are not this module's
+# own: they originate in the Decision-Support catalogue, whose own comment
+# calls them "placeholder engineering estimates for a hackathon demo". Nothing
+# is fitted to Guwahati LST, validated against a field trial, or adjusted for
+# canopy age, albedo, humidity or wind, and a flat per-action number ignores
+# that cooling scales with treated area and with how hot a cell already is.
 #
-# coverage_fraction = share of the ~8,900 m2 cell actually treated. Treating
-# 100% of a cell is not physically realistic (roads, buildings, water), so each
-# action carries its own plausible coverage.
+# Replace with measured or modelled values before any figure here is quoted as
+# an outcome or informs a budget.
 # ---------------------------------------------------------------------------
-COST_HEURISTICS: dict[str, dict[str, float]] = {
-    "Tree cover": {"inr_per_m2": 150.0, "coverage_fraction": 0.25},
-    "Cool roof": {"inr_per_m2": 400.0, "coverage_fraction": 0.15},
-    "Green park": {"inr_per_m2": 250.0, "coverage_fraction": 0.10},
-    "None": {"inr_per_m2": 0.0, "coverage_fraction": 0.0},
-}
-
-# ---------------------------------------------------------------------------
-# Rule 5 - expected cooling per action, in degrees C.
-#
-# THESE ARE ASSUMPTIONS, NOT MEASUREMENTS, AND THEY ARE NOT THIS MODULE'S OWN.
-# A cross-module audit claimed this module already computed a per-intervention
-# cooling value; it did not. This block is where such a number enters the ML
-# module for the first time. The values are copied from the Decision-Support
-# module (Decision-Support/member3_decision_support.py, INTERVENTIONS), whose
-# own comment calls them "placeholder engineering estimates for a hackathon
-# demo ... assumptions, not measured field data". Nothing here is fitted to
-# Guwahati LST, validated against a field trial, or adjusted for canopy age,
-# albedo, humidity or local wind. A single flat number per action also ignores
-# that cooling scales with treated area and with how hot the cell already is.
-#
-# Why carry them anyway: frontend/js/compareView.js currently subtracts a flat
-# 3 C from every treated cell, which is worse - it is both invented and
-# uniform. A per-action figure that is honestly labelled as borrowed is an
-# improvement on an unlabelled constant, and it keeps the ML module and the
-# Decision-Support module telling the same story. Replace with measured or
-# modelled cooling before any figure here is quoted as an outcome.
-#
-# Name mapping to the Decision-Support catalogue (this module's four action
-# names are fixed by ACTION_TABLE / the dashboard, and do not match theirs):
-#   Tree cover  <- trees       0.8 C
-#   Cool roof   <- cool_roof   1.0 C
-#   Green park  <- pocket_park 2.0 C
-#   None        <- (no action) 0.0 C
-# Their catalogue also carries green_roof at 1.5 C. This module has no action
-# it maps onto - ACTION_TABLE never recommends a roof-greening treatment - so
-# that option is unrepresented here rather than silently folded into another
-# action. If a "Green roof" action is ever added to Rule 3, 1.5 C is its value.
-# ---------------------------------------------------------------------------
-COOLING_C: dict[str, float] = {
-    "Tree cover": 0.8,
-    "Cool roof": 1.0,
-    "Green park": 2.0,
-    "None": 0.0,
-}
 
 # Degrees -> metres for cell area. The .geo polygons are axis-aligned
 # rectangles in EPSG:4326, so a local equirectangular conversion is exact for
@@ -136,7 +111,6 @@ COOLING_C: dict[str, float] = {
 M_PER_DEG_LAT = 110_574.0
 M_PER_DEG_LON_EQUATOR = 111_320.0
 
-MODULE_DIR = Path(__file__).resolve().parent.parent
 RESULTS_DIR = MODULE_DIR / "Results"
 INPUT_CSV = RESULTS_DIR / "preprocessed.csv"
 OUTPUT_CSV = RESULTS_DIR / "tiered.csv"
@@ -168,10 +142,20 @@ def main() -> None:
         )
     df = pd.read_csv(INPUT_CSV)
     print(f"Loaded {len(df):,} preprocessed rows")
-    print(
-        "WARNING: tiers derive from Heat_Risk, which is biased high by the "
-        "uncorrected NDVI (SPEC_AUDIT #3). Treat tiers as indicative ranks."
-    )
+
+    if "land_cover" not in df.columns:
+        raise ValueError(
+            "preprocessed.csv has no land_cover column - it was produced by an "
+            "older preprocess.py that dropped it. Re-run scripts/preprocess.py."
+        )
+
+    ndvi_max = float(df["NDVI"].max())
+    if not shared.ndvi_looks_corrected(ndvi_max):
+        print(
+            f"WARNING: NDVI max is only {ndvi_max:.3f}. This looks like the "
+            "pre-fix raw-DN export, so Heat_Risk is biased high and these tiers "
+            "are indicative ranks at best."
+        )
 
     # --- priority -----------------------------------------------------------
     df["priority"], low_cut, high_cut = assign_priority(df["Heat_Risk"])
@@ -180,31 +164,54 @@ def main() -> None:
         f"{high_cut:.6f} <= High"
     )
 
-    # --- vegetation class ---------------------------------------------------
-    veg_split = float(df["NDVI"].quantile(VEGETATION_SPLIT_QUANTILE))
-    df["vegetation_class"] = np.where(df["NDVI"] < veg_split, "sparse", "vegetated")
-    print(f"NDVI vegetation split (median): {veg_split:.6f}")
+    # --- vegetation class (descriptive; see Rule 2) -------------------------
+    df["vegetation_class"] = np.where(
+        df["NDVI"] < VEGETATION_NDVI_THRESHOLD, "sparse", "vegetated"
+    )
+    print(
+        f"NDVI vegetation threshold (absolute): {VEGETATION_NDVI_THRESHOLD} "
+        f"-> {(df['vegetation_class'] == 'vegetated').sum():,} vegetated / "
+        f"{(df['vegetation_class'] == 'sparse').sum():,} sparse"
+    )
 
-    # --- action -------------------------------------------------------------
-    df["recommended_action"] = [
-        ACTION_TABLE[(p, v)]
-        for p, v in zip(df["priority"], df["vegetation_class"], strict=True)
+    # --- action (land-cover aware; see Rule 3) ------------------------------
+    assigned = [
+        assign_action(lc, p)
+        for lc, p in zip(df["land_cover"], df["priority"], strict=True)
     ]
+    df["recommended_action"] = [a for a, _ in assigned]
+    df["exclusion_reason"] = [r for _, r in assigned]
+
+    excluded = df["recommended_action"] == "None"
+    print(f"\nNo action: {excluded.sum():,} cells")
+    print(df.loc[excluded, "exclusion_reason"].value_counts().to_string())
+
+    # The safety property this whole rule exists for. Asserted rather than
+    # trusted, because it is invisible in aggregate output and was wrong in
+    # production for weeks.
+    unsafe = df[
+        df["land_cover"].isin(shared.NEVER_TOUCH)
+        & (df["recommended_action"] != "None")
+    ]
+    if len(unsafe):
+        raise AssertionError(
+            f"{len(unsafe)} never-touch cells were assigned an intervention: "
+            f"{unsafe['land_cover'].value_counts().to_dict()}"
+        )
 
     # --- cost ---------------------------------------------------------------
     df["cell_area_m2"] = [cell_area_m2(g) for g in df["geo_json"]]
-    rates = df["recommended_action"].map(lambda a: COST_HEURISTICS[a]["inr_per_m2"])
-    coverage = df["recommended_action"].map(
-        lambda a: COST_HEURISTICS[a]["coverage_fraction"]
-    )
-    df["cost_estimate"] = (df["cell_area_m2"] * rates * coverage).round().astype("int64")
+    # Looked up through the shared helper so an action name missing from the
+    # catalogue raises KeyError instead of quietly becoming NaN - a silent NaN
+    # here becomes a silently free intervention downstream.
+    df["cost_estimate"] = [
+        round(shared.action_cost(a, area))
+        for a, area in zip(df["recommended_action"], df["cell_area_m2"], strict=True)
+    ]
+    df["cost_estimate"] = df["cost_estimate"].astype("int64")
 
     # --- expected cooling ---------------------------------------------------
-    # Appended last so the pre-existing column order in tiered.csv is untouched.
-    # Looked up through a lambda rather than .map(COOLING_C) so an action name
-    # missing from Rule 5 raises a KeyError instead of quietly becoming NaN -
-    # same failure mode as the cost lookups above.
-    df["cooling_c"] = df["recommended_action"].map(lambda a: COOLING_C[a])
+    df["cooling_c"] = df["recommended_action"].map(shared.action_cooling_c)
 
     print(
         f"Cell area: mean {df['cell_area_m2'].mean():,.0f} m2 "
@@ -239,16 +246,19 @@ def main() -> None:
     lines = [
         "# Tiering and recommendation summary",
         "",
-        "> Heat_Risk is biased high by the uncorrected NDVI "
-        "(Remote Sensing SPEC_AUDIT #3). Tiers are indicative ranks, not "
-        "calibrated risk levels. Costs are planning placeholders.",
+        "> Tiers are relative ranks within Guwahati (Heat_Risk quantiles), not "
+        "calibrated absolute risk levels. Costs are planning placeholders.",
         ">",
-        "> Expected cooling is a placeholder assumption too, and not even this "
-        "module's own: the per-action degrees C are copied from the "
-        "Decision-Support INTERVENTIONS catalogue, which labels them "
-        "\"placeholder engineering estimates for a hackathon demo\". They are "
-        "not measured, fitted or validated for Guwahati - see Rule 5 in "
-        "scripts/tier_and_recommend.py.",
+        "> Expected cooling is a placeholder assumption, and not this module's "
+        "own: the per-action degrees C originate in the Decision-Support "
+        "catalogue, which labels them \"placeholder engineering estimates for "
+        "a hackathon demo\". They are not measured, fitted or validated for "
+        "Guwahati - see shared/constants.json.",
+        ">",
+        "> Interventions are gated on real ESA WorldCover land cover: water "
+        "and wetland cells are never treated, built-up cells receive roof "
+        "interventions only, and ground interventions are placed only on open "
+        "land. See shared/uhi_shared.py:assign_action.",
         "",
         "## Thresholds actually applied",
         "",
@@ -256,7 +266,27 @@ def main() -> None:
         "|---|---|",
         f"| Heat_Risk q{LOW_QUANTILE:.2f} (Low boundary) | {low_cut:.6f} |",
         f"| Heat_Risk q{HIGH_QUANTILE:.2f} (High boundary) | {high_cut:.6f} |",
-        f"| NDVI vegetation split (q{VEGETATION_SPLIT_QUANTILE:.2f}) | {veg_split:.6f} |",
+        f"| NDVI vegetation threshold (absolute) | {VEGETATION_NDVI_THRESHOLD} |",
+        "",
+        "## Land cover of the study area",
+        "",
+        "| Land cover | Cells |",
+        "|---|---|",
+        *[
+            f"| {lc} | {n:,} |"
+            for lc, n in df["land_cover"].value_counts().items()
+        ],
+        "",
+        "## Why cells received no action",
+        "",
+        "| Reason | Cells |",
+        "|---|---|",
+        *[
+            f"| {reason} | {n:,} |"
+            for reason, n in df.loc[excluded, "exclusion_reason"]
+            .value_counts()
+            .items()
+        ],
         "",
         "## Outcome",
         "",

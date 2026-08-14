@@ -1,214 +1,241 @@
 """
-Decision Support (v3)
-Urban Heat Island priority ranking for Guwahati - now on real land cover.
+Decision Support (v4)
+Urban Heat Island priority ranking for Guwahati, on real ESA WorldCover land cover.
 
-WHY THIS VERSION EXISTS:
-v2 consumed the ML module's tiered.csv, which had real per-cell cost but no
-real land-cover suitability filtering (land cover didn't exist upstream yet).
-The satellite processing pipeline has since been re-run with the NDVI
-rescale fix applied - the committed dataset now has genuine ESA WorldCover
-land-cover codes, corrected NDVI (max 0.78, previously capped at 0.39), and
-real Latitude/Longitude. That finally makes the suitability filter
-meaningful instead of a documented no-op.
+WHAT CHANGED IN v4
+------------------
+v3 was correct in substance but could not run from a clean clone: it looked for
+`Guwahati_Urban_Heat_Dataset.csv`, which had been renamed to `dataset.csv`.
+It also carried its own private copies of the unit rates, the cooling
+assumptions, the land-cover mapping and the suitability rules - the same
+constants the Machine Learning module maintained separately.
 
-tiered.csv is NOT used here. Its tiers and actions were computed against the
-old, uncorrected NDVI - Heat_Risk quartile thresholds shifted completely
-after the fix (old: 0.006 / 0.241, new: -0.325 / 0.040), so every tier and
-action assignment in it is now stale. This module computes tiering directly
-from the corrected dataset instead of waiting on a rerun of that pipeline,
-since it doesn't depend on anything else changing.
+That duplication was not harmless. The ML module's copy had no land-cover input
+at all, so the dashboard it feeds recommended planting trees on 148 water and
+wetland cells and building parks on 3,433 built-up cells, while this module -
+with the correct rule - quietly produced the right answer into files nobody
+rendered.
 
-INPUT PATH: resolves relative to this file's own location in the repo
-(../Remote Sensing & Data Engineering/Dataset/Guwahati_Urban_Heat_Dataset.csv),
-not a hardcoded absolute path - runs correctly from any clean clone, verified
-against the actual committed repo structure.
+Every shared constant and the suitability rule itself now live in
+`shared/constants.json` and `shared/uhi_shared.py`, imported by both modules.
+This module's numbers are unchanged; it simply no longer owns them alone.
 
-PIPELINE:
-  1. Load dataset.csv (grid_id, LST, NDVI, Heat_Risk, LandCover, Latitude,
-     Longitude, NDBI, Vegetation)
-  2. Map real ESA WorldCover land-cover codes to suitability categories
-  3. Apply hard suitability rules (never-touch water/wetland; roof-type
+The script is also now importable: previously every statement ran at module
+level, so merely importing it executed the pipeline and wrote three CSVs as a
+side effect. That made it impossible to unit-test. See `tests/`.
+
+PIPELINE
+--------
+  1. Load the Remote Sensing module's exported grid dataset
+  2. Map ESA WorldCover codes to suitability categories
+  3. Apply the shared suitability rule (never-touch water/wetland; roof
      interventions only on built-up; ground interventions only on open land)
-  4. Tier by Heat_Risk quartile (High/Medium/Low), same convention as
-     the ML module's original approach, recomputed on corrected data
-  5. Score cooling_c / cost_estimate using real cell-area-based cost
+  4. Tier by Heat_Risk quartile
+  5. Score cooling_c and cost_estimate from the shared rate table
   6. Greedy, budget-capped ranking
   7. Export recommendation.csv, ranking.csv, excluded.csv
 
-KNOWN LIMITATION, STATED HONESTLY:
-ESA WorldCover has no dedicated road class - roads are folded into the
-generic "built-up" category alongside buildings. This module cannot fully
-guarantee "no interventions on roads" as a result. The mitigation: ground-
-level interventions (tree cover, park) are restricted to open-land classes
-only and never placed on built-up cells; built-up cells are only ever
-assigned roof-type interventions (cool roof), which are moot rather than
-harmful if a given built-up cell actually turns out to be a road. This is
-the same defensive principle used in earlier revisions, now applied to real
-data instead of a coarse NDVI proxy.
+KNOWN LIMITATION, STATED HONESTLY
+---------------------------------
+ESA WorldCover has no dedicated road class - roads are folded into the generic
+"built-up" category alongside buildings. This module cannot fully guarantee "no
+interventions on roads". The mitigation: ground-level interventions are
+restricted to open-land classes and never placed on built-up cells; built-up
+cells are only ever assigned roof-type interventions, which are moot rather
+than harmful if a given built-up cell turns out to be a road.
+
+Run:  python member3_decision_support.py
 """
 
-import os
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
 import pandas as pd
 
-# ------------------------------------------------------------------
-# CONFIG
-# ------------------------------------------------------------------
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATASET_CSV = os.path.join(
-    SCRIPT_DIR, "..", "Remote Sensing & Data Engineering", "Dataset",
-    "Guwahati_Urban_Heat_Dataset.csv"
-)
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_DIR = SCRIPT_DIR.parent
 
-# Grid cells are ~100m defined in degrees, not a projected CRS, so they are
-# not exactly square in metres. Verified in the Remote Sensing audit:
-# 0.00089832 deg square -> 89.8m x 99.3m at this latitude = ~8,918 sq m.
-# Matches cell_area_m2 previously computed by the ML module's own export.
+sys.path.insert(0, str(REPO_DIR / "shared"))
+import uhi_shared as shared  # noqa: E402  (path must be set before import)
+
+# Grid cells are ~100 m defined in degrees, not a projected CRS, so they are not
+# exactly square in metres. Verified in the Remote Sensing audit:
+# 0.00089832 deg square -> 89.8 m x 99.3 m at this latitude = ~8,918 m2.
+#
+# The ML module computes each cell's area from its own polygon instead, which
+# varies between 8,912 and 8,920 m2. The two therefore differ by well under
+# 0.1% on any given cell - acceptable, and documented here so the discrepancy
+# is not mistaken for a disagreement.
 CELL_AREA_M2 = 8918.0
 
-# Per-square-metre unit rates (INR), same rates the ML module used - these
-# don't depend on NDVI or land cover, so they remain valid unchanged.
-RATE_COOL_ROOF = 60.0
-RATE_TREE_COVER = 37.5
-RATE_GREEN_PARK = 25.0
+BUDGET_RUPEES = shared.CONSTANTS["budget_rupees"]
 
-# Cooling estimates (deg C) - stated engineering assumptions, not measured
-# or fitted for Guwahati. Unchanged from all earlier revisions.
-COOLING_COOL_ROOF = 1.0
-COOLING_TREE_COVER = 0.8
-COOLING_GREEN_PARK = 2.0
-
-BUDGET_RUPEES = 100_000_000  # INR 10 crore demo default
-
-# ------------------------------------------------------------------
-# STEP 0: LOAD DATA
-# ------------------------------------------------------------------
-df = pd.read_csv(DATASET_CSV)
-df = df.rename(columns={"Latitude": "lat", "Longitude": "lon"})
-
-print(f"Loaded {len(df)} grid cells from dataset.csv")
-print(f"NDVI range: {df['NDVI'].min():.3f} to {df['NDVI'].max():.3f} "
-      f"(confirms corrected data - buggy version capped at 0.386)")
-
-# ------------------------------------------------------------------
-# STEP 1: MAP REAL LAND COVER TO SUITABILITY CATEGORIES
-# ESA WorldCover v200 class codes:
-#   10 tree cover, 20 shrubland, 30 grassland, 40 cropland, 50 built-up,
-#   60 bare/sparse vegetation, 80 water, 90 herbaceous wetland
-# ------------------------------------------------------------------
-LANDCOVER_LABELS = {
-    10: "tree_cover", 20: "shrubland", 30: "grassland", 40: "cropland",
-    50: "built_up", 60: "bare_sparse", 70: "snow_ice", 80: "water",
-    90: "wetland", 95: "mangroves", 100: "moss_lichen",
-}
-df["land_cover"] = df["LandCover"].map(LANDCOVER_LABELS).fillna("unknown")
-
-print(f"\nLand cover distribution:\n{df['land_cover'].value_counts()}")
-
-NEVER_TOUCH = ["water", "wetland"]
-ALREADY_GREEN = ["tree_cover"]
-# built_up: roof-type only (could be a road, WorldCover has no road class - see module docstring)
-ROOF_ELIGIBLE = ["built_up"]
-# open land: ground-type only, never built_up
-GROUND_ELIGIBLE = ["bare_sparse", "grassland", "cropland"]
-
-# ------------------------------------------------------------------
-# STEP 2: TIER BY HEAT_RISK (recomputed on corrected data)
-# ------------------------------------------------------------------
-q1, q3 = df["Heat_Risk"].quantile([0.25, 0.75])
-print(f"\nHeat_Risk quartiles (corrected data): Low <{q1:.4f}, High >={q3:.4f}")
+OUTPUT_RECOMMENDATION = SCRIPT_DIR / "recommendation.csv"
+OUTPUT_EXCLUDED = SCRIPT_DIR / "excluded.csv"
+OUTPUT_RANKING = SCRIPT_DIR / "ranking.csv"
 
 
-def assign_tier(heat_risk):
-    if heat_risk >= q3:
-        return "High"
-    elif heat_risk <= q1:
-        return "Low"
-    return "Medium"
+def load_dataset() -> pd.DataFrame:
+    """Load the grid dataset and rename coordinates to this module's convention."""
+    path = shared.source_dataset_path()
+    df = pd.read_csv(path)
+    df = df.rename(columns={"Latitude": "lat", "Longitude": "lon"})
+
+    required = {"grid_id", "LST", "NDVI", "Heat_Risk", "LandCover", "lat", "lon"}
+    missing = required - set(df.columns)
+    if missing:
+        raise ValueError(
+            f"{path.name} is missing expected columns: {sorted(missing)}. "
+            "LandCover comes from the corrected Earth Engine export."
+        )
+
+    print(f"Loaded {len(df):,} grid cells from {path.name}")
+    ndvi_max = float(df["NDVI"].max())
+    if shared.ndvi_looks_corrected(ndvi_max):
+        print(f"NDVI range: {df['NDVI'].min():.3f} to {ndvi_max:.3f} (corrected export)")
+    else:
+        print(
+            f"WARNING: NDVI max is only {ndvi_max:.3f} - this looks like the "
+            "pre-fix raw-DN export. Heat_Risk is biased high."
+        )
+    return df
 
 
-df["priority"] = df["Heat_Risk"].apply(assign_tier)
-
-# ------------------------------------------------------------------
-# STEP 3: SUITABILITY FILTER + ACTION ASSIGNMENT
-# ------------------------------------------------------------------
-def assign_action(row):
-    lc = row["land_cover"]
-    tier = row["priority"]
-
-    if lc in NEVER_TOUCH:
-        return None, "excluded (never-touch land cover: water/wetland)"
-    if lc in ALREADY_GREEN:
-        return None, "already vegetated (tree cover) - no action needed"
-    if tier == "Low":
-        return None, "Low priority - no action needed"
-
-    if lc in ROOF_ELIGIBLE:
-        return "Cool roof", None
-    if lc in GROUND_ELIGIBLE:
-        # High-priority open land gets the larger intervention (park);
-        # Medium-priority open land gets the lighter one (tree cover)
-        return ("Green park" if tier == "High" else "Tree cover"), None
-
-    return None, f"excluded (unclassified land cover: {lc})"
+def add_land_cover(df: pd.DataFrame) -> pd.DataFrame:
+    df["land_cover"] = df["LandCover"].map(shared.land_cover_label)
+    print(f"\nLand cover distribution:\n{df['land_cover'].value_counts()}")
+    return df
 
 
-actions = df.apply(assign_action, axis=1, result_type="expand")
-df["recommended_action"] = actions[0]
-df["exclusion_reason"] = actions[1]
+def assign_tiers(df: pd.DataFrame) -> pd.DataFrame:
+    """Heat_Risk quartile tiers, using the shared cut points."""
+    q_low = shared.TIERING["low_quantile"]
+    q_high = shared.TIERING["high_quantile"]
+    low_cut, high_cut = df["Heat_Risk"].quantile([q_low, q_high])
+    print(f"\nHeat_Risk quartiles: Low <= {low_cut:.4f}, High >= {high_cut:.4f}")
 
-ACTION_SPEC = {
-    "Cool roof": (RATE_COOL_ROOF, COOLING_COOL_ROOF),
-    "Tree cover": (RATE_TREE_COVER, COOLING_TREE_COVER),
-    "Green park": (RATE_GREEN_PARK, COOLING_GREEN_PARK),
-}
-df["cost_estimate"] = df["recommended_action"].map(
-    lambda a: ACTION_SPEC[a][0] * CELL_AREA_M2 if a in ACTION_SPEC else None
-)
-df["cooling_c"] = df["recommended_action"].map(
-    lambda a: ACTION_SPEC[a][1] if a in ACTION_SPEC else None
-)
+    def tier(heat_risk: float) -> str:
+        if heat_risk >= high_cut:
+            return "High"
+        if heat_risk <= low_cut:
+            return "Low"
+        return "Medium"
 
-excluded = df[df["recommended_action"].isna()].copy()
-recommendation = df[df["recommended_action"].notna()].copy()
+    df["priority"] = df["Heat_Risk"].apply(tier)
+    return df
 
-print(f"\nExcluded: {len(excluded)} cells")
-print(excluded["exclusion_reason"].value_counts())
-print(f"\nActionable cells: {len(recommendation)}")
-print(recommendation["recommended_action"].value_counts())
 
-# ------------------------------------------------------------------
-# STEP 4: SCORE + GREEDY BUDGET-CAPPED RANKING
-# ------------------------------------------------------------------
-recommendation["cooling_per_rupee"] = (
-    recommendation["cooling_c"] / recommendation["cost_estimate"]
-)
+def assign_actions(df: pd.DataFrame) -> pd.DataFrame:
+    """Apply the shared suitability rule and cost/cooling lookups."""
+    assigned = [
+        shared.assign_action(lc, p)
+        for lc, p in zip(df["land_cover"], df["priority"], strict=True)
+    ]
+    df["recommended_action"] = [a for a, _ in assigned]
+    df["exclusion_reason"] = [r for _, r in assigned]
 
-ranking = recommendation.sort_values("cooling_per_rupee", ascending=False).reset_index(drop=True)
-ranking["rank"] = ranking.index + 1
-ranking["cumulative_cost"] = ranking["cost_estimate"].cumsum()
-ranking["within_budget"] = ranking["cumulative_cost"] <= BUDGET_RUPEES
+    actionable = df["recommended_action"] != "None"
+    df["cost_estimate"] = [
+        shared.action_cost(a, CELL_AREA_M2) if a != "None" else None
+        for a in df["recommended_action"]
+    ]
+    df["cooling_c"] = [
+        shared.action_cooling_c(a) if a != "None" else None
+        for a in df["recommended_action"]
+    ]
 
-n_selected = ranking["within_budget"].sum()
-print(f"\nBudget INR {BUDGET_RUPEES:,}: funds top {n_selected} of {len(ranking)} actionable cells")
-print(ranking.loc[ranking["within_budget"], "recommended_action"].value_counts())
+    # The safety property the suitability rule exists to guarantee. Asserted,
+    # not assumed - it is invisible in aggregate output.
+    unsafe = df[df["land_cover"].isin(shared.NEVER_TOUCH) & actionable]
+    if len(unsafe):
+        raise AssertionError(
+            f"{len(unsafe)} never-touch cells were assigned an intervention"
+        )
+    return df
 
-# ------------------------------------------------------------------
-# STEP 5: EXPORT DELIVERABLES
-# ------------------------------------------------------------------
-recommendation_cols = ["grid_id", "lat", "lon", "land_cover", "priority", "LST",
-                        "NDVI", "recommended_action", "cost_estimate", "cooling_c",
-                        "cooling_per_rupee"]
-recommendation.to_csv("recommendation.csv", index=False, columns=recommendation_cols)
 
-excluded_cols = ["grid_id", "lat", "lon", "land_cover", "priority", "LST",
-                  "exclusion_reason"]
-excluded.to_csv("excluded.csv", index=False, columns=excluded_cols)
+def rank_within_budget(recommendation: pd.DataFrame) -> pd.DataFrame:
+    """Greedy ranking by cooling per rupee, cut off at the budget."""
+    recommendation = recommendation.copy()
+    recommendation["cooling_per_rupee"] = (
+        recommendation["cooling_c"] / recommendation["cost_estimate"]
+    )
+    ranking = recommendation.sort_values(
+        "cooling_per_rupee", ascending=False
+    ).reset_index(drop=True)
+    ranking["rank"] = ranking.index + 1
+    ranking["cumulative_cost"] = ranking["cost_estimate"].cumsum()
+    ranking["within_budget"] = ranking["cumulative_cost"] <= BUDGET_RUPEES
+    return ranking
 
-ranking_cols = ["rank", "grid_id", "lat", "lon", "recommended_action", "cost_estimate",
-                 "cooling_c", "cooling_per_rupee", "cumulative_cost", "within_budget"]
-ranking.to_csv("ranking.csv", index=False, columns=ranking_cols)
 
-print("\nSaved recommendation.csv, ranking.csv, excluded.csv")
-print("\nTop 5 priority cells:")
-print(ranking[["rank", "grid_id", "recommended_action", "cost_estimate",
-                "cooling_c", "cooling_per_rupee"]].head())
+def main() -> None:
+    df = load_dataset()
+    df = add_land_cover(df)
+    df = assign_tiers(df)
+    df = assign_actions(df)
+
+    excluded = df[df["recommended_action"] == "None"].copy()
+    recommendation = df[df["recommended_action"] != "None"].copy()
+
+    print(f"\nNo action: {len(excluded):,} cells")
+    print(excluded["exclusion_reason"].value_counts())
+    print(f"\nActionable cells: {len(recommendation):,}")
+    print(recommendation["recommended_action"].value_counts())
+
+    recommendation["cooling_per_rupee"] = (
+        recommendation["cooling_c"] / recommendation["cost_estimate"]
+    )
+
+    ranking = rank_within_budget(recommendation)
+    n_selected = int(ranking["within_budget"].sum())
+    print(
+        f"\nBudget INR {BUDGET_RUPEES:,}: funds top {n_selected:,} of "
+        f"{len(ranking):,} actionable cells"
+    )
+    print(ranking.loc[ranking["within_budget"], "recommended_action"].value_counts())
+
+    recommendation.to_csv(
+        OUTPUT_RECOMMENDATION,
+        index=False,
+        columns=[
+            "grid_id", "lat", "lon", "land_cover", "priority", "LST", "NDVI",
+            "recommended_action", "cost_estimate", "cooling_c",
+            "cooling_per_rupee",
+        ],
+    )
+    excluded.to_csv(
+        OUTPUT_EXCLUDED,
+        index=False,
+        columns=[
+            "grid_id", "lat", "lon", "land_cover", "priority", "LST",
+            "exclusion_reason",
+        ],
+    )
+    ranking.to_csv(
+        OUTPUT_RANKING,
+        index=False,
+        columns=[
+            "rank", "grid_id", "lat", "lon", "recommended_action",
+            "cost_estimate", "cooling_c", "cooling_per_rupee",
+            "cumulative_cost", "within_budget",
+        ],
+    )
+
+    print(
+        f"\nSaved {OUTPUT_RECOMMENDATION.name}, {OUTPUT_RANKING.name}, "
+        f"{OUTPUT_EXCLUDED.name} in {SCRIPT_DIR}"
+    )
+    print("\nTop 5 priority cells:")
+    print(
+        ranking[
+            ["rank", "grid_id", "recommended_action", "cost_estimate",
+             "cooling_c", "cooling_per_rupee"]
+        ].head()
+    )
+
+
+if __name__ == "__main__":
+    main()

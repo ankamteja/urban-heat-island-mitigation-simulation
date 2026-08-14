@@ -1,0 +1,88 @@
+{
+  "_comment": [
+    "Single source of truth for every cross-module constant.",
+    "",
+    "Before this file existed, the ML module and the Decision-Support module each",
+    "carried their own copy of the unit rates, the cooling assumptions and the",
+    "land-cover mapping. They happened to agree numerically (ML expressed a rate",
+    "as inr_per_m2 x coverage_fraction, Decision-Support pre-multiplied the two",
+    "into a single effective rate), but nothing enforced that and nothing would",
+    "have caught them drifting apart. Both modules now read this file.",
+    "",
+    "Effective per-m2 rate = inr_per_m2 * coverage_fraction:",
+    "  Tree cover  150 x 0.25 = 37.5",
+    "  Cool roof   400 x 0.15 = 60.0",
+    "  Green park  250 x 0.10 = 25.0",
+    "These match the rates Decision-Support previously hardcoded."
+  ],
+
+  "dataset_filename": "dataset.csv",
+
+  "actions": {
+    "_comment": [
+      "The four action labels are a hard contract with the dashboard.",
+      "frontend/js/config.js keys INTERVENTIONS on these exact strings and",
+      "Machine Learning & Prediction/scripts/export_grid_geojson.py enforces",
+      "them in VALID_ACTIONS. Do not rename one side only.",
+      "",
+      "coverage_fraction is the share of a ~8,916 m2 cell actually treated.",
+      "Treating 100% of a cell is not physically realistic.",
+      "",
+      "cooling_c is a PLANNING ASSUMPTION, not a measurement. The figures",
+      "originate in the Decision-Support catalogue, which labels them",
+      "'placeholder engineering estimates for a hackathon demo'. Nothing here",
+      "is fitted to Guwahati, validated against a field trial, or adjusted for",
+      "canopy age, albedo, humidity or wind. Replace before any figure here is",
+      "quoted as an outcome."
+    ],
+    "Tree cover":  { "inr_per_m2": 150.0, "coverage_fraction": 0.25, "cooling_c": 0.8 },
+    "Cool roof":   { "inr_per_m2": 400.0, "coverage_fraction": 0.15, "cooling_c": 1.0 },
+    "Green park":  { "inr_per_m2": 250.0, "coverage_fraction": 0.10, "cooling_c": 2.0 },
+    "None":        { "inr_per_m2": 0.0,   "coverage_fraction": 0.0,  "cooling_c": 0.0 }
+  },
+
+  "land_cover": {
+    "_comment": [
+      "ESA WorldCover v200 class codes, as exported by the GEE script into the",
+      "LandCover column of dataset.csv.",
+      "",
+      "KNOWN LIMITATION: WorldCover has no dedicated road class - roads fall",
+      "into the generic built_up category alongside buildings. The suitability",
+      "rules below are defensive about this: built_up cells are only ever",
+      "assigned roof-type interventions, which are moot rather than harmful if",
+      "a given built_up cell turns out to be a road. Ground-level interventions",
+      "are never placed on built_up."
+    ],
+    "labels": {
+      "10": "tree_cover",
+      "20": "shrubland",
+      "30": "grassland",
+      "40": "cropland",
+      "50": "built_up",
+      "60": "bare_sparse",
+      "70": "snow_ice",
+      "80": "water",
+      "90": "wetland",
+      "95": "mangroves",
+      "100": "moss_lichen"
+    },
+    "never_touch": ["water", "wetland", "mangroves", "snow_ice"],
+    "already_green": ["tree_cover"],
+    "roof_eligible": ["built_up"],
+    "ground_eligible": ["bare_sparse", "grassland", "cropland", "shrubland", "moss_lichen"]
+  },
+
+  "tiering": {
+    "_comment": [
+      "Heat_Risk quantile cut points. Quantiles rather than absolute cutoffs",
+      "because Heat_Risk is a unit-scaled composite whose absolute value is not",
+      "physically meaningful across cities - the tiers are relative ranks",
+      "within Guwahati."
+    ],
+    "high_quantile": 0.75,
+    "low_quantile": 0.25,
+    "vegetation_ndvi_threshold": 0.3
+  },
+
+  "budget_rupees": 100000000
+}
