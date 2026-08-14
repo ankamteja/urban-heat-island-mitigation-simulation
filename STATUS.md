@@ -43,7 +43,7 @@ Current recommendation set, 8,144 cells:
 | None | 3,987 |
 
 Of the 3,987 excluded: 3,752 already tree cover, 149 water, 44 wetland, 42 low
-priority. Total notional programme cost ₹2,082,473,478 — see the caveat on
+priority. Total notional programme cost ₹2,141,865,191 — see the caveat on
 costs below.
 
 ---
@@ -78,8 +78,11 @@ costs below.
   adjusted for canopy age, albedo, humidity or wind. A flat per-action figure
   also ignores that cooling scales with treated area and with how hot a cell
   already is.
-- **Costs are planning placeholders.** 150/400/250 INR per m² at 25%/15%/10%
-  coverage. Order-of-magnitude figures with no tender or survey behind them.
+- **Two of three unit rates are unvalidated.** 150/400/1,150 INR per m² at
+  25%/15%/10% coverage. Only `Green park` has a real comparable — it was revised
+  from 250 on 2026-08-14, anchored on Gujarat AMRUT 2.0 municipal gardens
+  (₹1,152–2,250/m²). `Tree cover` and `Cool roof` remain assumptions with no
+  directly comparable municipal rate found. No tender, no survey.
 - **The "after intervention" map is a claim, not a forecast.** It shows what the
   plan asserts it would achieve.
 - **Quote the spatial-block R² (0.513), never the random-split figure (0.895)
@@ -98,7 +101,7 @@ costs below.
 | # | Item | Effort |
 |---|---|---|
 | 1 | **Cooling values are unvalidated.** Even a crude check — do cells WorldCover calls tree cover run measurably cooler than adjacent built-up cells? — would turn an assumption into an estimate. The data to do it is already committed. | days |
-| 2 | **`Cool roof` never enters the funded set.** At 60 INR/m² for 1.0 °C it is the least cost-effective option, so the greedy budget rank puts all 3,494 below the cut and the 3,523 built-up cells get nothing. Correct per the model; a direct consequence of item 1. | decision |
+| 2 | **The ₹10 crore budget funds only tree cover — 299 cells, no parks, no cool roofs.** Correct per the model, but it means the 3,494 built-up cells get nothing. Note this ordering already flipped once: the park rate was 5–9× too low, which had made parks the top-ranked option. Ranking is highly sensitive to unit rates, and two of the three are still unvalidated (item 1). | decision |
 | 3 | **QGIS project has three unresolvable layers.** `guwahati_heat_project.qgz` references `./guwahati_boundary.geojson` (wrong directory), a `.shp` that exists nowhere, and an absolute path into a `Downloads/` folder on the original author's machine. Needs opening in QGIS to relink and re-save. | hour |
 | 4 | **Dashboard downloads 3.7 MB to render centroids.** The renderer discards every polygon ring. A centroid-plus-bounds export would cut the payload several-fold with no visual change. | hours |
 | 5 | **Land cover is not surfaced in the UI.** It now decides every recommendation; showing why a cell got its action would make the tool defensible to a planner. | hours |

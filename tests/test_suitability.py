@@ -125,15 +125,37 @@ def test_no_action_costs_nothing_and_cools_nothing():
 
 @pytest.mark.parametrize(
     ("action", "expected_rate"),
-    [("Tree cover", 37.5), ("Cool roof", 60.0), ("Green park", 25.0)],
+    [("Tree cover", 37.5), ("Cool roof", 60.0), ("Green park", 115.0)],
 )
-def test_effective_rates_match_the_decision_support_figures(action, expected_rate):
+def test_effective_rates_are_the_documented_values(action, expected_rate):
     """
-    The ML module expresses a rate as inr_per_m2 x coverage_fraction; the
-    Decision-Support module historically pre-multiplied them into one number.
-    They agreed, but nothing enforced it. This test does.
+    Pins the effective per-m2 rate, because it is a number that moves the
+    conclusions and is easy to change without noticing what it does.
+
+    Tree cover and cool roof still match the figures the Decision-Support module
+    historically hardcoded (37.5 and 60.0). Green park deliberately no longer
+    does: its rate was revised from 250 to 1,150 INR/m2 on 2026-08-14, anchored
+    on real Gujarat AMRUT 2.0 municipal garden costs, because 250 was 5-9x below
+    every comparable. That single number had made parks the most cost-effective
+    intervention in the catalogue; correcting it removed parks from the funded
+    set entirely. See shared/constants.json for provenance.
     """
     assert shared.effective_rate_inr_per_m2(action) == pytest.approx(expected_rate)
+
+
+def test_cost_effectiveness_ordering_is_what_the_docs_claim():
+    """
+    The greedy budget ranking sorts on cooling per rupee, so this ordering is
+    what decides which cells get funded. It is documented in
+    docs/05-decision-support.md; assert it rather than leaving it to prose,
+    since it already flipped once when a unit rate was corrected.
+    """
+    ratio = {
+        action: shared.action_cooling_c(action)
+        / shared.action_cost(action, 8918.0)
+        for action in ("Tree cover", "Cool roof", "Green park")
+    }
+    assert ratio["Tree cover"] > ratio["Green park"] > ratio["Cool roof"], ratio
 
 
 def test_cost_scales_linearly_with_area():

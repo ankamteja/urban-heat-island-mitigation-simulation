@@ -295,7 +295,7 @@ cost_estimate = cell_area_m2 x inr_per_m2 x coverage_fraction
 |---|---|---|---|---|
 | `Tree cover` | 150 | 0.25 | 37.5 | 0.8 C |
 | `Cool roof` | 400 | 0.15 | 60.0 | 1.0 C |
-| `Green park` | 250 | 0.10 | 25.0 | 2.0 C |
+| `Green park` | 1,150 | 0.10 | 115.0 | 2.0 C |
 | `None` | 0 | 0.00 | 0 | 0 C |
 
 `coverage_fraction` exists because treating 100% of a cell is not physically
@@ -320,15 +320,17 @@ SPEC_AUDIT.
 | Priority | Action | Cells | Mean LST (C) | Mean NDVI | Total cost (INR) |
 |---|---|---|---|---|---|
 | High | Cool roof | 1,770 | 28.64 | 0.281 | 946,829,805 |
-| High | Green park | 74 | 28.82 | 0.277 | 16,497,707 |
+| High | Green park | 74 | 28.82 | 0.277 | 75,889,420 |
 | High | None | 192 | 26.06 | 0.038 | 0 |
 | Medium | Cool roof | 1,724 | 27.27 | 0.396 | 922,163,533 |
 | Medium | Tree cover | 589 | 27.71 | 0.472 | 196,982,433 |
 | Medium | None | 1,759 | 27.11 | 0.497 | 0 |
 | Low | None | 2,036 | 25.08 | 0.636 | 0 |
 
-**Total notional programme cost: INR 2,082,473,478** (~INR 208 crore, placeholder
+**Total notional programme cost: INR 2,141,865,191** (~INR 214 crore, placeholder
 rates).
+> **Only the `Green park` rate has a real-world comparable behind it.** It was revised from 250 to 1,150 INR/m² on 2026-08-14, anchored on Gujarat AMRUT 2.0 municipal gardens (Bhavani Garden ₹1,152/m²; Kailash Vatika ₹2,250/m²) — deliberately on the lower figure, since those are ~10,000 m² civic gardens with paths, lighting and boundary walls while this action treats ~892 m² of soft landscaping. The `Tree cover` and `Cool roof` rates are **unchanged and still unvalidated**: no directly comparable urban municipal rate was found for either. See `shared/constants.json` for the full provenance.
+
 
 ---
 

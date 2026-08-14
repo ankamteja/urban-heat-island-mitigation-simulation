@@ -18,7 +18,7 @@ the method can support. Open defects live in [`../STATUS.md`](../STATUS.md).
 | `Heat_Risk` | **Derived** — a closed-form function of LST and NDVI, not an independent quantity. |
 | Priority tier | **A relative rank** within Guwahati, not a calibrated risk level. |
 | Recommended action | **A rule**, not a prediction. No ground truth exists. |
-| `cost_estimate` | **A planning placeholder.** No tender, no survey. |
+| `cost_estimate` | **Mostly assumptions.** Only the park rate has a real comparable. |
 | `cooling_c` | **An assumption.** Not measured, not fitted, not validated. |
 | The "after intervention" map | **A claim about a plan**, not a forecast. |
 
@@ -49,22 +49,35 @@ intervention" surface, and the cost-effectiveness ranking that decides which
 cells get funded. A different set of plausible numbers would produce a different
 funded shortlist.
 
-Concretely: `Cool roof` never enters the funded set under the ₹10 crore budget,
-because 1.0 °C at 60 INR/m² loses to 2.0 °C at 25 INR/m² on every cell. That
-outcome rests entirely on two numbers nobody measured.
+This is not hypothetical — it has already happened once, via the cost side of
+the same ratio. The `Green park` rate sat at 250 INR/m², around 5–9× below every
+real municipal comparable, and that single wrong number made parks the most
+cost-effective option in the catalogue: the ₹10 crore budget funded 249 tree-cover
+cells and 74 parks. Re-anchoring the rate on real Gujarat AMRUT 2.0 garden
+projects (₹1,152–2,250/m²) moved parks below tree cover, and the funded set
+became 299 cells, **all tree cover, no parks at all**.
+
+One unit rate reordered the entire investment priority. The cooling figures have
+exactly the same leverage and, unlike that rate, still have nothing behind them.
 
 **Fixing this is the highest-value work available.** A crude first pass — do
 cells WorldCover classifies as tree cover run measurably cooler than adjacent
 built-up cells? — needs no new data.
 
-## 2. Costs are planning placeholders
+## 2. Two of the three unit rates are still unvalidated
 
-150 / 400 / 250 INR per m², at 25% / 15% / 10% coverage of a ~8,916 m² cell.
-Order-of-magnitude figures chosen so cells can be ranked by relative investment.
-No procurement, no municipal rate card, no survey.
+150 / 400 / 1,150 INR per m² for tree cover / cool roof / green park, at
+25% / 15% / 10% coverage of a ~8,916 m² cell.
 
-The total programme cost of ₹2.08 billion is the sum of 4,157 placeholders.
-Quote it as a scale indicator, never as a budget.
+| Rate | Status |
+|---|---|
+| `Green park` 1,150 INR/m² | **Sourced.** Anchored on the lower of two Gujarat AMRUT 2.0 municipal garden projects (₹1,152/m² and ₹2,250/m²), deliberately, because those are ~10,000 m² civic gardens with paths, lighting and boundary walls while this action treats ~892 m² of soft landscaping. |
+| `Tree cover` 150 INR/m² | **Unvalidated.** ≈₹3,750/tree at one tree per 25 m². Bulk Indian plantation runs ₹200–500/tree, but that is rural bulk planting without pits, guards, staking or tanker watering — not a comparable. |
+| `Cool roof` 400 INR/m² | **Unvalidated.** Sits between coating materials at ~₹173/m² and quoted professional application at ₹970–1,510/m², which includes waterproofing this action does not. Neither bounds it. |
+
+The total programme cost of ₹2.14 billion is therefore two-thirds assumption.
+Quote it as a scale indicator, never as a budget. No tender, no survey, no
+municipal schedule of rates.
 
 ## 3. One scene is one moment
 

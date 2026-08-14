@@ -55,13 +55,14 @@ Actionable cells, one row each.
 |---|---:|---:|---:|
 | Cool roof | 3,494 | 60.0 | 1.0 |
 | Tree cover | 589 | 37.5 | 0.8 |
-| Green park | 74 | 25.0 | 2.0 |
+| Green park | 74 | 115.0 | 2.0 |
 
 ### `ranking.csv`
 
 Actionable cells sorted by `cooling_per_rupee`, descending, with a running
 cost total and a budget flag. At a demonstration budget of INR
-10,00,00,000, this funds the top 323 cells (74 Green park, 249 Tree cover).
+10,00,00,000, this funds the top 299 cells, all Tree cover. Parks and cool roofs
+fall below the cut once the park rate is anchored on real municipal figures.
 
 ### `excluded.csv`
 

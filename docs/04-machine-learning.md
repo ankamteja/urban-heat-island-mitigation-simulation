@@ -155,7 +155,7 @@ Both come from `shared/constants.json`.
 |---|---|---|---|---|
 | Tree cover | 150 | 25% | 37.5 | 0.8 °C |
 | Cool roof | 400 | 15% | 60.0 | 1.0 °C |
-| Green park | 250 | 10% | 25.0 | 2.0 °C |
+| Green park | 1,150 | 10% | 115.0 | 2.0 °C |
 | None | 0 | 0% | 0 | 0 °C |
 
 Coverage is the share of a ~8,916 m² cell actually treated — you cannot plant
