@@ -36,6 +36,7 @@ This project documents its own weaknesses rather than hiding them. Before quotin
 
 - [`INTEGRATION_AUDIT.md`](./INTEGRATION_AUDIT.md) — cross-module audit: what is wired to what, and where two modules disagree.
 - [`docs/08-limitations.md`](./docs/08-limitations.md) — consolidated list of which figures are measurements and which are planning assumptions.
+- [`IMPROVEMENTS.md`](./IMPROVEMENTS.md) — prioritized list of what's still worth doing, and a record of what was already fixed.
 
 The headline caveat: **the NDVI in the committed dataset is uncorrected** and therefore compressed low, which biases `Heat_Risk` and everything derived from it. The fix is committed in the Earth Engine script; regenerating the data requires a run in an Earth Engine account. See [`docs/08-limitations.md`](./docs/08-limitations.md).
 
