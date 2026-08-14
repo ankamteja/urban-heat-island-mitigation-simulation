@@ -185,6 +185,35 @@ def test_ml_and_decision_support_agree_on_every_cell(tiered):
     assert mismatched.empty, f"{len(mismatched)} cells disagree between modules"
 
 
+def test_decision_support_ranking_is_deterministically_ordered():
+    """
+    Ties are the normal case in this ranking, not an edge case: cost uses a flat
+    cell area, so every cell sharing an action has an identical
+    cooling_per_rupee -- all 3,494 cool-roof cells score exactly the same.
+
+    With pandas' default (unstable) quicksort the order within a tie was
+    arbitrary, and ranking.csv failed to reproduce: 4,154 of 4,157 rows moved
+    between identical runs. CI caught it. The fix is a stable sort plus an
+    explicit grid_id tie-break, which this asserts.
+    """
+    path = DS_DIR / "ranking.csv"
+    if not path.exists():
+        pytest.skip("Decision-Support outputs not built")
+    ranking = pd.read_csv(path)
+
+    expected = ranking.sort_values(
+        ["cooling_per_rupee", "grid_id"],
+        ascending=[False, True],
+        kind="mergesort",
+    ).reset_index(drop=True)
+
+    assert list(ranking["grid_id"]) == list(expected["grid_id"]), (
+        "ranking.csv is not in (cooling_per_rupee desc, grid_id asc) order -- "
+        "the sort lost its tie-break and the file will not reproduce"
+    )
+    assert list(ranking["rank"]) == list(range(1, len(ranking) + 1))
+
+
 def test_ml_readme_quotes_the_committed_metrics():
     """
     The module README documents the model scores in prose. Prose does not
