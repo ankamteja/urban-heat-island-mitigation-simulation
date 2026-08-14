@@ -4,16 +4,37 @@
   <meta charset="UTF-8" />
   <title>Urban Heat Island Dashboard</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="map"></div>
+  <div id="loading-screen">Loading map data...</div>
+
+  <div id="filter-bar">
+    <button data-priority="All" class="filter-btn active">All</button>
+    <button data-priority="High" class="filter-btn">High</button>
+    <button data-priority="Medium" class="filter-btn">Medium</button>
+    <button data-priority="Low" class="filter-btn">Low</button>
+  </div>
+
+  <div id="compare-container">
+    <div id="map-before" class="map-half">
+      <div class="map-label">Current</div>
+    </div>
+    <div id="map-after" class="map-half">
+      <div class="map-label label-right">After Intervention</div>
+    </div>
+  </div>
+
   <div id="legend"></div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
   <script src="js/dataLoader.js"></script>
   <script src="js/mapView.js"></script>
   <script src="js/popup.js"></script>
+  <script src="js/compareView.js"></script>
+  <script src="js/filters.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

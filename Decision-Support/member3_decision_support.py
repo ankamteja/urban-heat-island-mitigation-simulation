@@ -1,29 +1,20 @@
 """
 Member 3 - Decision Support
-Urban Heat Island cooling-intervention recommender.
-
-Pipeline:
-  1. Load grid data (real, from Member 1/2, OR synthetic fallback so you're never blocked)
-  2. Apply hard suitability rules per intervention type (no ponds on highways, etc.)
-  3. Score cooling benefit vs cost -> cooling_per_rupee
-  4. Greedily rank grid cells (highest cooling_per_rupee first)
-  5. Export recommendation.csv (per-cell best option) and ranking.csv (priority-ordered list)
-
-Swap USE_SYNTHETIC = False and set the two file paths once real data lands.
-"""
-
-"""
-Member 3 - Decision Support
 Urban Heat Island cooling-intervention recommender for Guwahati.
 
 Pipeline:
-  1. Load real grid data from Member 1 (Guwahati_Urban_Heat_Dataset.csv)
+  1. Load real grid data from Member 1 (Guwahati_Urban_Heat_Dataset.csv), with a
+     synthetic fallback (USE_SYNTHETIC = True) so you're never blocked
      - extract lat/lon centroids from the .geo column (don't wait on their fix)
      - derive a PROXY land-cover from NDVI/LST until Member 1 adds real WorldCover data
-  2. Apply hard suitability rules per intervention type
+  2. Apply hard suitability rules per intervention type (no ponds on highways, etc.)
   3. Score cooling benefit vs cost -> cooling_per_rupee
   4. Greedily rank grid cells (highest cooling_per_rupee first)
-  5. Export recommendation.csv and ranking.csv
+  5. Export recommendation.csv (per-cell best option), excluded.csv (cells with no
+     valid intervention) and ranking.csv (priority-ordered list)
+
+Input and output paths are resolved relative to this file, so the script runs from
+anywhere in the repo - nothing to hand-edit.
 
 STATUS NOTE (2026-08-07): real dataset has no land_cover column yet (per Member 1/2
 audit). This script uses a documented NDVI/LST-based PROXY so the pipeline runs
@@ -33,6 +24,8 @@ downstream is unchanged.
 """
 
 import json
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 from shapely.geometry import shape
@@ -41,11 +34,28 @@ from shapely.geometry import shape
 # CONFIG
 # ------------------------------------------------------------------
 USE_SYNTHETIC = False
-DATASET_CSV = "/mnt/user-data/uploads/Guwahati_Urban_Heat_Dataset.csv"   # Member 1's real export
 USE_PROXY_LANDCOVER = True   # flip to False once Member 1 adds real land_cover column
 GRID_CELL_AREA_M2 = 100 * 100
 
 BUDGET_RUPEES = 5_000_000
+
+# ------------------------------------------------------------------
+# PATHS (resolved relative to this file, so the script runs from anywhere)
+# Same convention as Machine Learning & Prediction/scripts/preprocess.py.
+# This file sits directly in Decision-Support/, so .parent IS the module dir.
+# ------------------------------------------------------------------
+MODULE_DIR = Path(__file__).resolve().parent
+REPO_DIR = MODULE_DIR.parent
+SOURCE_CSV = (
+    REPO_DIR
+    / "Remote Sensing & Data Engineering"
+    / "Dataset"
+    / "Guwahati_Urban_Heat_Dataset.csv"
+)   # Member 1's real export
+
+RECOMMENDATION_CSV = MODULE_DIR / "recommendation.csv"
+EXCLUDED_CSV = MODULE_DIR / "excluded.csv"
+RANKING_CSV = MODULE_DIR / "ranking.csv"
 
 # ------------------------------------------------------------------
 # STEP 0: LOAD DATA
@@ -100,7 +110,17 @@ def load_data():
         })
         return df
 
-    df = pd.read_csv(DATASET_CSV)
+    # Fail loudly and explanatorily rather than letting pandas raise a bare
+    # FileNotFoundError on a path the reader has no context for.
+    if not SOURCE_CSV.exists():
+        raise FileNotFoundError(
+            f"Source dataset not found: {SOURCE_CSV}\n"
+            "Expected the Remote Sensing & Data Engineering module's exported CSV.\n"
+            "Set USE_SYNTHETIC = True to run this module on synthetic data instead."
+        )
+
+    df = pd.read_csv(SOURCE_CSV)
+    print(f"Loaded {len(df)} rows from {SOURCE_CSV}")
     df = df.join(df[".geo"].apply(extract_centroid))
     df = df.rename(columns={"LST": "predicted_temp", "NDVI": "ndvi"})
 
@@ -123,8 +143,28 @@ print(df["land_cover"].value_counts())
 # ------------------------------------------------------------------
 # STEP 1: INTERVENTION CATALOG - cost & cooling assumptions
 # Numbers are placeholder engineering estimates for a hackathon demo.
-# State clearly in your report/pitch that these are assumptions, not
-# measured field data - that's honest and judges respect it.
+# The cooling_c degrees-Celsius values are this module's own assumptions and are
+# not superseded by anything - state clearly in your report/pitch that they are
+# assumptions, not measured field data. That's honest and judges respect it.
+# The rupee costs are a different matter; see the block immediately below.
+#
+# SUPERSEDED COST MODEL - DO NOT QUOTE THESE RUPEE FIGURES TO ANYONE
+#
+# The cost_per_cell values below are placeholder FLAT PER-CELL estimates. They
+# are retained here for one reason only: this module's internal
+# cooling_per_rupee ranking, which depends on the RATIOS between them. Do not
+# change the numbers - changing any of them reorders the greedy ranking.
+#
+# A cross-module audit found these disagree with the Machine Learning module's
+# AREA-BASED cost model by 18-67x for the same intervention. The project has
+# decided that the ML module's model is the single source of truth for any
+# user-facing figure: see COST_HEURISTICS in
+#   Machine Learning & Prediction/scripts/tier_and_recommend.py
+# (INR per m2 x coverage fraction x actual cell area).
+#
+# So: for any reported, displayed, or pitched cost, use COST_HEURISTICS. The
+# two models must NEVER be quoted side by side - they are different units on
+# different bases, and presenting both invites a false comparison.
 # ------------------------------------------------------------------
 INTERVENTIONS = {
     "trees": {
@@ -235,15 +275,20 @@ else:
 # ------------------------------------------------------------------
 recommendation_cols = ["grid_id", "lat", "lon", "land_cover", "predicted_temp",
                         "intervention", "cost_rupees", "cooling_c"]
-recommendation.to_csv("recommendation.csv", index=False, columns=recommendation_cols)
+recommendation.to_csv(RECOMMENDATION_CSV, index=False, columns=recommendation_cols)
 
 excluded_cols = ["grid_id", "lat", "lon", "land_cover", "predicted_temp", "exclusion_reason"]
-excluded.to_csv("excluded.csv", index=False, columns=excluded_cols)
+excluded.to_csv(EXCLUDED_CSV, index=False, columns=excluded_cols)
 
 ranking_cols = ["rank", "grid_id", "lat", "lon", "intervention", "cost_rupees",
                  "cooling_c", "cooling_per_rupee", "cumulative_cost", "within_budget"]
-ranking.to_csv("ranking.csv", index=False, columns=[c for c in ranking_cols if c in ranking.columns])
+ranking.to_csv(RANKING_CSV, index=False, columns=[c for c in ranking_cols if c in ranking.columns])
 
-print("\nSaved recommendation.csv and ranking.csv")
+# Outputs land next to this script (MODULE_DIR), not in whatever directory you
+# happened to launch from - print the resolved paths so there's no guessing.
+print("\nSaved outputs:")
+print(f"  {RECOMMENDATION_CSV}")
+print(f"  {EXCLUDED_CSV}")
+print(f"  {RANKING_CSV}")
 print("\nTop 5 priority interventions:")
 print(ranking[["rank", "grid_id", "intervention", "cost_rupees", "cooling_c", "cooling_per_rupee"]].head())
