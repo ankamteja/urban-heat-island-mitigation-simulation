@@ -1,50 +1,58 @@
-const TEMP_COLOR_SCALE = [
-  { max: 30, color: '#2c7bb6' },
-  { max: 34, color: '#abd9e9' },
-  { max: 38, color: '#fdae61' },
-  { max: 100, color: '#d7191c' }
-];
+/* Map bootstrap, basemap, legend. */
 
-function colorByTemperature(temp) {
-  const match = TEMP_COLOR_SCALE.find(step => temp <= step.max);
-  return match ? match.color : '#d7191c';
-}
+const BASEMAP = {
+  url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+  attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+  subdomains: 'abcd',
+  maxZoom: 19
+};
 
-function initMap(containerId, center, zoom = 15) {
-  const map = L.map(containerId).setView(center, zoom);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors'
+function initMap(containerId, center, zoom) {
+  const map = L.map(containerId, {
+    center,
+    zoom: zoom || 13,
+    zoomControl: false,
+    attributionControl: true,
+    preferCanvas: true
+  });
+
+  /* Controls live on the right so they never sit under the pane label. */
+  if (containerId === 'map-before') L.control.zoom({ position: 'topright' }).addTo(map);
+
+  L.tileLayer(BASEMAP.url, BASEMAP).addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd', maxZoom: 19, pane: 'shadowPane', opacity: 0.75
   }).addTo(map);
 
-  setTimeout(() => map.invalidateSize(), 100);
-
+  setTimeout(() => map.invalidateSize(), 60);
   return map;
-}
-
-function renderGridLayer(map, geojson) {
-  return L.geoJSON(geojson, {
-    style: feature => ({
-      fillColor: colorByTemperature(feature.properties.temperature),
-      fillOpacity: 0.65,
-      color: '#333',
-      weight: 0.5
-    }),
-    onEachFeature: (feature, layer) => {
-      layer.bindPopup(buildPopupContent(feature.properties));
-    }
-  }).addTo(map);
 }
 
 function renderLegend(containerId) {
   const el = document.getElementById(containerId);
-  const labels = ['< 30°C', '30–34°C', '34–38°C', '> 38°C'];
-  el.innerHTML = TEMP_COLOR_SCALE.map((step, i) =>
-    `<div><span style="background:${step.color}"></span>${labels[i]}</div>`
-  ).join('');
+  const mid = (TEMP_DOMAIN.min + TEMP_DOMAIN.max) / 2;
+  el.innerHTML = `
+    <div class="legend-ramp" role="img" aria-label="Colour ramp from ${TEMP_DOMAIN.min} to ${TEMP_DOMAIN.max} degrees Celsius"></div>
+    <div class="legend-scale">
+      <span>${TEMP_DOMAIN.min}°C</span><span>${mid}°C</span><span>${TEMP_DOMAIN.max}°C</span>
+    </div>
+    <p class="panel-hint">Land surface temperature, blended across the 100 m grid.</p>
+  `;
 }
 
-function colorByTemperature(temp) {
-  if (typeof temp !== 'number' || isNaN(temp)) return '#999999';
-  const match = TEMP_COLOR_SCALE.find(step => temp <= step.max);
-  return match ? match.color : '#d7191c';
+function addGeocoder(map) {
+  if (L.Control.geocoder) L.Control.geocoder({ defaultMarkGeocode: true, position: 'topright' }).addTo(map);
+}
+
+/* Keeps the two maps on the same view without feedback loops. */
+function syncMaps(a, b) {
+  let lock = false;
+  const link = (src, dst) => () => {
+    if (lock) return;
+    lock = true;
+    dst.setView(src.getCenter(), src.getZoom(), { animate: false });
+    lock = false;
+  };
+  a.on('move zoom', link(a, b));
+  b.on('move zoom', link(b, a));
 }

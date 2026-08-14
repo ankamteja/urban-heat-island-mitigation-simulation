@@ -1,40 +1,147 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <title>Urban Heat Island Dashboard</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Urban Heat Island Dashboard — Guwahati</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23FB923C'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23EF4444'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600;700&display=swap" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="loading-screen">Loading map data...</div>
 
-  <div id="filter-bar">
-    <button data-priority="All" class="filter-btn active">All</button>
-    <button data-priority="High" class="filter-btn">High</button>
-    <button data-priority="Medium" class="filter-btn">Medium</button>
-    <button data-priority="Low" class="filter-btn">Low</button>
+<div id="boot" class="boot">
+  <div class="boot-inner">
+    <svg class="boot-mark" viewBox="0 0 48 48" aria-hidden="true">
+      <circle cx="24" cy="24" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+      <circle cx="24" cy="24" r="15" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".55"/>
+      <circle cx="24" cy="24" r="22" fill="none" stroke="currentColor" stroke-width="1" opacity=".25"/>
+    </svg>
+    <p class="boot-title">Loading thermal grid</p>
+    <p class="boot-sub" id="boot-sub">Reading Landsat-derived surface temperature…</p>
+  </div>
+</div>
+
+<header class="topbar">
+  <div class="brand">
+    <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+      <defs><linearGradient id="bg1" x1="0" y1="1" x2="1" y2="0">
+        <stop offset="0" stop-color="#38BDF8"/><stop offset=".55" stop-color="#FBBF24"/><stop offset="1" stop-color="#EF4444"/>
+      </linearGradient></defs>
+      <path d="M4 22c3-6 6-3 9-8s5-9 9-11" fill="none" stroke="url(#bg1)" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="24" cy="24" r="5" fill="url(#bg1)" opacity=".9"/>
+    </svg>
+    <div class="brand-text">
+      <h1>Urban Heat Island <span>Mitigation</span></h1>
+      <p>Guwahati, Assam · Landsat 8 · 100 m grid</p>
+    </div>
   </div>
 
-  <div id="compare-container">
-    <div id="map-before" class="map-half">
-      <div class="map-label">Current</div>
-    </div>
-    <div id="map-after" class="map-half">
-      <div class="map-label label-right">After Intervention</div>
-    </div>
+  <div class="topbar-stats" id="topbar-stats"></div>
+
+  <div class="topbar-actions">
+    <button id="btn-select" class="btn btn-accent" type="button">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7V4a1 1 0 0 1 1-1h3M17 7V4a1 1 0 0 0-1-1h-3M3 13v3a1 1 0 0 0 1 1h3M17 13v3a1 1 0 0 1-1 1h-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span id="btn-select-label">Select area</span>
+    </button>
+    <button id="btn-analytics" class="btn btn-ghost" type="button" aria-expanded="false">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 16V9M10 16V4M16 16v-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Analytics</span>
+    </button>
   </div>
+</header>
 
-  <div id="legend"></div>
+<main class="stage">
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-  <script src="js/dataLoader.js"></script>
-  <script src="js/mapView.js"></script>
-  <script src="js/popup.js"></script>
-  <script src="js/compareView.js"></script>
-  <script src="js/filters.js"></script>
-  <script src="js/main.js"></script>
+  <aside class="sidebar" id="sidebar">
+    <section class="panel">
+      <h2 class="panel-title">Priority filter</h2>
+      <div class="segmented" id="filter-bar" role="group" aria-label="Filter grid cells by priority">
+        <button data-priority="All" class="filter-btn is-active" type="button">All</button>
+        <button data-priority="High" class="filter-btn" type="button">High</button>
+        <button data-priority="Medium" class="filter-btn" type="button">Medium</button>
+        <button data-priority="Low" class="filter-btn" type="button">Low</button>
+      </div>
+      <p class="panel-hint" id="filter-count"></p>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-title">Surface temperature</h2>
+      <div id="legend" class="legend"></div>
+    </section>
+
+    <section class="panel" id="selection-panel">
+      <h2 class="panel-title">Selection</h2>
+      <div id="selection-body" class="selection-empty">
+        <svg viewBox="0 0 24 24" aria-hidden="true" class="empty-icon"><rect x="3.5" y="3.5" width="17" height="17" rx="2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="3 2.5"/></svg>
+        <p>No area selected.</p>
+        <p class="muted">Drag a box on the map to model interventions and reveal the predicted surface.</p>
+      </div>
+    </section>
+
+    <section class="panel" id="ecology-panel" hidden>
+      <h2 class="panel-title">Ecological interventions</h2>
+      <div id="ecology-legend" class="eco-legend"></div>
+      <p class="panel-hint">Pointers mark where each measure is viable inside your selection.</p>
+    </section>
+  </aside>
+
+  <section class="maps" id="maps">
+    <div class="map-pane" id="pane-before">
+      <div class="map-chip">
+        <span class="dot dot-live"></span> Current surface
+      </div>
+      <div id="map-before" class="map-canvas"></div>
+    </div>
+
+    <div class="map-divider" id="map-divider" hidden></div>
+
+    <div class="map-pane is-hidden" id="pane-after" aria-hidden="true">
+      <div class="map-chip chip-right">
+        <span class="dot dot-pred"></span> Predicted after mitigation
+        <em id="pane-after-delta"></em>
+      </div>
+      <div id="map-after" class="map-canvas"></div>
+      <div class="pane-lock" id="pane-lock">
+        <p>Select an area to generate the prediction</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<section class="analytics" id="analytics" hidden>
+  <div class="analytics-head">
+    <h2>Analytics</h2>
+    <p id="analytics-scope">Whole study area · 8,144 cells</p>
+    <button id="btn-analytics-close" class="btn btn-ghost btn-sm" type="button">Close</button>
+  </div>
+  <div class="kpi-row" id="kpi-row"></div>
+  <div class="chart-grid">
+    <figure class="chart-card"><figcaption>Temperature distribution</figcaption><div class="chart-box"><canvas id="chart-dist"></canvas></div></figure>
+    <figure class="chart-card"><figcaption>Priority breakdown</figcaption><div class="chart-box"><canvas id="chart-priority"></canvas></div></figure>
+    <figure class="chart-card"><figcaption>Vegetation vs. temperature</figcaption><div class="chart-box"><canvas id="chart-ndvi"></canvas></div></figure>
+    <figure class="chart-card"><figcaption>Cooling &amp; cost by intervention</figcaption><div class="chart-box"><canvas id="chart-action"></canvas></div></figure>
+  </div>
+</section>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/dataLoader.js"></script>
+<script src="js/heatField.js"></script>
+<script src="js/mapView.js"></script>
+<script src="js/popup.js"></script>
+<script src="js/selection.js"></script>
+<script src="js/ecology.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/compareView.js"></script>
+<script src="js/filters.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>

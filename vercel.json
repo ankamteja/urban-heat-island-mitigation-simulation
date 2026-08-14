@@ -1,0 +1,23 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "trailingSlash": true,
+  "redirects": [
+    { "source": "/dashboard", "destination": "/frontend/", "permanent": false },
+    { "source": "/deck", "destination": "/presentation/deck.html", "permanent": false },
+    { "source": "/architecture", "destination": "/presentation/architecture.html", "permanent": false }
+  ],
+  "headers": [
+    {
+      "source": "/frontend/data/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }
+      ]
+    },
+    {
+      "source": "/presentation/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=604800" }
+      ]
+    }
+  ]
+}

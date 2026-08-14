@@ -1,0 +1,18 @@
+# Only the static web layer needs to ship. The analysis modules are large
+# (the ML module alone is ~180 MB with the trained model) and are never
+# fetched by the browser.
+
+Machine Learning & Prediction/
+Remote Sensing & Data Engineering/
+Decision-Support/
+graphify-out/
+.claude/
+
+# The dashboard reads frontend/data/grid.geojson; the mock is only a local
+# fallback and would otherwise ship a second copy of the whole grid.
+frontend/mock_data/
+
+*.qgz
+*.pkl
+*.ipynb
+__pycache__/
