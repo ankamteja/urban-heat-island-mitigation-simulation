@@ -29,6 +29,7 @@ planning assumptions, not measurements. See [08 — Limitations](./08-limitation
 | [06 — Frontend](./06-frontend.md) | The dashboard's files and how the heat surface is actually drawn. |
 | [07 — Data contracts](./07-data-contracts.md) | Every schema, who writes it, who reads it, what breaks if it changes. |
 | [08 — Limitations](./08-limitations.md) | Which numbers are measurements and which are assumptions. |
+| [09 — Automated refresh](./09-automated-refresh.md) | How the satellite data keeps itself current, and the one-time setup to enable it. |
 
 ## Reading order
 
