@@ -16,3 +16,6 @@ frontend/mock_data/
 *.pkl
 *.ipynb
 __pycache__/
+
+# Generated deck - large binary, not needed by the browser
+*.pptx
