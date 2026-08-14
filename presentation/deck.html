@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Urban Heat Island Mitigation — Guwahati</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23FB923C'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23EF4444'/%3E%3C/svg%3E" />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:        #0B1120;
+  --surface:   #131C2E;
+  --surface-2: #192134;
+  --border:    rgba(255,255,255,.09);
+  --border-2:  rgba(255,255,255,.16);
+  --fg:        #F1F5F9;
+  --muted:     #94A3B8;
+  --dim:       #64748B;
+  --accent:    #FBBF24;
+  --primary:   #3B82F6;
+  --hot:       #EF4444;
+  --warm:      #FB923C;
+  --cool:      #34D399;
+  --cyan:      #22D3EE;
+  --font-ui:   'Fira Sans', system-ui, sans-serif;
+  --font-data: 'Fira Code', ui-monospace, monospace;
+  --font-display: 'Instrument Serif', Georgia, serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #05080F;
+  color: var(--fg);
+  font-family: var(--font-ui);
+  overflow: hidden;
+}
+
+.deck { position: absolute; inset: 0; margin: auto; }
+@media (min-width: 861px) {
+  .deck { max-width: calc(100vh * 16 / 9); max-height: calc(100vw * 9 / 16); }
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  padding: 56px 68px;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .38s ease;
+  overflow: hidden;
+}
+.slide.active { opacity: 1; visibility: visible; }
+
+.eyebrow {
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 14px;
+}
+.eyebrow b { color: var(--accent); font-weight: 500; }
+
+h1 { font-family: var(--font-display); font-weight: 400; font-size: clamp(38px, 5.4vw, 74px); line-height: 1.04; letter-spacing: -.015em; }
+h2 { font-family: var(--font-display); font-weight: 400; font-size: clamp(28px, 3.4vw, 46px); line-height: 1.1; margin-bottom: 10px; letter-spacing: -.01em; }
+h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+p.lead { color: var(--muted); font-size: clamp(14px, 1.35vw, 18px); line-height: 1.55; max-width: 74ch; }
+.sub { color: var(--muted); font-size: 14px; line-height: 1.5; margin-bottom: 22px; max-width: 82ch; }
+strong { color: var(--fg); font-weight: 600; }
+.hl { color: var(--accent); }
+.hl-cool { color: var(--cool); }
+.hl-hot { color: var(--hot); }
+
+/* title slide */
+.title-wrap { display: flex; flex-direction: column; justify-content: center; height: 100%; }
+.title-rule { width: 88px; height: 3px; background: linear-gradient(90deg, var(--cyan), var(--accent), var(--hot)); margin: 26px 0; border-radius: 2px; }
+.title-meta { display: flex; gap: 40px; margin-top: 28px; flex-wrap: wrap; }
+.title-meta div span { display: block; font-family: var(--font-data); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); margin-bottom: 3px; }
+.title-meta div b { font-family: var(--font-data); font-size: 16px; font-weight: 500; }
+
+/* grids */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; align-items: center; }
+.grid-2.wide-left { grid-template-columns: 1.15fr .85fr; }
+.grid-2.wide-right { grid-template-columns: .82fr 1.18fr; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+.card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+.card.accent { border-left: 3px solid var(--accent); }
+.card.hot { border-left: 3px solid var(--hot); }
+.card.cool { border-left: 3px solid var(--cool); }
+.card.blue { border-left: 3px solid var(--primary); }
+.card p { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+.metric b { display: block; font-family: var(--font-data); font-size: clamp(24px, 2.9vw, 40px); font-weight: 600; line-height: 1.08; white-space: nowrap; }
+.metric b span { color: inherit; letter-spacing: 0; }
+.metric > span { display: block; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); margin-top: 6px; }
+.metric em { font-style: normal; font-size: 12px; color: var(--muted); display: block; margin-top: 7px; line-height: 1.45; }
+
+.big-number { font-family: var(--font-data); font-size: clamp(60px, 11vw, 150px); font-weight: 600; line-height: .95; letter-spacing: -.03em; }
+
+/* lists */
+ul.clean { list-style: none; display: flex; flex-direction: column; gap: 13px; }
+ul.clean li { display: flex; gap: 13px; font-size: 14.5px; line-height: 1.5; color: var(--muted); }
+ul.clean li b { color: var(--fg); font-weight: 600; }
+.bullet {
+  flex: 0 0 auto; width: 21px; height: 21px; border-radius: 6px;
+  background: var(--surface); border: 1px solid var(--border-2);
+  display: grid; place-items: center;
+  font-family: var(--font-data); font-size: 10px; color: var(--accent); margin-top: 1px;
+}
+
+/* figures */
+figure { margin: 0; }
+.shot {
+  width: 100%; border-radius: 12px; border: 1px solid var(--border-2);
+  display: block; background: var(--surface);
+}
+.shot.contain { object-fit: contain; }
+figcaption { font-family: var(--font-data); font-size: 11px; color: var(--dim); margin-top: 10px; letter-spacing: .04em; }
+
+.chart-wrap { position: relative; width: 100%; height: 100%; min-height: 0; }
+.chart-frame { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; height: 100%; min-height: 340px; display: flex; flex-direction: column; }
+.chart-frame h3 { font-family: var(--font-data); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); font-weight: 500; margin-bottom: 12px; }
+.chart-body { flex: 1; position: relative; min-height: 0; }
+
+/* table */
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--border); }
+th { font-family: var(--font-data); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); font-weight: 500; }
+td { color: var(--muted); }
+td b { color: var(--fg); font-weight: 600; }
+td.num, th.num { text-align: right; font-family: var(--font-data); }
+tr.is-focus td { background: rgba(251,191,36,.07); }
+tr.is-focus td b, tr.is-focus td.num { color: var(--accent); }
+
+.pill {
+  display: inline-block; padding: 2px 9px; border-radius: 999px;
+  font-family: var(--font-data); font-size: 10.5px; font-weight: 500;
+}
+.pill.high { background: rgba(248,113,113,.16); color: #FCA5A5; }
+.pill.med  { background: rgba(251,191,36,.16); color: var(--accent); }
+.pill.low  { background: rgba(52,211,153,.16); color: var(--cool); }
+
+.callout {
+  border-left: 3px solid var(--accent);
+  background: rgba(251,191,36,.06);
+  padding: 14px 18px; border-radius: 0 10px 10px 0;
+  font-size: 13.5px; color: var(--muted); line-height: 1.55;
+}
+.callout b { color: var(--accent); }
+
+.split-note { font-family: var(--font-data); font-size: 11.5px; color: var(--dim); margin-top: 12px; }
+
+/* chrome */
+.chrome {
+  position: fixed; bottom: 0; left: 0; right: 0; height: 42px;
+  display: flex; align-items: center; gap: 16px; padding: 0 22px;
+  font-family: var(--font-data); font-size: 11px; color: var(--dim);
+  pointer-events: none; z-index: 60;
+}
+.chrome .brand { color: var(--dim); letter-spacing: .1em; }
+.chrome .count { margin-left: auto; letter-spacing: .1em; }
+.nav { display: flex; gap: 7px; pointer-events: auto; }
+.nav button {
+  width: 30px; height: 30px; border-radius: 8px; cursor: pointer;
+  background: var(--surface-2); border: 1px solid var(--border-2); color: var(--fg);
+  font-size: 13px; line-height: 1; transition: background .2s;
+}
+.nav button:hover { background: #24304A; }
+.nav button:disabled { opacity: .32; cursor: default; }
+.progress { position: fixed; top: 0; left: 0; height: 2px; background: linear-gradient(90deg, var(--cyan), var(--accent)); z-index: 70; transition: width .35s ease; }
+
+@media (max-width: 860px) {
+  .slide { padding: 28px 22px; }
+  .grid-2, .grid-2.wide-left, .grid-2.wide-right, .grid-3, .grid-4 { grid-template-columns: 1fr; gap: 12px; }
+  .title-meta { gap: 20px; }
+  ul.clean li { font-size: 13px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<div class="deck" id="deck">
+
+  <!-- 1 · TITLE -->
+  <section class="slide active">
+    <div class="title-wrap">
+      <p class="eyebrow">Remote sensing · Machine learning · Urban planning</p>
+      <h1>Cooling the city,<br/>one hundred metres<br/>at a time.</h1>
+      <div class="title-rule"></div>
+      <p class="lead">A decision-support pipeline that turns Landsat thermal imagery into a ranked, costed plan for where to plant, shade and re-surface Guwahati.</p>
+      <div class="title-meta">
+        <div><span>Study area</span><b>Guwahati, Assam</b></div>
+        <div><span>Resolution</span><b>100 m grid</b></div>
+        <div><span>Cells</span><b>8,144</b></div>
+        <div><span>Source</span><b>Landsat 8 · GEE</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · PROBLEM -->
+  <section class="slide">
+    <p class="eyebrow">01 · The problem</p>
+    <div class="grid-2 wide-left">
+      <div>
+        <h2>Cities cook themselves.</h2>
+        <p class="sub">Dense construction replaces vegetation with concrete and asphalt — surfaces that absorb solar radiation by day and release it at night. The result is a measurable temperature gap between the built core and its green surroundings.</p>
+        <ul class="clean">
+          <li><span class="bullet">01</span><span><b>It is unevenly distributed.</b> A city-wide average hides the neighbourhoods actually at risk.</span></li>
+          <li><span class="bullet">02</span><span><b>It is expensive to fix blindly.</b> Planting everywhere is not a budget any municipality has.</span></li>
+          <li><span class="bullet">03</span><span><b>It is invisible without data.</b> Heat has no skyline — you cannot see where it concentrates.</span></li>
+        </ul>
+      </div>
+      <div class="grid-2" style="grid-template-columns:1fr 1fr;gap:14px">
+        <div class="card hot metric"><b>33.1<span style="font-size:.5em">°C</span></b><span>Peak surface temp</span></div>
+        <div class="card blue metric"><b>20.9<span style="font-size:.5em">°C</span></b><span>Coolest cell</span></div>
+        <div class="card accent metric" style="grid-column:1/-1"><b>12.2<span style="font-size:.5em">°C</span></b><span>Spread across one city</span><em>The gap between the hottest and coolest 100&nbsp;m cell in the same study area, measured on a single Landsat pass.</em></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · APPROACH -->
+  <section class="slide">
+    <p class="eyebrow">02 · The approach</p>
+    <h2>Make the heat legible, then make it actionable.</h2>
+    <p class="sub">Four modules, each owning one question, connected by a single shared data contract.</p>
+    <div class="grid-4" style="margin-top:8px">
+      <div class="card blue">
+        <h3>Where is it hot?</h3>
+        <p>Landsat 8 thermal and NDVI composites reduced to a 100&nbsp;m fishnet over the ward boundary.</p>
+      </div>
+      <div class="card accent">
+        <h3>Why is it hot?</h3>
+        <p>A regression model relates surface temperature to vegetation cover and spatial position.</p>
+      </div>
+      <div class="card cool">
+        <h3>Where should we act?</h3>
+        <p>Quantile tiering ranks every cell High / Medium / Low by modelled heat risk.</p>
+      </div>
+      <div class="card hot">
+        <h3>What will it cost?</h3>
+        <p>A rule-based engine attaches an intervention, an expected cooling and a rupee figure to each cell.</p>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:22px">
+      <b>The design constraint:</b> every module writes to and reads from one file — <span style="font-family:var(--font-data)">grid.geojson</span>. Swap the mock for real pipeline output and nothing downstream changes.
+    </div>
+  </section>
+
+  <!-- 4 · ARCHITECTURE -->
+  <section class="slide">
+    <p class="eyebrow">03 · System architecture</p>
+    <h2 style="margin-bottom:16px">From satellite radiance to a costed plan</h2>
+    <figure style="flex:1;display:flex;flex-direction:column;min-height:0">
+      <img src="assets/architecture.png" alt="Three-stage architecture: remote sensing feeds a feature table; a random forest predicts land surface temperature and quantile tiering assigns priority; a suitability and cost engine writes grid.geojson, which the dashboard renders." class="shot contain" style="flex:1;min-height:0;border:0;background:transparent" />
+    </figure>
+  </section>
+
+  <!-- 5 · DATA -->
+  <section class="slide">
+    <p class="eyebrow">04 · The data</p>
+    <div class="grid-2 wide-right">
+      <div>
+        <h2>8,144 cells,<br/>one thermal snapshot.</h2>
+        <p class="sub">Google Earth Engine composites Landsat 8 surface temperature and NDVI over the study boundary. QGIS builds a 100&nbsp;m fishnet; each cell carries a temperature, a vegetation index and a position.</p>
+        <ul class="clean">
+          <li><span class="bullet">◆</span><span><b>Land surface temperature</b> — thermal band, converted to °C</span></li>
+          <li><span class="bullet">◆</span><span><b>NDVI</b> — vegetation cover, −1 to 1</span></li>
+          <li><span class="bullet">◆</span><span><b>Centroid</b> — latitude / longitude per cell</span></li>
+        </ul>
+      </div>
+      <div class="chart-frame">
+        <h3>Surface temperature distribution — 8,144 cells</h3>
+        <div class="chart-body"><canvas id="c-dist"></canvas></div>
+        <p class="split-note">Median 27.3&nbsp;°C · IQR 26.0–28.2&nbsp;°C · 99th pct 30.2&nbsp;°C</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · MODEL -->
+  <section class="slide">
+    <p class="eyebrow">05 · Machine learning</p>
+    <div class="grid-2">
+      <div>
+        <h2>The model fits — but read the second bar.</h2>
+        <p class="sub">The canonical model — a random forest on NDVI and position — reaches <strong>R² 0.90</strong> (0.52&nbsp;°C RMSE) under a random split, rising to 0.94 once spatial-lag features are added. Under a <strong>spatial block split</strong> — training on one part of the city and predicting an unseen part — performance collapses.</p>
+        <div class="callout">
+          <b>Why this matters:</b> the random split leaks spatial autocorrelation. Neighbouring cells are nearly identical, so a random 20% test set is effectively memorisable. The honest number for generalising to a new district is the block-CV score, not the 0.90.
+        </div>
+      </div>
+      <div class="chart-frame">
+        <h3>R² by model and validation split</h3>
+        <div class="chart-body"><canvas id="c-model"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 · FEATURES -->
+  <section class="slide">
+    <p class="eyebrow">06 · What drives the prediction</p>
+    <div class="grid-2 wide-right">
+      <div>
+        <h2>Position dominates. Vegetation still speaks.</h2>
+        <p class="sub">Latitude and longitude together carry three quarters of the model's importance — the model is largely learning <em style="color:var(--fg)">where</em> the city is. NDVI contributes a quarter, and it is the only feature a planner can actually change.</p>
+        <div class="callout">
+          <b>Known limitation:</b> NDVI in this dataset is uncorrected, which attenuates the true vegetation–temperature relationship. The real effect of greening is very likely stronger than 0.246 suggests.
+        </div>
+      </div>
+      <div class="chart-frame">
+        <h3>Feature importance — canonical model</h3>
+        <div class="chart-body"><canvas id="c-feat"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 · TIERING -->
+  <section class="slide">
+    <p class="eyebrow">07 · Priority tiering</p>
+    <h2>Every cell gets a rank, an action and a price.</h2>
+    <p class="sub">Heat risk is split at the 25th and 75th percentiles; a vegetation split at the median decides whether a cell wants canopy, a park, or a cool roof.</p>
+    <div class="grid-2 wide-left" style="align-items:start;margin-top:6px">
+      <table>
+        <thead><tr><th>Priority</th><th>Recommended action</th><th class="num">Cells</th><th class="num">Mean LST</th><th class="num">Cost</th></tr></thead>
+        <tbody>
+          <tr class="is-focus"><td><span class="pill high">High</span></td><td><b>Tree cover</b></td><td class="num">1,955</td><td class="num">28.70 °C</td><td class="num">₹65.4 Cr</td></tr>
+          <tr><td><span class="pill high">High</span></td><td><b>Cool roof</b></td><td class="num">81</td><td class="num">29.47 °C</td><td class="num">₹4.3 Cr</td></tr>
+          <tr><td><span class="pill med">Medium</span></td><td><b>Green park</b></td><td class="num">4,072</td><td class="num">27.17 °C</td><td class="num">₹90.8 Cr</td></tr>
+          <tr><td><span class="pill low">Low</span></td><td><b>No action</b></td><td class="num">2,036</td><td class="num">24.92 °C</td><td class="num">—</td></tr>
+        </tbody>
+      </table>
+      <div class="chart-frame" style="min-height:262px">
+        <h3>Cells by priority tier</h3>
+        <div class="chart-body"><canvas id="c-tier"></canvas></div>
+      </div>
+    </div>
+    <p class="split-note">Total notional programme cost <strong style="color:var(--accent)">₹160.5 Cr</strong> · unit rates are planning placeholders, not tendered figures.</p>
+  </section>
+
+  <!-- 9 · DASHBOARD OVERVIEW -->
+  <section class="slide">
+    <p class="eyebrow">08 · The dashboard</p>
+    <div class="grid-2 wide-right">
+      <div>
+        <h2>A continuous thermal surface, not a grid of boxes.</h2>
+        <p class="sub">The 100&nbsp;m lattice is interpolated into a smooth field: each cell splats into a weight and a weight×temperature accumulator, a separable blur diffuses both, and dividing them per pixel recovers temperature — so colour still means degrees, not density.</p>
+        <ul class="clean">
+          <li><span class="bullet">◆</span><span><b>Cloud-like blending</b> closes the gaps in a sparse grid</span></li>
+          <li><span class="bullet">◆</span><span><b>Percentile-anchored ramp</b> — 23&nbsp;°C to 30&nbsp;°C spans the real distribution</span></li>
+          <li><span class="bullet">◆</span><span><b>O(1) blur radius</b> keeps redraws at a few milliseconds</span></li>
+        </ul>
+      </div>
+      <figure>
+        <img src="assets/dash-overview.png" alt="Dashboard showing Guwahati with a smooth orange and blue thermal cloud over a dark basemap." class="shot" />
+        <figcaption>Current surface · 8,144 cells blended into one field</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 10 · BEFORE / AFTER -->
+  <section class="slide">
+    <p class="eyebrow">09 · Prediction on demand</p>
+    <h2 style="margin-bottom:6px">Select an area — then see what mitigation buys you.</h2>
+    <p class="sub">The predicted surface stays hidden until a planner draws a box. Ecology pointers then drop on the sites where each measure is viable, spaced so no two overlap.</p>
+    <figure style="flex:1;display:flex;flex-direction:column;min-height:0">
+      <img src="assets/dash-compare.png" alt="Split screen: the left pane shows the current hot orange surface, the right pane shows the cooled green and cyan predicted surface with ecology intervention pins." class="shot contain" style="flex:1;min-height:0" />
+      <figcaption>Left: current surface · Right: predicted after mitigation, with ecology pointers on the selected area</figcaption>
+    </figure>
+  </section>
+
+  <!-- 11 · ECOLOGY -->
+  <section class="slide">
+    <p class="eyebrow">10 · Where the ecology goes</p>
+    <div class="grid-2 wide-left">
+      <div>
+        <h2>Five measures, placed where they work.</h2>
+        <p class="sub">The coarse action from the model is refined into distinct ecological measures using temperature and vegetation cover, then thinned to representative sites so a pointer marks a project, not a pixel.</p>
+        <table style="margin-top:4px">
+          <thead><tr><th>Measure</th><th class="num">Assumed cooling</th><th class="num">Cells</th></tr></thead>
+          <tbody>
+            <tr class="is-focus"><td><b>Green park / lawn</b></td><td class="num">−2.0 °C</td><td class="num">4,072</td></tr>
+            <tr><td><b>Retention pond</b> <span class="pill med">derived</span></td><td class="num">−2.0 °C</td><td class="num">—</td></tr>
+            <tr><td><b>High-albedo roof</b></td><td class="num">−1.0 °C</td><td class="num">81</td></tr>
+            <tr><td><b>Vegetated roof</b> <span class="pill med">derived</span></td><td class="num">−1.0 °C</td><td class="num">—</td></tr>
+            <tr><td><b>Urban tree canopy</b></td><td class="num">−0.8 °C</td><td class="num">1,955</td></tr>
+          </tbody>
+        </table>
+        <p class="split-note">Derived measures are refined from a parent cell by NDVI and inherit its cooling.</p>
+      </div>
+      <div>
+        <div class="grid-2" style="grid-template-columns:1fr 1fr;gap:14px">
+          <div class="card cool metric"><b>−1.20<span style="font-size:.45em">°C</span></b><span>Mean drop, all cells</span></div>
+          <div class="card blue metric"><b>6,108</b><span>Actionable cells</span></div>
+        </div>
+        <div class="callout" style="margin-top:16px">
+          <b>These are assumptions, not predictions.</b> The per-action degrees come from the Decision-Support catalogue, which labels them placeholder engineering estimates — not measured, fitted or validated for Guwahati. They set relative priority; they are not a performance guarantee.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 · ANALYTICS -->
+  <section class="slide">
+    <p class="eyebrow">11 · Analytics</p>
+    <h2 style="margin-bottom:6px">Every selection re-scores itself.</h2>
+    <p class="sub">Filters and area selection drive the same summary — distribution shift, priority mix, the vegetation–temperature relationship, and cooling against cost.</p>
+    <figure style="flex:1;display:flex;flex-direction:column;min-height:0;justify-content:center">
+      <img src="assets/dash-charts.png" alt="Four analytics charts: temperature distribution before and after mitigation, priority breakdown donut, NDVI versus temperature scatter, and cooling and cost by intervention." class="shot contain" style="min-height:0" />
+      <figcaption>Current vs. mitigated distribution · priority mix · NDVI–temperature relationship · cooling and cost by measure</figcaption>
+    </figure>
+  </section>
+
+  <!-- 13 · IMPACT -->
+  <section class="slide" style="align-items:flex-start">
+    <p class="eyebrow">12 · What it adds up to</p>
+    <div style="display:flex;flex-direction:column;justify-content:center;flex:1;width:100%">
+      <div style="display:flex;align-items:baseline;gap:20px;flex-wrap:wrap">
+        <span class="big-number hl-cool">−1.20</span>
+        <div style="max-width:46ch">
+          <h2 style="font-size:clamp(22px,2.4vw,34px);margin-bottom:8px">degrees, city-wide mean</h2>
+          <p class="lead">if every recommended intervention is implemented across the 6,108 actionable cells — for a notional ₹160.5 Cr programme.</p>
+        </div>
+      </div>
+      <div class="grid-4" style="margin-top:38px">
+        <div class="card cool metric"><b>2,036</b><span>High-priority cells</span><em>Where heat risk sits above the 75th percentile.</em></div>
+        <div class="card accent metric"><b>₹160.5<span style="font-size:.45em"> Cr</span></b><span>Notional programme</span><em>Placeholder unit rates — direction, not a tender.</em></div>
+        <div class="card blue metric"><b>0.52<span style="font-size:.45em">°C</span></b><span>Model RMSE</span><em>Canonical model, random split; block CV is materially weaker.</em></div>
+        <div class="card hot metric"><b>100<span style="font-size:.45em"> m</span></b><span>Decision resolution</span><em>Fine enough to name a street, coarse enough to plan.</em></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 14 · LIMITATIONS -->
+  <section class="slide">
+    <p class="eyebrow">13 · What we would not claim</p>
+    <h2>Honest limits.</h2>
+    <p class="sub">Documented in the repository's own spec audits, not discovered after the fact.</p>
+    <div class="grid-3" style="margin-top:8px">
+      <div class="card hot">
+        <h3>NDVI is uncorrected</h3>
+        <p>The vegetation–temperature relationship is attenuated. Heat risk skews high and tiers are indicative ranks, not calibrated risk levels.</p>
+      </div>
+      <div class="card accent">
+        <h3>Spatial CV collapses</h3>
+        <p>R² falls from 0.94 to near zero under a block split. The model interpolates well inside the studied area; it does not yet transfer to an unseen district.</p>
+      </div>
+      <div class="card blue">
+        <h3>Costs are placeholders</h3>
+        <p>Unit rates are planning assumptions. The ranking by cooling-per-rupee is meaningful; the absolute rupee total is not a budget.</p>
+      </div>
+      <div class="card">
+        <h3>Exclusion data is thin</h3>
+        <p>Roads, water and restricted zones are filtered only as well as the upstream land-cover proxy allows.</p>
+      </div>
+      <div class="card">
+        <h3>One thermal snapshot</h3>
+        <p>A single Landsat pass captures one moment. Seasonal and diurnal variation is not yet modelled.</p>
+      </div>
+      <div class="card">
+        <h3>Cooling is modelled</h3>
+        <p>Intervention effects come from literature-scale assumptions, not local field measurement.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 15 · CLOSE -->
+  <section class="slide">
+    <div class="title-wrap">
+      <p class="eyebrow">14 · Next</p>
+      <h1 style="font-size:clamp(32px,4.4vw,62px)">Correct the NDVI.<br/>Re-validate spatially.<br/>Then argue about budgets.</h1>
+      <div class="title-rule"></div>
+      <div class="grid-3" style="margin-top:6px">
+        <div class="card blue"><h3>Near term</h3><p>Apply the NDVI correction and re-fit; report block-CV as the headline metric.</p></div>
+        <div class="card accent"><h3>Then</h3><p>Ground-truth cooling coefficients against local measurement for two or three pilot sites.</p></div>
+        <div class="card cool"><h3>After</h3><p>Add seasonal composites so priority reflects the worst month, not one pass.</p></div>
+      </div>
+      <p class="split-note" style="margin-top:26px">Urban Heat Island Mitigation Simulation · Guwahati, Assam · Landsat 8 · 100 m grid · 8,144 cells</p>
+    </div>
+  </section>
+
+</div>
+
+<div class="chrome">
+  <span class="brand">UHI MITIGATION · GUWAHATI</span>
+  <span class="nav">
+    <button id="prev" aria-label="Previous slide">‹</button>
+    <button id="next" aria-label="Next slide">›</button>
+  </span>
+  <span class="count" id="count">1 / 15</span>
+</div>
+
+<script>
+const slides = [...document.querySelectorAll('.slide')];
+let idx = 0;
+const built = new Set();
+
+function show(n) {
+  idx = Math.max(0, Math.min(slides.length - 1, n));
+  slides.forEach((s, i) => s.classList.toggle('active', i === idx));
+  document.getElementById('count').textContent = `${idx + 1} / ${slides.length}`;
+  document.getElementById('progress').style.width = ((idx + 1) / slides.length * 100) + '%';
+  document.getElementById('prev').disabled = idx === 0;
+  document.getElementById('next').disabled = idx === slides.length - 1;
+  buildCharts(idx);
+  location.hash = idx + 1;
+}
+
+document.getElementById('prev').onclick = () => show(idx - 1);
+document.getElementById('next').onclick = () => show(idx + 1);
+document.addEventListener('keydown', e => {
+  if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); show(idx + 1); }
+  if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); show(idx - 1); }
+  if (e.key === 'Home') show(0);
+  if (e.key === 'End') show(slides.length - 1);
+});
+
+/* ---------- charts ---------- */
+const INK = '#94A3B8', GRID = 'rgba(255,255,255,.07)';
+Chart.defaults.color = INK;
+Chart.defaults.borderColor = GRID;
+Chart.defaults.font.family = "'Fira Sans', system-ui, sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.maintainAspectRatio = false;
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+Chart.defaults.plugins.legend.labels.boxWidth = 9;
+Chart.defaults.plugins.legend.labels.boxHeight = 9;
+
+/* 1 °C bins over all 8,144 cells, computed from data/grid.geojson. */
+const DIST_LABELS = ['20','21','22','23','24','25','26','27','28','29','30','31','32','33'];
+const DIST_COUNTS = [1, 73, 98, 273, 534, 1051, 1455, 2072, 1826, 634, 102, 18, 6, 1];
+
+function buildCharts(slideIndex) {
+  if (built.has(slideIndex)) return;
+
+  if (slideIndex === 4) {
+    built.add(4);
+    new Chart(document.getElementById('c-dist'), {
+      type: 'bar',
+      data: {
+        labels: DIST_LABELS,
+        datasets: [{
+          label: 'cells',
+          data: DIST_COUNTS,
+          backgroundColor: DIST_LABELS.map(v => {
+            const t = Math.min(1, Math.max(0, (+v - 23) / 7));
+            return t < .3 ? 'rgba(34,211,238,.85)' : t < .6 ? 'rgba(253,224,71,.85)'
+                 : t < .82 ? 'rgba(251,146,60,.85)' : 'rgba(239,68,68,.85)';
+          }),
+          borderRadius: 3
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, title: { display: true, text: 'surface temperature (°C)' } },
+          y: { grid: { color: GRID }, title: { display: true, text: 'cells' } }
+        }
+      }
+    });
+  }
+
+  if (slideIndex === 5) {
+    built.add(5);
+    new Chart(document.getElementById('c-model'), {
+      type: 'bar',
+      data: {
+        labels: ['Linear\nbase', 'RF\nbase', 'Linear\n+spatial lag', 'RF\n+spatial lag'],
+        datasets: [
+          { label: 'Random 80/20 split', data: [0.248, 0.901, 0.934, 0.938], backgroundColor: 'rgba(59,130,246,.85)', borderRadius: 3 },
+          { label: 'Spatial block split', data: [-0.614, 0.151, -0.062, -0.025], backgroundColor: 'rgba(251,191,36,.85)', borderRadius: 3 }
+        ]
+      },
+      options: {
+        plugins: { legend: { position: 'bottom' } },
+        scales: {
+          x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: false } },
+          y: { grid: { color: GRID }, title: { display: true, text: 'R²' }, suggestedMin: -0.8, suggestedMax: 1 }
+        }
+      }
+    });
+  }
+
+  if (slideIndex === 6) {
+    built.add(6);
+    new Chart(document.getElementById('c-feat'), {
+      type: 'bar',
+      data: {
+        labels: ['Latitude', 'Longitude', 'NDVI'],
+        datasets: [{
+          data: [0.4885, 0.2653, 0.2462],
+          backgroundColor: ['rgba(148,163,184,.75)', 'rgba(148,163,184,.75)', 'rgba(52,211,153,.9)'],
+          borderRadius: 3
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: it => ' importance ' + it.parsed.x.toFixed(4) } }
+        },
+        scales: {
+          x: { grid: { color: GRID }, suggestedMax: 0.55, title: { display: true, text: 'relative importance' } },
+          y: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  if (slideIndex === 7) {
+    built.add(7);
+    new Chart(document.getElementById('c-tier'), {
+      type: 'doughnut',
+      data: {
+        labels: ['High', 'Medium', 'Low'],
+        datasets: [{
+          data: [2036, 4072, 2036],
+          backgroundColor: ['#F87171', '#FBBF24', '#34D399'],
+          borderColor: '#192134',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        cutout: '56%',
+        plugins: {
+          legend: { position: 'right' },
+          tooltip: { callbacks: { label: it => ` ${it.label}: ${it.raw.toLocaleString()} cells (${(it.raw / 8144 * 100).toFixed(1)}%)` } }
+        }
+      }
+    });
+  }
+}
+
+const start = parseInt(location.hash.replace('#', ''), 10);
+show(Number.isFinite(start) && start > 0 ? start - 1 : 0);
+</script>
+</body>
+</html>

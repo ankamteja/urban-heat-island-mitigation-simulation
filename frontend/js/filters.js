@@ -1,20 +1,27 @@
-function setupFilters(originalGeojson, onFilterChange) {
+function setupFilters(allCells, onChange) {
   const buttons = document.querySelectorAll('.filter-btn');
+  const count = document.getElementById('filter-count');
+
+  function announce(cells, priority) {
+    count.textContent = priority === 'All'
+      ? `${cells.length.toLocaleString()} cells in the study area`
+      : `${cells.length.toLocaleString()} ${priority.toLowerCase()}-priority cells`;
+  }
 
   buttons.forEach(btn => {
     btn.addEventListener('click', () => {
-      buttons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      buttons.forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
 
       const priority = btn.dataset.priority;
-      const filtered = priority === 'All'
-        ? originalGeojson
-        : {
-            ...originalGeojson,
-            features: originalGeojson.features.filter(f => f.properties.priority === priority)
-          };
+      const cells = priority === 'All'
+        ? allCells
+        : allCells.filter(c => c.priority === priority);
 
-      onFilterChange(filtered);
+      announce(cells, priority);
+      onChange(cells);
     });
   });
+
+  announce(allCells, 'All');
 }

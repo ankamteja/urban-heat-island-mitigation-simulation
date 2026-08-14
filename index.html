@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Urban Heat Island Mitigation — Guwahati</title>
+<meta name="description" content="Turning Landsat thermal imagery into a ranked, costed cooling plan for Guwahati, Assam." />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23FB923C'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23EF4444'/%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Fira+Code:wght@400;500&family=Fira+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --bg: #0B1120; --surface: #131C2E; --surface-2: #192134;
+  --border: rgba(255,255,255,.09); --border-2: rgba(255,255,255,.18);
+  --fg: #F1F5F9; --muted: #94A3B8; --dim: #64748B;
+  --accent: #FBBF24; --cool: #34D399; --primary: #3B82F6;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Fira Sans', system-ui, sans-serif;
+  line-height: 1.55;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.glow {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(50% 40% at 18% 12%, rgba(251,146,60,.14), transparent 70%),
+    radial-gradient(45% 40% at 82% 78%, rgba(34,211,238,.10), transparent 70%);
+}
+main { position: relative; z-index: 1; flex: 1; width: 100%; max-width: 1080px; margin: 0 auto; padding: 72px 28px 40px; }
+.eyebrow {
+  font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--dim); margin-bottom: 18px;
+}
+h1 { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: clamp(38px, 6vw, 66px); line-height: 1.05; letter-spacing: -.015em; }
+.rule { width: 84px; height: 3px; border-radius: 2px; margin: 24px 0; background: linear-gradient(90deg, #22D3EE, var(--accent), #EF4444); }
+.lead { color: var(--muted); font-size: clamp(15px, 1.6vw, 18px); max-width: 66ch; }
+
+.stats { display: flex; flex-wrap: wrap; gap: 34px; margin: 34px 0 44px; }
+.stats div span { display: block; font-family: 'Fira Code', monospace; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+.stats div b { font-family: 'Fira Code', monospace; font-size: 19px; font-weight: 500; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+a.card {
+  display: flex; flex-direction: column; gap: 8px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 22px 22px 20px;
+  text-decoration: none; color: inherit;
+  transition: border-color .2s ease, background .2s ease, transform .2s ease;
+}
+a.card:hover { border-color: var(--border-2); background: #1F2A40; transform: translateY(-2px); }
+a.card:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.card .tag {
+  font-family: 'Fira Code', monospace; font-size: 10px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--accent);
+}
+.card.b .tag { color: var(--primary); }
+.card.c .tag { color: var(--cool); }
+.card h2 { font-size: 18px; font-weight: 600; }
+.card p { color: var(--muted); font-size: 13.5px; }
+.card .go { margin-top: auto; padding-top: 12px; font-family: 'Fira Code', monospace; font-size: 12px; color: var(--dim); }
+a.card:hover .go { color: var(--fg); }
+
+.note {
+  margin-top: 40px; border-left: 3px solid var(--accent);
+  background: rgba(251,191,36,.06); border-radius: 0 10px 10px 0;
+  padding: 14px 18px; font-size: 13.5px; color: var(--muted); max-width: 74ch;
+}
+.note b { color: var(--accent); }
+
+footer {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--border); margin-top: 48px;
+  padding: 18px 28px; text-align: center;
+  font-family: 'Fira Code', monospace; font-size: 11px; color: var(--dim); letter-spacing: .06em;
+}
+footer a { color: var(--muted); }
+
+@media (max-width: 620px) { main { padding: 44px 20px 32px; } .stats { gap: 22px; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="glow"></div>
+
+<main>
+  <p class="eyebrow">Remote sensing · Machine learning · Urban planning</p>
+  <h1>Urban Heat Island<br/>Mitigation — Guwahati</h1>
+  <div class="rule"></div>
+  <p class="lead">A decision-support pipeline that turns Landsat&nbsp;8 thermal imagery into a ranked, costed plan for where to plant, shade and re-surface the city.</p>
+
+  <div class="stats">
+    <div><span>Grid cells</span><b>8,144</b></div>
+    <div><span>Resolution</span><b>100 m</b></div>
+    <div><span>Mean LST</span><b>27.0 °C</b></div>
+    <div><span>Peak hotspot</span><b>33.1 °C</b></div>
+    <div><span>Modelled drop</span><b>−1.51 °C</b></div>
+  </div>
+
+  <div class="cards">
+    <a class="card" href="/frontend/">
+      <span class="tag">Interactive</span>
+      <h2>Heat dashboard</h2>
+      <p>The grid as a continuous thermal surface. Select an area to reveal the predicted post-mitigation map and drop ecology pointers.</p>
+      <span class="go">Open dashboard →</span>
+    </a>
+
+    <a class="card b" href="/presentation/deck.html">
+      <span class="tag">15 slides</span>
+      <h2>Presentation</h2>
+      <p>Problem, method, model results, decision support, dashboard walkthrough, and an honest account of the limitations.</p>
+      <span class="go">Open deck →</span>
+    </a>
+
+    <a class="card c" href="/presentation/architecture.html">
+      <span class="tag">Diagram</span>
+      <h2>System architecture</h2>
+      <p>How Earth Engine, the regression model, the cost engine and the dashboard connect through one shared data contract.</p>
+      <span class="go">Open diagram →</span>
+    </a>
+  </div>
+
+  <p class="note"><b>Read the caveats:</b> NDVI is uncorrected upstream, model R² falls sharply under spatial block cross-validation, and all costs are planning placeholders. The deck states each of these plainly.</p>
+</main>
+
+<footer>
+  Guwahati, Assam · Landsat 8 · 100 m grid ·
+  <a href="https://github.com/ankamteja/urban-heat-island-mitigation-simulation">source on GitHub</a>
+</footer>
+</body>
+</html>
