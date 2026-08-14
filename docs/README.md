@@ -13,9 +13,9 @@ Four of eight pages are written. The remaining four are tracked in
 | [02 — Setup and build](./02-setup-and-build.md) | Written |
 | [03 — Remote Sensing](./03-remote-sensing.md) | Written |
 | 04 — Machine Learning | **Not yet written** — see the module's own [README](../Machine%20Learning%20%26%20Prediction/README.md), which is thorough |
-| 05 — Decision-Support | **Not yet written** — see the module's own [README](../Decision-Support/README.md) |
+| [05 — Decision-Support](./05-decision-support.md) | Written |
 | 06 — Frontend | **Not yet written** — see [`frontend/README.md`](../frontend/README.md), which was updated alongside these docs |
-| 07 — Data contracts | **Not yet written** — the schemas are described in [01-architecture](./01-architecture.md#the-three-contracts) and enforced by `validate()` in `export_grid_geojson.py` |
+| [07 — Data contracts](./07-data-contracts.md) | Written |
 | [08 — Limitations](./08-limitations.md) | Written |
 
 Nothing below links to a page that does not exist.
