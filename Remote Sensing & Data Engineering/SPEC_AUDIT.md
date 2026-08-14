@@ -10,6 +10,29 @@ Verified by reading `GEE/urban_heat_analysis.js`, `README.md`, `Boundary/guwahat
 
 ---
 
+> ## Resolution status — updated 2026-08-14
+>
+> **Every fix in the "How to close the gaps" section below has since been applied to `GEE/urban_heat_analysis.js`.** The script now contains the SR rescale, the `QA_PIXEL` cloud/shadow mask, NDBI, ESA WorldCover land cover and vegetation, per-cell Latitude/Longitude, the GeoJSON grid export, both GeoTIFF exports, and the renamed CSV export.
+>
+> **The data has not been regenerated.** `Dataset/Guwahati_Urban_Heat_Dataset.csv` is still the pre-fix export, so every NDVI-derived figure quoted below remains true of the committed data. Closing the remaining gaps for real requires one run of the corrected script in the Earth Engine Code Editor, by someone with access to the private asset `projects/urban-heat-guwahati/assets/guwahati_boundary` — the exports land in that account's Google Drive.
+>
+> **Section numbers below are pre-fix.** The script grew from 12 sections to 17. Mapping for the references in this document:
+>
+> | This document says | Script section today |
+> |---|---|
+> | §2 Load Landsat | §2 (unchanged) |
+> | §3 Median composite | §4 — a new §3 holds the cloud mask |
+> | §4 LST | §5 |
+> | §5 NDVI | §6 |
+> | §6 Normalize | §9 |
+> | §8 Create grid | §11 |
+> | §9 Extract features | §12 |
+> | §11 Export CSV | §14 — new §15/§16 hold the GeoJSON and GeoTIFF exports |
+>
+> The audit body is left as written, as the historical record of what was found on 2026-08-07.
+
+---
+
 ## Summary
 
 | # | Spec item | Status |
