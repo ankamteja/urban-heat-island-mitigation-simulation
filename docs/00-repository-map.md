@@ -141,6 +141,17 @@ open it over HTTP and it runs. Libraries load from CDNs at pinned versions.
 
 ---
 
+## `backend/` — the automated data refresh
+
+| Path | Kind | What it is |
+|---|---|---|
+| `backend/refresh_dataset.py` | source | Re-measures every committed grid cell from Earth Engine headlessly, against a service account, and rewrites `dataset.csv`. **Deliberately does not regenerate the grid** — it recomputes over the existing cell polygons so `grid_id` stays stable and every downstream join keeps working. |
+| `backend/requirements.txt` | source | The Earth Engine client, on top of the ML module's dependencies. |
+
+Driven by `.github/workflows/refresh-data.yml` monthly. See [09 — Automated refresh](./09-automated-refresh.md).
+
+---
+
 ## `tests/` — what stops this from happening again
 
 | Path | Kind | What it is |
@@ -166,6 +177,7 @@ Run them with `pytest tests/` from the repository root.
 | `docs/06-frontend.md` | The dashboard's files and rendering approach. |
 | `docs/07-data-contracts.md` | Every schema, who writes it, who reads it, and what breaks if it changes. |
 | `docs/08-limitations.md` | Which numbers are measurements and which are assumptions. |
+| `docs/09-automated-refresh.md` | The scheduled satellite-data refresh and its setup. |
 
 ---
 

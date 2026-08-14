@@ -1,0 +1,8 @@
+# Automated refresh only. The analysis pipeline's own dependencies are in
+# "Machine Learning & Prediction/requirements.txt"; this file adds the Earth
+# Engine client on top of them.
+#
+#     pip install -r "Machine Learning & Prediction/requirements.txt"
+#     pip install -r backend/requirements.txt
+
+earthengine-api>=1.6.9
