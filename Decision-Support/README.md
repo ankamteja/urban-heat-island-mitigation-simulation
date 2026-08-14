@@ -1,145 +1,150 @@
-# Spec Compliance Audit — Decision Support
+# Decision Support
 
-**Audited:** 2026-08-08
-**Repo:** `ankamteja/urban-heat-island-mitigation-simulation`
-**Scope:** the Decision Support module spec — *"Identify the best locations for cooling interventions."*
+Budget-constrained priority ranking of urban cooling interventions for
+Guwahati's 100m grid, based on real land-cover classification and measured
+land surface temperature.
 
-Verified by reading `member3_decision_support.py` and by statistically analysing all
-8,144 rows produced from `Dataset/Guwahati_Urban_Heat_Dataset.csv`.
-
-**Score: 3 of 4 spec items fully met, 1 met with a documented limitation.**
-
----
-
-## Summary
-
-| # | Spec item | Status |
-|---|---|---|
-| 1 | Apply rule-based suitability filtering | ✅ Done |
-| 2 | Exclude unsuitable areas (roads, water, buildings, restricted zones) | ⚠️ Done but limited by upstream data |
-| 3 | Recommend interventions (Trees, Parks, Green roofs, Cool roofs) | ⚠️ Done, 2 of 4 interventions disabled by design |
-| 4 | Rank locations using Cooling Benefit / Cost | ✅ Done |
-| — | Deliverable — `recommendation.csv` | ✅ Done |
-| — | Deliverable — `ranking.csv` | ✅ Done |
-| — | Tool — Python | ✅ Used |
-| — | Tool — Pandas | ✅ Used |
-| — | Tool — GeoPandas | ⚠️ Not used — `shapely` used directly instead |
-
----
-
-## Detail
-
-### 1. Rule-based suitability filtering — Done
-
-`suitable_interventions_for_cell()` matches each cell's `land_cover` against a
-per-intervention `allowed_land_cover` list defined in the `INTERVENTIONS` dict.
-`best_intervention_for_cell()` then picks whichever allowed option maximizes
-`cooling_per_rupee` for that cell. No cell is assigned an intervention its land
-cover doesn't permit. **Met.**
-
-### 2. Exclusion of unsuitable areas — Done, limited by upstream data
-
-```python
-NEVER_TOUCH = ["road", "highway", "water", "wetland"]
+```
+Satellite data  →  Land cover + heat mapping  →  Decision Support  →  Interactive map
 ```
 
-This list is correct and would fully satisfy the spec **if** the input data
-carried a real land-cover classification. It doesn't yet — `Guwahati_Urban_Heat_Dataset.csv`
-has no `land_cover` column (confirmed in the Remote Sensing audit, 2026-08-07).
+## Overview
 
-**Current behavior:** `USE_PROXY_LANDCOVER = True` derives a 3-class stand-in
-from this dataset's own NDVI quantiles:
+Every 100m×100m grid cell in the study area is classified by land cover and
+heat risk, then matched to a suitable cooling intervention where one
+applies. This module determines three things in sequence:
 
-```python
-q1, q3 = df["ndvi"].quantile([0.25, 0.75])
-# top 25% NDVI  -> "vegetated"
-# bottom 25%    -> "bare_or_built_hot"
-# middle 50%    -> "moderate"
-```
+1. **Where** an intervention is physically appropriate (suitability)
+2. **What** intervention fits that location (action assignment)
+3. **Which specific cells** should be funded first under a fixed budget
+   (priority ranking)
 
-None of `road`, `highway`, `water`, `wetland`, or `building` exist as labels in
-this proxy — satellite NDVI alone cannot separate a road from a building from
-bare soil. So on the current run, the `NEVER_TOUCH` list is logically correct
-but **numerically inactive** (0 cells excluded on that basis; 100% of exclusions
-are from the "already vegetated" case below, not from road/water/restricted-zone
-exclusion). This is a data gap, not a logic gap — the rule is ready the moment
-real land cover lands.
+## Features
 
-**Knock-on effect:** because roads/buildings can't be identified, `pocket_park`
-and `green_roof` are deliberately disabled on proxy data (see item 3) rather
-than risk placing them on the wrong surface.
-
-### 3. Recommend interventions — Done, 2 of 4 enabled
-
-```python
-INTERVENTIONS = {
-    "trees":       {..., "allowed_land_cover": ["moderate", "bare_or_built_hot", ...]},
-    "pocket_park": {..., "allowed_land_cover": [] if USE_PROXY_LANDCOVER else ["vacant"]},
-    "green_roof":  {..., "allowed_land_cover": [] if USE_PROXY_LANDCOVER else ["building_dense"]},
-    "cool_roof":   {..., "allowed_land_cover": ["moderate", "bare_or_built_hot", ...]},
-}
-```
-
-All four intervention types are implemented with cost and cooling-benefit
-assumptions. On the current proxy-based run, only `trees` and `cool_roof` are
-reachable — `pocket_park` and `green_roof` have an empty `allowed_land_cover`
-list while `USE_PROXY_LANDCOVER = True`, by design: a reflective-roof
-recommendation on the wrong surface is merely moot, but a pond or park
-recommendation on the wrong surface (e.g. a road) would be actively wrong.
-This is a one-flag change (`USE_PROXY_LANDCOVER = False`) once real land cover
-is available — no other code changes needed.
-
-Cost/cooling figures are stated assumptions, not measured field data:
-
-| Intervention | Cost per 100m cell | Cooling estimate |
-|---|---|---|
-| Trees | ₹5,000 | 0.8°C |
-| Pocket park | ₹400,000 | 2.0°C |
-| Green roof | ₹150,000 | 1.5°C |
-| Cool roof | ₹30,000 | 1.0°C |
-
-### 4. Ranking by Cooling Benefit / Cost — Done
-
-```python
-cpr = spec["cooling_c"] / spec["cost_per_cell"]
-adjusted_cpr = cpr * heat_priority_boost   # mild boost for already-hotter cells
-ranking = recommendation.sort_values("cooling_per_rupee", ascending=False)
-```
-
-Greedy sort, budget-capped cumulative sum (`BUDGET_RUPEES = 5,000,000`) — the
-spec calls for a ranked list, not an optimizer, and that's what's implemented:
-no knapsack DP, no RL/GA. **Met**, and intentionally simple.
-
-### Deliverables
-
-| Deliverable | Status |
+| Feature | Description |
 |---|---|
-| `recommendation.csv` | ✅ 6,108 of 8,144 cells, columns: `grid_id, lat, lon, land_cover, predicted_temp, intervention, cost_rupees, cooling_c` |
-| `ranking.csv` | ✅ Same cells sorted by `cooling_per_rupee`, capped to top 1,000 within the ₹50,00,000 budget |
-| `excluded.csv` *(beyond spec)* | 2,036 cells excluded, all currently reason `"already vegetated - no action needed"` — not roads/water, see item 2 |
+| Real suitability filter | Built on actual ESA WorldCover land-cover classification — water and wetland cells are hard-excluded; roof interventions are restricted to built-up land; ground interventions are restricted to open land |
+| Cost-based scoring | Cost derived from real per-cell area and a per-square-metre unit rate |
+| Cooling-per-rupee ranking | Every intervention type scored on °C reduced per rupee spent, so cool roofs, parks, and tree cover are compared on equal footing |
+| Budget cutoff | Given a total budget, returns the exact set of cells that can be funded |
+| Transparent exclusions | Every cell without a recommendation is recorded with an explicit reason, never silently dropped |
+| Portable input path | Resolves the dataset relative to its own location in the repository — runs correctly on any machine that clones the project |
 
-### Tools
+## Outputs
 
-- **Python** ✅
-- **Pandas** ✅ — all filtering, scoring, ranking
-- **GeoPandas** ⚠️ — spec lists this explicitly; the script uses `shapely.geometry.shape` directly to parse the `.geo` centroid column instead of a full GeoDataFrame. Functionally equivalent for this task (no spatial joins or CRS reprojection were needed), but doesn't match the spec's named tool. Low-risk gap — flagged for completeness, not urgent to fix before the demo.
+### `recommendation.csv`
 
----
+Actionable cells, one row each.
 
-## Two inputs this module depends on, not yet resolved elsewhere
+| Column | Description |
+|---|---|
+| `grid_id` | Unique cell identifier |
+| `lat`, `lon` | Cell centroid coordinates |
+| `land_cover` | Classified land-cover type |
+| `priority` | Heat tier (High / Medium) |
+| `LST` | Measured land surface temperature (°C) |
+| `NDVI` | Vegetation index |
+| `recommended_action` | Cool roof / Green park / Tree cover |
+| `cost_estimate` | Cost in INR, based on cell area and unit rate |
+| `cooling_c` | Estimated temperature reduction (°C) |
+| `cooling_per_rupee` | `cooling_c ÷ cost_estimate` — the ranking score |
 
-1. **Real `land_cover`** — pending Member 1's GEE re-export with the WorldCover
-   join (fix already written and handed off as `urban_heat_analysis_FIXED.js`).
-2. **`predicted_temp`** from Member 2 — currently substituting raw `LST`
-   (measured, not modeled). Legitimate stand-in; ranking logic is agnostic to
-   the source of the temperature column.
+**Recommended interventions by type:**
 
-Both are single-flag swaps in `load_data()` — no downstream rework required.
+| Intervention | Cells | Rate (INR/m²) | Cooling (°C) |
+|---|---:|---:|---:|
+| Cool roof | 3,494 | 60.0 | 1.0 |
+| Tree cover | 589 | 37.5 | 0.8 |
+| Green park | 74 | 25.0 | 2.0 |
 
-## Suggested order (for next commit)
+### `ranking.csv`
 
-1. Get `predictions.csv` from Member 2 — swap `LST` for `predicted_temp`, rerun.
-2. Get re-exported `dataset.csv` from Member 1 with real `LandCover` — set
-   `USE_PROXY_LANDCOVER = False`, rerun. This is the one that unlocks
-   `pocket_park` and `green_roof`, and makes `NEVER_TOUCH` numerically active.
-3. Optional: migrate `.geo` parsing to GeoPandas to close the tools gap.
+Actionable cells sorted by `cooling_per_rupee`, descending, with a running
+cost total and a budget flag. At a demonstration budget of INR
+10,00,00,000, this funds the top 323 cells (74 Green park, 249 Tree cover).
+
+### `excluded.csv`
+
+3,987 cells excluded from recommendation, with reasons:
+
+| Reason | Cells |
+|---|---:|
+| Already vegetated (tree cover) — no action needed | 3,752 |
+| Never-touch land cover (water / wetland) | 193 |
+| Low heat priority — no action needed | 42 |
+
+## Land-cover classification
+
+Real ESA WorldCover categories, mapped to suitability rules:
+
+| Land cover | Cells | Rule |
+|---|---:|---|
+| Tree cover | 3,752 | Already vegetated — excluded, no action needed |
+| Built-up | 3,523 | Roof-type interventions only (Cool roof) |
+| Cropland | 573 | Ground-type interventions only |
+| Water | 149 | Never touch |
+| Grassland | 79 | Ground-type interventions only |
+| Wetland | 44 | Never touch |
+| Bare / sparse vegetation | 24 | Ground-type interventions only |
+
+## Method
+
+```
+for each cell:
+    if land_cover in [water, wetland]: exclude
+    elif land_cover == tree_cover: exclude (already green)
+    elif heat priority == Low: exclude
+    elif land_cover == built_up: assign Cool roof
+    elif land_cover in [bare_sparse, grassland, cropland]:
+        assign Green park (if High priority) else Tree cover
+
+for each actionable cell:
+    cooling_per_rupee = cooling_c / cost_estimate
+
+sort all cells by cooling_per_rupee, descending
+accumulate cost while walking down the sorted list
+mark cells within_budget = True until the budget is exhausted
+```
+
+A greedy ratio-ranking approach was used deliberately rather than an
+optimizer. For a "maximize benefit per rupee under a fixed budget"
+objective, this gives a reasonable, fully explainable result without the
+added complexity of a solver, appropriate to the project's scope.
+
+## Data source
+
+Reads directly from the committed dataset at:
+```
+../Remote Sensing & Data Engineering/Dataset/Guwahati_Urban_Heat_Dataset.csv
+```
+resolved relative to this script's own location, so it runs unmodified on
+any machine after cloning the repository — no absolute or user-specific
+paths.
+
+## Limitations
+
+| Limitation | Cause | Path to resolution |
+|---|---|---|
+| Roads are not separately classified | ESA WorldCover has no dedicated road class — roads are folded into the built-up category alongside buildings | Ground-level interventions are restricted away from built-up cells entirely as a safeguard; full resolution would require a dedicated road layer (e.g. OpenStreetMap) |
+| Cooling estimates (0.8 / 1.0 / 2.0°C) are engineering assumptions | Not measured or fitted to Guwahati-specific conditions | Future work: regression against tree canopy fraction and albedo |
+| Cost varies only by intervention type, not individually by cell | Grid cells are near-uniform in area | Incorporate real per-cell cost variation (acquisition, access, condition) |
+
+## Future improvements
+
+- **Fitted cooling estimates.** Replace flat per-intervention assumptions
+  with a regression against tree canopy fraction, albedo, and building
+  density, once available.
+- **Road-aware suitability.** Integrate a dedicated road layer (e.g.
+  OpenStreetMap) to separate roads from buildings within the built-up
+  class, enabling more precise placement.
+- **Real per-cell cost variation.** Incorporate plot acquisition cost,
+  rooftop condition, and access constraints so cost varies meaningfully
+  between individual cells.
+- **Phased, multi-year budgeting.** Produce a tranche-based rollout plan
+  rather than a single budget cutoff, to support realistic funding cycles.
+- **Equity-weighted ranking.** Optionally weight underserved areas above
+  raw cooling-per-rupee, as an explicit, disclosed policy parameter layered
+  on top of the existing ranking.
+- **Interactive budget exploration.** A budget-input control that re-ranks
+  and re-highlights the map in real time, without rerunning the pipeline
+  manually.
