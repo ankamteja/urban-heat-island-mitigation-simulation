@@ -8,8 +8,8 @@ A deeper walkthrough of every file lives in [`../docs/06-frontend.md`](../docs/0
 
 ## Running locally
 
-Serve the **repository root**, not this directory — the landing page and the
-presentation link across folders:
+Serve the **repository root**, not this directory — the landing page links
+across folders:
 
 ```bash
 python3 -m http.server 8000

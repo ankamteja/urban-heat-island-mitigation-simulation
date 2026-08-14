@@ -1,6 +1,6 @@
-# Only the static web layer needs to ship. The analysis modules are large
-# (the ML module alone is ~180 MB with the trained model) and are never
-# fetched by the browser.
+# Only the dashboard needs to ship. The analysis modules are large (the ML
+# module alone is ~180 MB with the trained model) and are never fetched by
+# the browser.
 
 Machine Learning & Prediction/
 Remote Sensing & Data Engineering/

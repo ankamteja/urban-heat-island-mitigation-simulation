@@ -3,3 +3,6 @@
 # 100 MB blob limit. Fully reproducible (fixed random_state) by running
 # `python scripts/train_regression.py` from that module's directory.
 Machine Learning & Prediction/Models/heat_risk_model.pkl
+
+.vercel
+.env*
