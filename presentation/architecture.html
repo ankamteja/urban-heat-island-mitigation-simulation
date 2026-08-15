@@ -1,127 +1,134 @@
 <meta charset="utf-8">
-<title>Pipeline architecture — Urban Heat Island Mitigation</title>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Fira+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Processing pipeline — Urban Heat Island Mitigation</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  html, body { margin: 0; padding: 0; background: #0B1120; }
+  html, body { margin: 0; padding: 0; background: #0C1017; }
   body { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-  svg { display: block; width: 1440px; height: 580px; }
+  svg { display: block; width: 1600px; height: 620px; }
 </style>
 
-<!-- Architecture diagram, diagram-design system, skinned to the dashboard palette
-     (frontend/style.css tokens). Fira Sans / Fira Code stand in for Geist so the
-     diagram matches the deck and the dashboard it describes.
-
-     Each node carries three lines: what it is, what it runs on, and the number a
-     judge would otherwise have to ask for. The arrows carry the funnel —
-     8,144 cells in, 4,157 eligible, 249 funded — so the drop-off is legible
-     without a second chart. Canvas is ~2.5:1 to fit the deck's content area. -->
-<svg viewBox="0 0 1440 580" role="img" aria-labelledby="uhi-arch-title uhi-arch-desc"
+<!-- Processing pipeline, diagram-design system, skinned to the dashboard palette
+     (frontend/style.css). Every stage names the artefact it produces, so the
+     diagram doubles as the data-flow reference rather than a decorative chain. -->
+<svg viewBox="0 0 1600 620" role="img" aria-labelledby="pipe-title pipe-desc"
      xmlns="http://www.w3.org/2000/svg">
-  <title id="uhi-arch-title">Urban Heat Island pipeline architecture</title>
-  <desc id="uhi-arch-desc">Remote sensing feeds two branches: a machine-learning branch that ends in a metrics report used only as a diagnostic, and a decision-support branch whose land-cover gate narrows 8,144 cells to 4,157 eligible and 249 funded, driving the dashboard. Decision support, not the model, produces the recommendation.</desc>
+  <title id="pipe-title">Urban heat mitigation processing pipeline</title>
+  <desc id="pipe-desc">Eight stages in four phases: acquisition composites Landsat 8 and masks cloud; derivation computes land surface temperature, NDVI and NDBI onto a 100 metre grid of 8,144 cells; decision gates cells on ESA WorldCover land cover, prices each measure, ranks by cooling per rupee with temperature as tie-break and caps at budget; delivery emits the ranked CSV and the dashboard.</desc>
 
   <defs>
-    <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-      <polygon points="0 0, 8 3, 0 6" fill="#94A3B8"/>
+    <marker id="a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#9AA6BC"/>
     </marker>
-    <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-      <polygon points="0 0, 8 3, 0 6" fill="#FBBF24"/>
+    <marker id="a-acc" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#E0A23C"/>
     </marker>
-    <marker id="arrow-soft" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
-      <polygon points="0 0, 8 3, 0 6" fill="#64748B"/>
+    <marker id="a-dim" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#6B7891"/>
     </marker>
   </defs>
 
-  <rect width="1440" height="580" fill="#0B1120"/>
+  <rect width="1600" height="620" fill="#0C1017"/>
 
-  <!-- ============ arrows first (z-order: lines behind boxes) ============ -->
+  <!-- ============ phase zones (drawn first) ============ -->
+  <g fill="rgba(232,234,240,0.018)" stroke="rgba(232,234,240,0.09)" stroke-width="0.8">
+    <rect x="40"   y="170" width="352" height="184" rx="6"/>
+    <rect x="412"  y="170" width="352" height="184" rx="6"/>
+    <rect x="784"  y="170" width="536" height="184" rx="6"/>
+    <rect x="1340" y="170" width="220" height="184" rx="6"/>
+  </g>
+  <g font-family="'IBM Plex Mono', monospace" font-size="10" letter-spacing="0.14em" fill="#6B7891">
+    <rect x="52" y="163" width="94" height="13" fill="#0C1017"/><text x="56" y="173">ACQUISITION</text>
+    <rect x="424" y="163" width="80" height="13" fill="#0C1017"/><text x="428" y="173">DERIVATION</text>
+    <rect x="796" y="163" width="66" height="13" fill="#0C1017"/><text x="800" y="173">DECISION</text>
+    <rect x="1352" y="163" width="62" height="13" fill="#0C1017"/><text x="1356" y="173">DELIVERY</text>
+  </g>
 
-  <!-- Remote Sensing -> Machine Learning. Exits are fanned 48 px apart so neither
-       connector hides the other. -->
-  <path d="M 264,268 H 552 Q 560,268 560,260 V 176" fill="none" stroke="#94A3B8" stroke-width="1.2" marker-end="url(#arrow)"/>
-  <rect x="360" y="248" width="96" height="14" rx="2" fill="#0B1120"/>
-  <text x="408" y="259" fill="#64748B" font-size="10" font-family="'Fira Code', monospace" text-anchor="middle" letter-spacing="0.08em">5 FEATURES</text>
+  <!-- ============ connectors ============ -->
+  <g fill="none" stroke="#9AA6BC" stroke-width="1.2" marker-end="url(#a)">
+    <path d="M 212,262 H 224"/>
+    <path d="M 384,262 H 424"/>
+    <path d="M 584,262 H 596"/>
+    <path d="M 756,262 H 796"/>
+    <path d="M 956,262 H 968"/>
+    <path d="M 1128,262 H 1140"/>
+  </g>
+  <path d="M 1300,262 H 1352" fill="none" stroke="#E0A23C" stroke-width="1.4" marker-end="url(#a-acc)"/>
 
-  <!-- Remote Sensing -> Decision Support -->
-  <path d="M 264,316 H 552 Q 560,316 560,324 V 368" fill="none" stroke="#94A3B8" stroke-width="1.2" marker-end="url(#arrow)"/>
-  <rect x="356" y="296" width="104" height="14" rx="2" fill="#0B1120"/>
-  <text x="408" y="307" fill="#94A3B8" font-size="10" font-family="'Fira Code', monospace" text-anchor="middle" letter-spacing="0.08em">8,144 CELLS</text>
+  <!-- side input: WorldCover into the eligibility gate -->
+  <path d="M 878,404 V 326" fill="none" stroke="#6B7891" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#a-dim)"/>
 
-  <!-- Machine Learning -> metrics.json (dashed: diagnostic, not consumed) -->
-  <path d="M 672,116 H 816" fill="none" stroke="#64748B" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow-soft)"/>
-  <rect x="712" y="96" width="64" height="14" rx="2" fill="#0B1120"/>
-  <text x="744" y="107" fill="#64748B" font-size="10" font-family="'Fira Code', monospace" text-anchor="middle" letter-spacing="0.08em">SCORES</text>
+  <!-- ============ stage boxes ============ -->
+  <g>
+    <!-- A -->
+    <rect x="56" y="218" width="156" height="88" rx="5" fill="#11161F" stroke="rgba(232,234,240,0.16)"/>
+    <text x="134" y="248" fill="#E8EAF0" font-size="14" font-weight="600" font-family="Inter, sans-serif" text-anchor="middle">Landsat 8</text>
+    <text x="134" y="268" fill="#9AA6BC" font-size="10.5" font-family="'IBM Plex Mono', monospace" text-anchor="middle">Collection 2 L2</text>
+    <text x="134" y="286" fill="#6B7891" font-size="10" font-family="'IBM Plex Mono', monospace" text-anchor="middle">thermal + optical</text>
 
-  <!-- Decision Support -> Dashboard (accent: the load-bearing hand-off) -->
-  <path d="M 672,428 H 816" fill="none" stroke="#FBBF24" stroke-width="1.4" marker-end="url(#arrow-accent)"/>
-  <rect x="696" y="408" width="96" height="14" rx="2" fill="#0B1120"/>
-  <text x="744" y="419" fill="#FBBF24" font-size="10" font-family="'Fira Code', monospace" text-anchor="middle" letter-spacing="0.08em">249 FUNDED</text>
+    <!-- B -->
+    <rect x="228" y="218" width="156" height="88" rx="5" fill="#11161F" stroke="rgba(232,234,240,0.16)"/>
+    <text x="306" y="248" fill="#E8EAF0" font-size="14" font-weight="600" font-family="Inter, sans-serif" text-anchor="middle">Cloud mask</text>
+    <text x="306" y="268" fill="#9AA6BC" font-size="10.5" font-family="'IBM Plex Mono', monospace" text-anchor="middle">QA_PIXEL + composite</text>
+    <text x="306" y="286" fill="#6B7891" font-size="10" font-family="'IBM Plex Mono', monospace" text-anchor="middle">Earth Engine</text>
 
-  <!-- dead-end stub after metrics.json -->
-  <path d="M 1040,116 H 1100" fill="none" stroke="#64748B" stroke-width="1" stroke-dasharray="4,3"/>
-  <line x1="1104" y1="100" x2="1104" y2="132" stroke="#64748B" stroke-width="1.6"/>
+    <!-- C -->
+    <rect x="428" y="218" width="156" height="88" rx="5" fill="#11161F" stroke="rgba(232,234,240,0.16)"/>
+    <text x="506" y="248" fill="#E8EAF0" font-size="14" font-weight="600" font-family="Inter, sans-serif" text-anchor="middle">LST · NDVI · NDBI</text>
+    <text x="506" y="268" fill="#9AA6BC" font-size="10.5" font-family="'IBM Plex Mono', monospace" text-anchor="middle">per-pixel indices</text>
+    <text x="506" y="286" fill="#6B7891" font-size="10" font-family="'IBM Plex Mono', monospace" text-anchor="middle">21.1 – 33.2 °C</text>
 
-  <!-- ============ nodes ============ -->
+    <!-- D -->
+    <rect x="600" y="218" width="156" height="88" rx="5" fill="#11161F" stroke="rgba(232,234,240,0.16)"/>
+    <text x="678" y="248" fill="#E8EAF0" font-size="14" font-weight="600" font-family="Inter, sans-serif" text-anchor="middle">100 m grid</text>
+    <text x="678" y="268" fill="#9AA6BC" font-size="10.5" font-family="'IBM Plex Mono', monospace" text-anchor="middle">QGIS fishnet</text>
+    <text x="678" y="286" fill="#6B7891" font-size="10" font-family="'IBM Plex Mono', monospace" text-anchor="middle">8,144 cells</text>
 
-  <!-- Remote Sensing -->
-  <rect x="40" y="232" width="224" height="120" rx="8" fill="#0B1120"/>
-  <rect x="40" y="232" width="224" height="120" rx="8" fill="#131C2E" stroke="rgba(255,255,255,0.16)" stroke-width="1"/>
-  <rect x="52" y="244" width="44" height="16" rx="2" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="0.8"/>
-  <text x="74" y="255" fill="#94A3B8" font-size="9" font-family="'Fira Code', monospace" text-anchor="middle" letter-spacing="0.10em">DATA</text>
-  <text x="152" y="288" fill="#F1F5F9" font-size="16" font-weight="600" font-family="'Fira Sans', sans-serif" text-anchor="middle">Remote Sensing</text>
-  <text x="152" y="310" fill="#94A3B8" font-size="11" font-family="'Fira Code', monospace" text-anchor="middle">Landsat 8 · ESA WorldCover</text>
-  <text x="152" y="330" fill="#64748B" font-size="10" font-family="'Fira Code', monospace" text-anchor="middle">Earth Engine · QGIS · 100 m</text>
+    <!-- E — eligibility -->
+    <rect x="800" y="218" width="156" height="88" rx="5" fill="rgba(94,158,126,0.10)" stroke="#5E9E7E"/>
+    <text x="878" y="248" fill="#E8EAF0" font-size="14" font-weight="600" font-family="Inter, sans-serif" text-anchor="middle">Eligibility gate</text>
+    <text x="878" y="268" fill="#9AA6BC" font-size="10.5" font-family="'IBM Plex Mono', monospace" text-anchor="middle">never-touch classes</text>
+    <text x="878" y="286" fill="#5E9E7E" font-size="10" font-family="'IBM Plex Mono', monospace" text-anchor="middle">8,144 → 4,157</text>
 
-  <!-- Machine Learning -->
-  <rect x="448" y="56" width="224" height="120" rx="8" fill="#0B1120"/>
-  <rect x="448" y="56" width="224" height="120" rx="8" fill="#131C2E" stroke="rgba(255,255,255,0.16)" stroke-width="1"/>
-  <rect x="460" y="68" width="52" height="16" rx="2" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="0.8"/>
-  <text x="486" y="79" fill="#94A3B8" font-size="9" font-family="'Fira Code', monospace" text-anchor="middle" letter-spacing="0.10em">MODEL</text>
-  <text x="560" y="112" fill="#F1F5F9" font-size="16" font-weight="600" font-family="'Fira Sans', sans-serif" text-anchor="middle">Machine Learning</text>
-  <text x="560" y="134" fill="#94A3B8" font-size="11" font-family="'Fira Code', monospace" text-anchor="middle">RandomForest</text>
-  <text x="560" y="154" fill="#64748B" font-size="10" font-family="'Fira Code', monospace" text-anchor="middle">NDBI · NDVI · veg · lat · lon</text>
+    <!-- F — cost -->
+    <rect x="972" y="218" width="156" height="88" rx="5" fill="#11161F" stroke="rgba(232,234,240,0.16)"/>
+    <text x="1050" y="248" fill="#E8EAF0" font-size="14" font-weight="600" font-family="Inter, sans-serif" text-anchor="middle">Cost model</text>
+    <text x="1050" y="268" fill="#9AA6BC" font-size="10.5" font-family="'IBM Plex Mono', monospace" text-anchor="middle">rate × coverage × area</text>
+    <text x="1050" y="286" fill="#6B7891" font-size="10" font-family="'IBM Plex Mono', monospace" text-anchor="middle">₹167.5 Cr upper bound</text>
 
-  <!-- metrics.json (terminates) -->
-  <rect x="816" y="56" width="224" height="120" rx="8" fill="#0B1120"/>
-  <rect x="816" y="56" width="224" height="120" rx="8" fill="rgba(241,245,249,0.02)" stroke="rgba(255,255,255,0.10)" stroke-width="1" stroke-dasharray="4,3"/>
-  <rect x="828" y="68" width="56" height="16" rx="2" fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="0.8"/>
-  <text x="856" y="79" fill="#64748B" font-size="9" font-family="'Fira Code', monospace" text-anchor="middle" letter-spacing="0.10em">REPORT</text>
-  <text x="928" y="112" fill="#94A3B8" font-size="16" font-weight="600" font-family="'Fira Sans', sans-serif" text-anchor="middle">metrics.json</text>
-  <text x="928" y="134" fill="#94A3B8" font-size="11" font-family="'Fira Code', monospace" text-anchor="middle">R² 0.51 spatial-block</text>
-  <text x="928" y="154" fill="#64748B" font-size="10" font-family="'Fira Code', monospace" text-anchor="middle">0.90 random — the leaky one</text>
+    <!-- G — ranking, focal -->
+    <rect x="1144" y="218" width="156" height="88" rx="5" fill="rgba(224,162,60,0.10)" stroke="#E0A23C" stroke-width="1.2"/>
+    <text x="1222" y="248" fill="#E8EAF0" font-size="14" font-weight="600" font-family="Inter, sans-serif" text-anchor="middle">Rank + budget cap</text>
+    <text x="1222" y="268" fill="#9AA6BC" font-size="10.5" font-family="'IBM Plex Mono', monospace" text-anchor="middle">greedy, cooling per ₹</text>
+    <text x="1222" y="286" fill="#E0A23C" font-size="10" font-family="'IBM Plex Mono', monospace" text-anchor="middle">4,157 → 249 funded</text>
 
-  <!-- Decision Support — FOCAL -->
-  <rect x="448" y="368" width="224" height="120" rx="8" fill="#0B1120"/>
-  <rect x="448" y="368" width="224" height="120" rx="8" fill="rgba(251,191,36,0.10)" stroke="#FBBF24" stroke-width="1.2"/>
-  <rect x="460" y="380" width="48" height="16" rx="2" fill="none" stroke="rgba(251,191,36,0.45)" stroke-width="0.8"/>
-  <text x="484" y="391" fill="#FBBF24" font-size="9" font-family="'Fira Code', monospace" text-anchor="middle" letter-spacing="0.10em">RULES</text>
-  <text x="560" y="424" fill="#F1F5F9" font-size="16" font-weight="600" font-family="'Fira Sans', sans-serif" text-anchor="middle">Decision Support</text>
-  <text x="560" y="446" fill="#94A3B8" font-size="11" font-family="'Fira Code', monospace" text-anchor="middle">land-cover gate · cost · rank</text>
-  <text x="560" y="466" fill="#FBBF24" font-size="10" font-family="'Fira Code', monospace" text-anchor="middle">8,144 → 4,157 eligible → 249</text>
+    <!-- H -->
+    <rect x="1356" y="218" width="188" height="88" rx="5" fill="#11161F" stroke="rgba(232,234,240,0.16)"/>
+    <text x="1450" y="248" fill="#E8EAF0" font-size="14" font-weight="600" font-family="Inter, sans-serif" text-anchor="middle">Dashboard + CSV</text>
+    <text x="1450" y="268" fill="#9AA6BC" font-size="10.5" font-family="'IBM Plex Mono', monospace" text-anchor="middle">grid.geojson · ranking.csv</text>
+    <text x="1450" y="286" fill="#6B7891" font-size="10" font-family="'IBM Plex Mono', monospace" text-anchor="middle">Leaflet, re-runs client-side</text>
 
-  <!-- Dashboard -->
-  <rect x="816" y="368" width="224" height="120" rx="8" fill="#0B1120"/>
-  <rect x="816" y="368" width="224" height="120" rx="8" fill="#131C2E" stroke="rgba(255,255,255,0.16)" stroke-width="1"/>
-  <rect x="828" y="380" width="32" height="16" rx="2" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="0.8"/>
-  <text x="844" y="391" fill="#94A3B8" font-size="9" font-family="'Fira Code', monospace" text-anchor="middle" letter-spacing="0.10em">UI</text>
-  <text x="928" y="424" fill="#F1F5F9" font-size="16" font-weight="600" font-family="'Fira Sans', sans-serif" text-anchor="middle">Dashboard</text>
-  <text x="928" y="446" fill="#94A3B8" font-size="11" font-family="'Fira Code', monospace" text-anchor="middle">blended field · grid cells</text>
-  <text x="928" y="466" fill="#34D399" font-size="10" font-family="'Fira Code', monospace" text-anchor="middle">every cell → Google Street View</text>
+    <!-- side input -->
+    <rect x="790" y="404" width="176" height="52" rx="5" fill="#11161F" stroke="rgba(232,234,240,0.12)" stroke-dasharray="4,3"/>
+    <text x="878" y="426" fill="#9AA6BC" font-size="12.5" font-weight="500" font-family="Inter, sans-serif" text-anchor="middle">ESA WorldCover 10 m</text>
+    <text x="878" y="444" fill="#6B7891" font-size="10" font-family="'IBM Plex Mono', monospace" text-anchor="middle">water · wetland · tree cover</text>
+  </g>
 
-  <!-- ============ editorial annotation ============ -->
-  <text x="1128" y="108" fill="#94A3B8" font-size="15" font-style="italic" font-family="Georgia, 'Times New Roman', serif">screening signal —</text>
-  <text x="1128" y="132" fill="#94A3B8" font-size="15" font-style="italic" font-family="Georgia, 'Times New Roman', serif">not the decision path</text>
+  <!-- ============ the ranking rule, stated ============ -->
+  <rect x="1000" y="404" width="544" height="76" rx="5" fill="rgba(224,162,60,0.06)" stroke="rgba(224,162,60,0.28)"/>
+  <text x="1020" y="426" fill="#E0A23C" font-size="10" letter-spacing="0.12em" font-family="'IBM Plex Mono', monospace">SELECTION RULE</text>
+  <text x="1020" y="448" fill="#E8EAF0" font-size="13" font-family="'IBM Plex Mono', monospace">sort by  ΔT / cost  desc,  then LST desc,  then grid_id</text>
+  <text x="1020" y="468" fill="#9AA6BC" font-size="11" font-family="Inter, sans-serif">fill greedily while cumulative cost ≤ budget</text>
 
-  <!-- ============ legend strip ============ -->
-  <line x1="40" y1="512" x2="1400" y2="512" stroke="rgba(255,255,255,0.10)" stroke-width="0.8"/>
-  <text x="40" y="540" fill="#64748B" font-size="10" font-family="'Fira Code', monospace" letter-spacing="0.14em">LEGEND</text>
+  <!-- ============ legend ============ -->
+  <line x1="40" y1="530" x2="1560" y2="530" stroke="rgba(232,234,240,0.08)" stroke-width="0.8"/>
+  <text x="40" y="558" fill="#6B7891" font-size="10" letter-spacing="0.14em" font-family="'IBM Plex Mono', monospace">LEGEND</text>
 
-  <line x1="132" y1="536" x2="172" y2="536" stroke="#94A3B8" stroke-width="1.2" marker-end="url(#arrow)"/>
-  <text x="184" y="540" fill="#94A3B8" font-size="11" font-family="'Fira Sans', sans-serif">The decision path</text>
+  <rect x="132" y="547" width="12" height="12" rx="2" fill="rgba(94,158,126,0.10)" stroke="#5E9E7E"/>
+  <text x="154" y="558" fill="#9AA6BC" font-size="11.5" font-family="Inter, sans-serif">Safety gate — rules that remove cells</text>
 
-  <line x1="368" y1="536" x2="408" y2="536" stroke="#64748B" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow-soft)"/>
-  <text x="420" y="540" fill="#94A3B8" font-size="11" font-family="'Fira Sans', sans-serif">Diagnostic — reported, not consumed</text>
+  <rect x="452" y="547" width="12" height="12" rx="2" fill="rgba(224,162,60,0.10)" stroke="#E0A23C"/>
+  <text x="474" y="558" fill="#9AA6BC" font-size="11.5" font-family="Inter, sans-serif">Selection — where the shortlist is decided</text>
 
-  <rect x="760" y="528" width="16" height="16" rx="3" fill="rgba(251,191,36,0.10)" stroke="#FBBF24" stroke-width="1.2"/>
-  <text x="788" y="540" fill="#94A3B8" font-size="11" font-family="'Fira Sans', sans-serif">Auditable rule + cost engine — every recommendation traceable to a rule and a rate</text>
+  <line x1="800" y1="553" x2="836" y2="553" stroke="#6B7891" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#a-dim)"/>
+  <text x="848" y="558" fill="#9AA6BC" font-size="11.5" font-family="Inter, sans-serif">Reference dataset, not a processing stage</text>
 </svg>

@@ -17,31 +17,47 @@ python presentation/build_deck.py
 
 ## Structure
 
-Ordered for a hackathon judging panel — one claim per slide, stated in the
-slide's own accent bar:
+Thirteen slides in the order a technical panel reads them:
 
-| # | Slide | The claim |
+| # | Slide | Carries |
 |---|---|---|
-| 1 | Title | Satellite heat data → a safe, ranked, cost-aware plan a planner can explore now |
-| 2 | The problem | Heat is uneven; choosing well needs a map at the scale of the decision |
-| 3 | The solution | Four steps, each auditable — decision support, not prediction |
-| 4 | Data and architecture | Real data in, auditable plan out |
-| 5 | Key result | ₹10 Cr, 249 cells — and cooling values are assumptions, not guarantees |
-| 6 | Interactive demo | Both surfaces, live, for any selection |
-| 7 | Safety and trust | The rules that stop a bad recommendation |
-| 8 | Impact | What a planner can do on Monday |
-| 9 | Limitations and next step | What we would validate first |
-| 10 | Close | From satellite pixels to a defensible urban cooling shortlist |
+| 1 | Title | Project, team and roles, the three project links |
+| 2 | Problem | Why block-scale ranking is needed at all |
+| 3 | Solution | The pipeline in five bullets, then the headline figures |
+| 4 | Novelty | Five specific claims, each falsifiable |
+| 5 | Approach | The eight-stage pipeline diagram |
+| 6 | Algorithm | Cost/cooling table, the selection rule, one worked cell |
+| 7 | Validation | Random vs hottest-first vs ours, at the same budget |
+| 8 | Dashboard | Screenshot of the cell inspector |
+| 9 | Impact | Hotspot reduction, then scalability and reproducibility |
+| 10 | Limitations | Six, each naming what would settle it |
+| 11 | Future work | Five, ordered by effect on decision quality |
+| 12 | Links | Resource table plus the four key repository documents |
+| 13 | Citations | Data sources, unit rates, methods |
 
-Two positions the deck holds deliberately, because both are credibility risks in
-front of judges:
+Written as bullets and tables. Two positions the content holds deliberately,
+because both are credibility risks in front of judges:
 
-- **Cooling values are planning assumptions used to compare scenarios, never
-  measured guarantees.** Slide 5 says so in red under the headline figures, and
-  slide 9 leads with it.
-- **The model is not the decision-maker.** The visible recommendation comes from
-  an auditable rule and cost engine. The architecture diagram marks the ML branch
-  as a diagnostic that terminates, rather than implying the plan is model output.
+- **Cooling values are planning assumptions, not measured guarantees.** Slide 6
+  shows where each one came from; slide 10 leads with the fact that they
+  determine the ranking and were never validated locally.
+- **The model is not the decision-maker.** The recommendation comes from the
+  rule and cost engine. Slide 4 says so as a design claim rather than a caveat.
+
+## Regenerating the validation table
+
+Slide 7 is the one table that is not read from a committed artefact. It is
+computed by replaying three selection strategies over `frontend/data/grid.geojson`
+at the same ₹10 Cr budget:
+
+- **Random among eligible** — mean of 200 seeded shuffles
+- **Hottest eligible first** — eligible cells by LST descending
+- **Cooling per rupee, then hottest** — the shipped rule
+
+Each fills greedily while cumulative cost stays under budget. "Hotspots cut" is
+the change in cells at or above the top decile of the observed range. The
+current figures are in `FIGURES` in `build_deck.py`; re-derive them with the
+script in that section's comment if the grid changes.
 
 ## Where the numbers come from
 
