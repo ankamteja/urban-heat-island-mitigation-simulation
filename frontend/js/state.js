@@ -49,6 +49,10 @@ const BUDGET_PRESETS = [
   { label: '₹100 Cr', value: 1000000000, note: null }
 ];
 
+/* Slider granularity, ₹1 Cr. The range's max is rounded up to a multiple of
+   this so the top of the track is actually reachable — see renderBudget(). */
+const BUDGET_STEP = 10000000;
+
 function onStateChange(fn) {
   App._subs.push(fn);
 }

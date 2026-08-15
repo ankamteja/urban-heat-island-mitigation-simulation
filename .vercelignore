@@ -19,8 +19,3 @@ __pycache__/
 
 # Generated deck - large binary, not needed by the browser
 *.pptx
-
-# The deck generator and its diagram. The previous presentation/ folder was
-# deleted (8e6ba44) because it shipped ~4.3 MB of screenshots into every
-# deployment; excluding it here is what keeps that from happening again.
-presentation/
