@@ -61,8 +61,13 @@ Actionable cells, one row each.
 
 Actionable cells sorted by `cooling_per_rupee`, descending, with a running
 cost total and a budget flag. At a demonstration budget of INR
-10,00,00,000, this funds the top 299 cells, all Tree cover. Parks and cool roofs
-fall below the cut once the park rate is anchored on real municipal figures.
+10,00,00,000, this funds the top 249 cells, all Cool roof (₹9.99 crore of the
+₹10 crore cap). Tree cover and parks fall below the cut.
+
+Cool roof leads tree cover on cooling per rupee by about 4% — close enough that
+a small error in either unit rate reverses the recommendation, and the tree
+cover rate is still unvalidated. This ordering has already flipped twice on a
+rate correction. See [`../docs/08-limitations.md`](../docs/08-limitations.md).
 
 ### `excluded.csv`
 

@@ -43,8 +43,12 @@ Current recommendation set, 8,144 cells:
 | None | 3,987 |
 
 Of the 3,987 excluded: 3,752 already tree cover, 149 water, 44 wetland, 42 low
-priority. Total notional programme cost ₹2,141,865,191 — see the caveat on
-costs below.
+priority.
+
+Total cost if every actionable cell were treated: **₹1,674,616,910** (~₹167.5
+crore). That is an upper bound, not a proposal. The actual recommendation is the
+budget-capped set in `Decision-Support/ranking.csv`: **₹9.99 crore, 249 cells,
+all cool roof.** See the caveat on costs below.
 
 ---
 
@@ -79,11 +83,18 @@ costs below.
   adjusted for canopy age, albedo, humidity or wind. A flat per-action figure
   also ignores that cooling scales with treated area and with how hot a cell
   already is.
-- **Two of three unit rates are unvalidated.** 150/400/1,150 INR per m² at
-  25%/15%/10% coverage. Only `Green park` has a real comparable — it was revised
-  from 250 on 2026-08-14, anchored on Gujarat AMRUT 2.0 municipal gardens
-  (₹1,152–2,250/m²). `Tree cover` and `Cool roof` remain assumptions with no
-  directly comparable municipal rate found. No tender, no survey.
+- **One of three unit rates is still unvalidated.** 150/300/1,150 INR per m² at
+  25%/15%/10% coverage. `Cool roof` was revised from 400 on 2026-08-15 on
+  Telangana's Cool Roof Policy 2023–28 (₹300/m² for cool roof painting or
+  tiles); `Green park` from 250 on 2026-08-14 on Gujarat AMRUT 2.0 municipal
+  gardens (₹1,152–2,250/m²). `Tree cover` remains an assumption — no all-in
+  urban municipal per-tree rate was found, though municipal tree-guard tenders
+  alone run ₹1,280–2,250 per guard, which puts a floor under it. No tender, no
+  survey for that one.
+- **The rates decide the answer, not the model.** Cooling per rupee has been
+  reordered twice, both times by a cost correction and never by a model result,
+  and each reordering replaced the funded set wholesale. Cool roof currently
+  leads tree cover by 4% — inside the error of an unvalidated rate.
 - **The "after intervention" map is a claim, not a forecast.** It shows what the
   plan asserts it would achieve.
 - **Quote the spatial-block R² (0.513), never the random-split figure (0.895)
@@ -102,7 +113,7 @@ costs below.
 | # | Item | Effort |
 |---|---|---|
 | 1 | **Cooling values are unvalidated.** Even a crude check — do cells WorldCover calls tree cover run measurably cooler than adjacent built-up cells? — would turn an assumption into an estimate. The data to do it is already committed. | days |
-| 2 | **The ₹10 crore budget funds only tree cover — 299 cells, no parks, no cool roofs.** Correct per the model, but it means the 3,494 built-up cells get nothing. Note this ordering already flipped once: the park rate was 5–9× too low, which had made parks the top-ranked option. Ranking is highly sensitive to unit rates, and two of the three are still unvalidated (item 1). | decision |
+| 2 | **The ₹10 crore budget funds only cool roofs — 249 cells, no trees, no parks.** Correct per the model, but it means the 589 open-land cells get nothing. This ordering has now flipped twice, both times on a rate correction: the park rate was 5–9× too low, then the cool-roof rate was 33% too high. Cool roof now leads tree cover by just 4%, and the tree-cover rate is still unvalidated (item 1). Treat the funded set as approximately right, not decisively right. | decision |
 | 3 | **QGIS project has three unresolvable layers.** `guwahati_heat_project.qgz` references `./guwahati_boundary.geojson` (wrong directory), a `.shp` that exists nowhere, and an absolute path into a `Downloads/` folder on the original author's machine. Needs opening in QGIS to relink and re-save. | hour |
 | 4 | **Dashboard downloads 3.7 MB to render centroids.** The renderer discards every polygon ring. A centroid-plus-bounds export would cut the payload several-fold with no visual change. | hours |
 | 5 | **Land cover is not surfaced in the UI.** It now decides every recommendation; showing why a cell got its action would make the tool defensible to a planner. | hours |
