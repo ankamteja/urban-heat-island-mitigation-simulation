@@ -1,22 +1,27 @@
 """
 Step 4 - Export grid.geojson for the dashboard.
 
-Emits a FeatureCollection whose feature properties are EXACTLY the seven keys
+Emits a FeatureCollection whose feature properties are EXACTLY the ten keys
 the existing frontend reads, and no others:
 
-    grid_id, temperature, ndvi, priority, recommended_action, cost_estimate,
-    cooling_c
+    grid_id, temperature, ndvi, ndbi, land_cover, priority, recommended_action,
+    exclusion_reason, cost_estimate, cooling_c
 
 Consumers of those keys (do not rename without updating both sides):
   - frontend/js/mapView.js     -> properties.temperature (heat layer + legend)
-  - frontend/js/popup.js       -> grid_id, temperature, ndvi, priority,
-                                  recommended_action, cost_estimate, rendered
-                                  verbatim in the popup
+  - frontend/js/inspector.js   -> grid_id, temperature, ndvi, ndbi, land_cover,
+                                  priority, recommended_action,
+                                  exclusion_reason, cost_estimate
   - frontend/js/dataLoader.js  -> applyIntervention() subtracts cooling_c from
-                                  temperature to build the "After Intervention"
-                                  map.
+                                  temperature to build the mitigation surface.
 
-Column renames applied here: LST -> temperature, NDVI -> ndvi.
+ndbi, land_cover and exclusion_reason were added for the cell inspector: it has
+to answer "why this cell?", and that answer is land cover plus built-up
+intensity for a treated cell, or the exclusion reason for an untreated one.
+Deriving any of it in the browser would mean re-implementing the rule engine on
+the client, which is exactly the duplication this contract exists to prevent.
+
+Column renames applied here: LST -> temperature, NDVI -> ndvi, NDBI -> ndbi.
 
 Geometry is the original .geo polygon carried through verbatim from the source
 CSV, so no reprojection or precision loss is introduced.
@@ -49,10 +54,14 @@ FRONTEND_PROPERTIES = [
     "grid_id",
     "temperature",
     "ndvi",
+    "ndbi",
+    "land_cover",
     "priority",
     "recommended_action",
+    "exclusion_reason",
     "cost_estimate",
     "cooling_c",
+    "plan_rank",
 ]
 
 TEMPERATURE_DECIMALS = 1  # popup.js prints "${temperature}degC"
@@ -114,14 +123,30 @@ def build_feature(row: pd.Series) -> dict:
             "temperature": round(float(row["LST"]), TEMPERATURE_DECIMALS),
             # NDVI -> ndvi.
             "ndvi": round(float(row["NDVI"]), NDVI_DECIMALS),
+            # NDBI -> ndbi. The inspector labels this "built-up intensity"; it is
+            # the strongest single driver in the model (0.408 importance), so it
+            # is the honest answer to "why is this cell hot?".
+            "ndbi": round(float(row["NDBI"]), NDVI_DECIMALS),
+            # Already normalised by add_land_cover(); the raw WorldCover integer
+            # would mean nothing in a UI.
+            "land_cover": str(row["land_cover"]),
             "priority": str(row["priority"]),
             "recommended_action": str(row["recommended_action"]),
+            # Empty for the 4,157 actionable cells - pandas reads the blank as
+            # NaN, and "nan" in a UI is the same defect STRING_COLUMNS exists to
+            # prevent. Normalised to "" so the frontend can branch on falsiness.
+            "exclusion_reason": (
+                "" if pd.isna(row["exclusion_reason"]) else str(row["exclusion_reason"])
+            ),
             # int, because popup.js calls .toLocaleString() on it
             "cost_estimate": int(row["cost_estimate"]),
             # float, because compareView.js computes temperature - cooling_c.
             # This is an ASSUMED cooling, not a predicted one - see Rule 5 in
             # tier_and_recommend.py.
             "cooling_c": round(float(row["cooling_c"]), COOLING_DECIMALS),
+            # The pipeline's funding order. 0 for cells that are never funded.
+            # int, because the browser sorts on it.
+            "plan_rank": int(row["plan_rank"]),
         },
     }
 
@@ -164,6 +189,57 @@ def validate(features: list[dict]) -> None:
             )
 
 
+def add_plan_rank(df: pd.DataFrame) -> pd.DataFrame:
+    """Carry the funding order into the grid, so the browser never re-derives it.
+
+    The dashboard lets a planner re-run the budget over a filtered subset, which
+    means it needs the priority order client-side. Deriving it in JavaScript from
+    the exported fields does not work: `temperature` ships at 1 dp because that is
+    what the UI prints, cooling_per_rupee has only three distinct values, and
+    thousands of cells therefore tie at a precision the pipeline never saw. Sorted
+    that way the browser funded 249 cells that cost the same and cooled the same
+    as the pipeline's 249 - and were an entirely different 249.
+
+    So the rank is computed once, here, at full precision, using the same keys as
+    rank_within_budget() in member3_decision_support.py. The browser sorts on this
+    integer and nothing else, which makes disagreement with ranking.csv
+    structurally impossible rather than merely unlikely.
+
+    Non-actionable cells get 0: they are never funded at any budget.
+    """
+    df = df.copy()
+    actionable = df["recommended_action"] != "None"
+
+    ranked = df[actionable].copy()
+
+    # Cooling per rupee is an ATTRIBUTE OF THE MEASURE, not of the cell, and it
+    # has to be computed that way or it stops working as a sort key.
+    #
+    # This module prices each cell from its own polygon area, so cost_estimate
+    # varies by a few rupees between cells with the same action (401327, 401331,
+    # ...) where Decision-Support uses one flat area (401310). Dividing per cell
+    # turns that geometric noise into ~3,500 distinct scores differing in the
+    # sixth decimal, which then dominate the sort and leave LST unused: the first
+    # attempt ranked a 25.1 C cell above a 33.2 C one because its polygon was a
+    # few square metres smaller.
+    #
+    # Using the median cost per action restores the three real values - one per
+    # measure, the thing the ratio is actually comparing - so the LST tie-break
+    # decides which cells get funded, exactly as it does in the pipeline.
+    unit_cost = ranked.groupby("recommended_action")["cost_estimate"].transform("median")
+    ranked["_cpr"] = ranked["cooling_c"] / unit_cost
+    ranked = ranked.sort_values(
+        ["_cpr", "LST", "grid_id"],
+        ascending=[False, False, True],
+        kind="mergesort",
+    )
+
+    df["plan_rank"] = 0
+    df.loc[ranked.index, "plan_rank"] = range(1, len(ranked) + 1)
+    print(f"Ranked {len(ranked):,} actionable cells for the plan order")
+    return df
+
+
 def main() -> None:
     if not INPUT_CSV.exists():
         raise FileNotFoundError(
@@ -177,6 +253,8 @@ def main() -> None:
         na_values={c: [] for c in STRING_COLUMNS},
     )
     print(f"Loaded {len(df):,} tiered rows")
+
+    df = add_plan_rank(df)
 
     features = [build_feature(row) for _, row in df.iterrows()]
     validate(features)

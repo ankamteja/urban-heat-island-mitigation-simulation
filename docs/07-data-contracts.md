@@ -124,18 +124,27 @@ pd.read_csv(path, keep_default_na=False,
 **Read by** the browser. One file, one writer.
 
 A `FeatureCollection`. Each feature has a `Polygon` geometry and **exactly**
-these seven properties — no more, no fewer. `validate()` enforces this and
+these ten properties — no more, no fewer. `validate()` enforces this and
 refuses to write a file that violates it.
 
 | Property | Type | Consumed by | Breaks how if wrong |
 |---|---|---|---|
-| `grid_id` | string | `popup.js` | Popup shows a blank identifier. |
+| `grid_id` | string | `inspector.js` | Inspector shows a blank identifier. |
 | `temperature` | float, 1 dp | `heatField.js`, `mapView.js`, `analytics.js` | The entire heat surface. Renamed from `LST`. |
-| `ndvi` | float, 3 dp | `popup.js`, `analytics.js` | Scatter plot and popup. Renamed from `NDVI`. |
-| `priority` | string | `filters.js`, `popup.js`, `analytics.js` | Filter buttons match nothing. |
-| `recommended_action` | string | `compareView.js`, `popup.js` | Must be one of the four labels — `config.js` keys `INTERVENTIONS` on them. An unknown label renders a blank popup rather than raising. |
-| `cost_estimate` | **int** | `popup.js` | Must be `int`: `.toLocaleString()` is called on it. |
-| `cooling_c` | **numeric** | `dataLoader.js`, `compareView.js` | Must be numeric: the after-map computes `temperature − cooling_c`. A string silently produces string concatenation, not arithmetic. |
+| `ndvi` | float, 3 dp | `inspector.js`, `analytics.js` | Scatter plot and inspector. Renamed from `NDVI`. |
+| `ndbi` | float, 3 dp | `inspector.js` | Shown as "built-up intensity" in the why-this-cell breakdown. Renamed from `NDBI`. |
+| `land_cover` | string | `inspector.js`, `planner.js` | The normalised WorldCover class. Drives the why-this-cell explanation and the safety statement; the raw integer class would be meaningless in a UI. |
+| `priority` | string | `filters.js`, `inspector.js`, `analytics.js` | Filter buttons match nothing. |
+| `recommended_action` | string | `planner.js`, `inspector.js` | Must be one of the four labels — `config.js` keys `INTERVENTIONS` on them. An unknown label renders a blank inspector rather than raising. |
+| `exclusion_reason` | string, `""` when actionable | `inspector.js` | Answers why-this-cell for the 3,987 untreated cells. Must be `""` and never `"nan"` — pandas reads the blank column as NaN, which is the same defect `STRING_COLUMNS` exists to prevent. |
+| `cost_estimate` | **int** | `inspector.js`, `planner.js` | Must be `int`: `.toLocaleString()` is called on it. |
+| `cooling_c` | **numeric** | `dataLoader.js`, `planner.js` | Must be numeric: the mitigation surface computes `temperature − cooling_c`. A string silently produces string concatenation, not arithmetic. |
+
+`ndbi`, `land_cover` and `exclusion_reason` were added when the cell inspector
+landed. The inspector has to answer "why this cell?", and that answer is land
+cover plus built-up intensity for a treated cell, or the exclusion reason for an
+untreated one. Deriving any of it in the browser would mean re-implementing the
+rule engine on the client — the duplication this contract exists to prevent.
 
 **There is one copy.** Previously only a `Results/` copy was written and somebody
 moved it into `frontend/data/` by hand — an undocumented step with nothing to
@@ -161,7 +170,15 @@ these are analysis products.
 |---|---|---|
 | `recommendation.csv` | 4,157 | `grid_id`, `lat`, `lon`, `land_cover`, `priority`, `LST`, `NDVI`, `recommended_action`, `cost_estimate`, `cooling_c`, `cooling_per_rupee` |
 | `excluded.csv` | 3,987 | `grid_id`, `lat`, `lon`, `land_cover`, `priority`, `LST`, `exclusion_reason` |
-| `ranking.csv` | 4,157 | `rank`, `grid_id`, `lat`, `lon`, `recommended_action`, `cost_estimate`, `cooling_c`, `cooling_per_rupee`, `cumulative_cost`, `within_budget` |
+| `ranking.csv` | 4,157 | `rank`, `grid_id`, `lat`, `lon`, `LST`, `recommended_action`, `cost_estimate`, `cooling_c`, `cooling_per_rupee`, `cumulative_cost`, `within_budget` |
+
+`ranking.csv` sorts by `cooling_per_rupee` descending, then **`LST` descending**,
+then `grid_id`. The middle key is load-bearing, not cosmetic: `cooling_per_rupee`
+has only three distinct values — one per action, because cost is a flat cell area
+— so all 3,494 cool-roof cells tie. With `grid_id` alone breaking the tie the
+budget funded the first 249 cells in spatial scan order (mean 28.69 °C) rather
+than the hottest 249 (mean 30.16 °C). `LST` carries in the output columns because
+without it the ranking cannot be re-derived from its own file.
 
 These use `lat`/`lon` where the ML module uses `Latitude`/`Longitude`, and carry
 no polygon geometry — they are point records. Turning them into a `grid.geojson`
