@@ -13,8 +13,17 @@ const view = {
   allCells: [],
   activeCells: [],
   selection: null,
-  revealed: false
+  revealed: false,
+  heatMode: 'field'
 };
+
+/* Both panes switch together — the two surfaces are only comparable while they
+   are drawn the same way. */
+function setHeatMode(mode) {
+  view.heatMode = mode;
+  if (view.fieldBefore) view.fieldBefore.setMode(mode);
+  if (view.fieldAfter) view.fieldAfter.setMode(mode);
+}
 
 function initCompareView(data) {
   view.allCells = data.cells;
@@ -33,22 +42,12 @@ function initCompareView(data) {
   view.mapBefore.on('click', e => {
     if (view.selector && view.selector.isArmed()) return;
     const cell = view.fieldBefore.cellAt(e.latlng);
-    if (cell) {
-      L.popup({ closeButton: true })
-        .setLatLng([cell.lat, cell.lon])
-        .setContent(buildPopupContent(cell, { title: 'Current conditions' }))
-        .openOn(view.mapBefore);
-    }
+    if (cell) openCellPopup(view.mapBefore, cell, { title: 'Current conditions' });
   });
 
   view.mapAfter.on('click', e => {
     const cell = view.fieldAfter.cellAt(e.latlng);
-    if (cell) {
-      L.popup({ closeButton: true })
-        .setLatLng([cell.lat, cell.lon])
-        .setContent(buildPopupContent(cell, { title: 'Planning scenario' }))
-        .openOn(view.mapAfter);
-    }
+    if (cell) openCellPopup(view.mapAfter, cell, { title: 'Planning scenario' });
   });
 
   setupSelector();

@@ -28,16 +28,60 @@ function initMap(containerId, center, zoom) {
   return map;
 }
 
-function renderLegend(containerId) {
+const LAYER_MODES = {
+  field: {
+    label: 'Blended',
+    hint: 'Land surface temperature, blended across the 100 m grid.',
+    icon: '<path d="M4 12c0-3 2.5-5 5-4.5C10 4.5 12.5 3 15 4.5S19 8 18.5 11 15 16 11 15.5 4 15 4 12z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>'
+  },
+  grid: {
+    label: 'Grid cells',
+    hint: 'The raw 100 m cells the blend is smoothing over. Same ramp, lighter.',
+    icon: '<path d="M3.5 3.5h13v13h-13zM8 3.5v13M12 3.5v13M3.5 8h13M3.5 12h13" fill="none" stroke="currentColor" stroke-width="1.3"/>'
+  }
+};
+
+/* The ramp doubles as the layer switch: the thing that explains the colour is
+   also the thing that changes how the colour is drawn. */
+function renderLegend(containerId, onModeChange, initialMode) {
   const el = document.getElementById(containerId);
   const mid = (TEMP_DOMAIN.min + TEMP_DOMAIN.max) / 2;
+  const active = LAYER_MODES[initialMode] ? initialMode : 'field';
+
+  const buttonFor = key => {
+    const m = LAYER_MODES[key];
+    const on = key === active;
+    return `<button type="button" class="filter-btn${on ? ' is-active' : ''}" data-mode="${key}" aria-pressed="${on}">
+        <svg viewBox="0 0 20 20" aria-hidden="true">${m.icon}</svg><span>${m.label}</span>
+      </button>`;
+  };
+
   el.innerHTML = `
     <div class="legend-ramp" role="img" aria-label="Colour ramp from ${TEMP_DOMAIN.min} to ${TEMP_DOMAIN.max} degrees Celsius"></div>
     <div class="legend-scale">
       <span>${TEMP_DOMAIN.min}°C</span><span>${mid}°C</span><span>${TEMP_DOMAIN.max}°C</span>
     </div>
-    <p class="panel-hint">Land surface temperature, blended across the 100 m grid.</p>
+    <div class="segmented is-pair legend-modes" role="group" aria-label="Heat layer rendering">
+      ${buttonFor('field')}${buttonFor('grid')}
+    </div>
+    <p class="panel-hint" data-legend-hint>${LAYER_MODES[active].hint}</p>
   `;
+
+  const buttons = Array.from(el.querySelectorAll('.legend-modes .filter-btn'));
+  const hint = el.querySelector('[data-legend-hint]');
+
+  for (const btn of buttons) {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.mode;
+      for (const b of buttons) {
+        const on = b === btn;
+        b.classList.toggle('is-active', on);
+        b.setAttribute('aria-pressed', String(on));
+      }
+      hint.textContent = LAYER_MODES[mode].hint;
+      if (onModeChange) onModeChange(mode);
+    });
+  }
 }
 
 function addGeocoder(map) {
