@@ -253,10 +253,14 @@ MARGIN = Inches(0.65)
 COL_W = Inches(12.0)
 
 
-def section(slide, index_label, title, standfirst=None):
-    """Eyebrow, functional section title, optional one-line standfirst."""
-    text(slide, MARGIN, Inches(0.38), Inches(6.0), Inches(0.25),
-         [(index_label.upper(), 10, ACCENT, True, DATA)])
+def section(slide, n, label, title, standfirst=None):
+    """Eyebrow, functional section title, optional one-line standfirst.
+
+    The number comes from the slide index rather than the call site, so removing
+    a section cannot leave the rest misnumbered.
+    """
+    text(slide, MARGIN, Inches(0.38), Inches(7.5), Inches(0.25),
+         [(f"{n:02d} — {label.upper()}", 10, ACCENT, True, DATA)])
     text(slide, MARGIN, Inches(0.95), COL_W, Inches(0.65),
          [(title, 30, FG, True, DISPLAY)])
     if standfirst:
@@ -403,7 +407,7 @@ def slide_title(prs, f, n, total):
 
 def slide_problem(prs, f, n, total):
     s = add_slide(prs)
-    section(s, "02 — problem understanding & motivation",
+    section(s, n, "problem understanding & motivation",
             "Urban heat is a health and energy burden with an uneven footprint",
             "Guwahati, Assam — 8,144 cells of Landsat-derived surface temperature.")
 
@@ -438,51 +442,9 @@ def slide_problem(prs, f, n, total):
     page(s, n)
 
 
-def slide_literature(prs, f, n, total):
-    s = add_slide(prs)
-    section(s, "03 — literature review & existing approaches",
-            "Where prior work stops",
-            "Four established strands, and the gap this project addresses.")
-
-    rows = [
-        ("Thermal remote sensing of urban climate",
-         "Voogt & Oke 2003; Weng 2009",
-         "Establishes satellite LST as the standard measure of urban heat. Produces "
-         "a risk surface; does not select interventions."),
-        ("Measured cooling from surfaces and canopy",
-         "Akbari et al. 2001; Santamouris 2014",
-         "Field and review evidence that cool roofs and vegetation reduce temperature. "
-         "Site-specific, not a city-wide allocation method."),
-        ("Microclimate simulation",
-         "Bruse & Fleer 1998 (ENVI-met)",
-         "Physically detailed simulation of a street or block. Computationally heavy; "
-         "impractical across thousands of cells."),
-        ("Green-infrastructure prioritisation",
-         "Norton et al. 2015",
-         "Closest prior work — a framework ranking green infrastructure by cooling "
-         "need. Does not carry a unit-cost model or a budget constraint."),
-    ]
-    y = Inches(2.3)
-    for title, cite, body in rows:
-        text(s, MARGIN, y, Inches(3.6), Inches(0.24), [(title, 12.5, FG, True, UI)])
-        text(s, MARGIN, y + Inches(0.26), Inches(3.6), Inches(0.24),
-             [(cite, 10.5, DIM, False, DATA)])
-        text(s, Inches(4.5), y, Inches(8.15), Inches(0.6),
-             [(body, 12.5, MUTED, False, UI)], line_spacing=1.32)
-        y += Inches(0.96)
-
-    panel(s, MARGIN, Inches(6.02), COL_W, Inches(0.76), "Identified gap", tint=SUCCESS)
-    text(s, MARGIN + Inches(0.26), Inches(6.44), Inches(11.4), Inches(0.28),
-         [("No existing method combines city-wide satellite screening, land-cover "
-           "suitability rules and unit costs into a shortlist that respects a stated "
-           "budget ceiling.", 12.5, FG, False, UI)])
-
-    page(s, n)
-
-
 def slide_method(prs, f, n, total):
     s = add_slide(prs)
-    section(s, "04 — proposed methodology & technical approach",
+    section(s, n, "proposed methodology & technical approach",
             "From thermal imagery to a budget-constrained shortlist",
             "Five stages, each producing an artefact the next stage consumes.")
 
@@ -520,7 +482,7 @@ def slide_method(prs, f, n, total):
 
 def slide_architecture(prs, f, n, total):
     s = add_slide(prs)
-    section(s, "05 — system architecture & processing pipeline",
+    section(s, n, "system architecture & processing pipeline",
             "Six layers, and the artefacts that cross between them")
 
     png = ASSETS / "architecture.png"
@@ -555,7 +517,7 @@ def slide_architecture(prs, f, n, total):
 
 def slide_data(prs, f, n, total):
     s = add_slide(prs)
-    section(s, "06 — data sources & preprocessing",
+    section(s, n, "data sources & preprocessing",
             "Inputs, resolution and the steps applied before analysis")
 
     text(s, MARGIN, Inches(2.24), Inches(5.9), Inches(0.24),
@@ -608,7 +570,7 @@ def slide_data(prs, f, n, total):
 
 def slide_algorithm(prs, f, n, total):
     s = add_slide(prs)
-    section(s, "07 — selection algorithm & worked example",
+    section(s, n, "selection algorithm & worked example",
             "The cost model, the ordering rule, and one cell traced through it")
 
     text(s, MARGIN, Inches(2.24), Inches(5.9), Inches(0.24),
@@ -658,45 +620,9 @@ def slide_algorithm(prs, f, n, total):
     page(s, n)
 
 
-def slide_validation(prs, f, n, total):
-    s = add_slide(prs)
-    section(s, "08 — validation & comparative evaluation",
-            "The ordering rule tested against two alternatives",
-            "Identical budget, eligible pool and cooling assumptions. Only the ordering differs.")
-
-    table(s, MARGIN, Inches(2.4), COL_W,
-          ["Ordering strategy", "Sites", "Spend", "Total ΔT", "Mean °C", "Hotspots cut"],
-          [["Random among eligible", "248", "₹9.99 Cr", "245", "27.94", "25"],
-           ["Hottest eligible first", "229", "₹9.98 Cr", "240", "30.28", "154"],
-           ["Cooling per rupee, then hottest", "249", "₹9.99 Cr", "249", "30.16", "180"]],
-          widths=[.34, .12, .14, .13, .13, .14], highlight=2, row_h=0.4)
-
-    rule(s, MARGIN, Inches(4.12), COL_W)
-
-    findings = [
-        ("Against hottest-first",
-         "20 additional sites and 26 further hotspot cells removed for the same "
-         "outlay, because the lower cost per degree admits more sites under the cap."),
-        ("Against random ordering",
-         "180 hotspot cells removed versus 25, confirming the gain comes from the "
-         "ordering rather than the budget."),
-        ("Against no suitability gate",
-         "Taking the hottest 249 cells without land-cover filtering places 14 of them "
-         "on existing tree cover, where planting adds nothing."),
-    ]
-    y = Inches(4.36)
-    for lead, body in findings:
-        text(s, MARGIN, y, Inches(3.3), Inches(0.24), [(lead, 12.5, FG, True, UI)])
-        text(s, Inches(4.2), y, Inches(8.45), Inches(0.5),
-             [(body, 12.5, MUTED, False, UI)], line_spacing=1.3)
-        y += Inches(0.78)
-
-    page(s, n)
-
-
 def slide_dashboard(prs, f, n, total):
     s = add_slide(prs)
-    section(s, "09 — dashboard & decision interface",
+    section(s, n, "dashboard & decision interface",
             "Per-cell inspection, budget scenarios and scenario comparison")
 
     png = ASSETS / "dash-compare.jpg"
@@ -732,7 +658,7 @@ def slide_dashboard(prs, f, n, total):
 
 def slide_outcomes(prs, f, n, total):
     s = add_slide(prs)
-    section(s, "10 — expected outcomes & impact",
+    section(s, n, "expected outcomes & impact",
             "What the shortlist achieves, and how the method transfers")
 
     panel(s, MARGIN, Inches(2.24), Inches(5.85), Inches(2.5), "Measured outcomes at ₹10 Cr")
@@ -774,16 +700,17 @@ def slide_outcomes(prs, f, n, total):
     text(s, MARGIN, Inches(5.36), COL_W, Inches(1.2),
          [("Targeted surface cooling reduces heat exposure for the population living "
            "in the hottest blocks and lowers peak cooling demand, which is where urban "
-           "electricity emissions concentrate. Directing a fixed budget to the highest "
-           "cooling per rupee means the same public money removes 180 hotspot cells "
-           "rather than 25.", 12.5, MUTED, False, UI)], line_spacing=1.35)
+           "electricity emissions concentrate. Ordering by cooling per rupee rather "
+           "than temperature alone admits more sites under the same ceiling, so the "
+           "budget removes 180 top-decile cells instead of 154.",
+           12.5, MUTED, False, UI)], line_spacing=1.35)
 
     page(s, n)
 
 
 def slide_limits(prs, f, n, total):
     s = add_slide(prs)
-    section(s, "11 — limitations & future work",
+    section(s, n, "limitations & future work",
             "Known constraints, and the work that would resolve them")
 
     panel(s, MARGIN, Inches(2.24), Inches(5.85), Inches(3.5), "Current limitations", tint=DANGER)
@@ -834,40 +761,43 @@ def slide_limits(prs, f, n, total):
 
 def slide_references(prs, f, n, total):
     s = add_slide(prs)
-    section(s, "13 — appendix: links & references",
+    section(s, n, "appendix: links & references",
             "Project resources and cited work")
 
-    text(s, MARGIN, Inches(2.2), Inches(5.9), Inches(0.24),
-         [("PROJECT LINKS", 10, DIM, False, DATA)])
-    y = Inches(2.52)
+    text(s, MARGIN, Inches(2.16), Inches(4.0), Inches(0.22),
+         [("PROJECT LINKS", 9, MUTED, False, DATA)])
+    # Full width per row: these URLs run to 74 characters and were previously
+    # clipped, which makes a link slide worse than useless.
+    y = Inches(2.46)
     for label, url in [("Live dashboard", LINKS["dashboard"]),
                        ("Landing page", LINKS["site"]),
                        ("Source repository", LINKS["repo"]),
                        ("Documentation", LINKS["docs"])]:
-        text(s, MARGIN, y, Inches(1.9), Inches(0.26), [(label, 11.5, FG, False, UI)])
-        text(s, Inches(2.65), y, Inches(3.9), Inches(0.26),
-             [("↗ ", 10.5, ACCENT, False, DATA),
-              (url.replace("https://", "")[:44], 10.5, ACCENT, False, DATA, url)])
+        text(s, MARGIN, y, Inches(2.3), Inches(0.26), [(label, 12, FG, False, UI)])
+        text(s, Inches(3.05), y, Inches(9.6), Inches(0.26),
+             [(url, 11.5, ACCENT, False, DATA, url)])
         y += Inches(0.36)
 
-    text(s, MARGIN, Inches(4.16), Inches(5.9), Inches(0.24),
-         [("DATA SOURCES", 10, DIM, False, DATA)])
-    y = Inches(4.48)
-    for src in ["USGS Landsat 8–9 Collection 2 Level-2",
-                "ESA WorldCover 10 m 2021 v200",
-                "Telangana Cool Roof Policy 2023–28",
-                "Gujarat AMRUT 2.0 garden schedule"]:
+    rule(s, MARGIN, Inches(4.06), COL_W)
+
+    text(s, MARGIN, Inches(4.28), Inches(5.9), Inches(0.22),
+         [("DATA SOURCES", 9, MUTED, False, DATA)])
+    y = Inches(4.58)
+    for src in ["USGS Landsat 8–9 Collection 2 Level-2 Science Products",
+                "ESA WorldCover 10 m 2021 v200 (Zanaga et al., 2022)",
+                "Telangana Cool Roof Policy 2023–28 — ₹300/m²",
+                "Gujarat AMRUT 2.0 garden schedule — ₹1,152–2,250/m²"]:
         text(s, MARGIN, y, Inches(5.9), Inches(0.26), [(src, 11.5, MUTED, False, UI)])
         y += Inches(0.32)
 
     x2 = Inches(7.05)
-    text(s, x2, Inches(2.2), Inches(5.6), Inches(0.24),
-         [("CITED WORK", 10, DIM, False, DATA)])
-    y = Inches(2.52)
+    text(s, x2, Inches(4.28), Inches(5.6), Inches(0.22),
+         [("METHODS AND TOOLING", 9, MUTED, False, DATA)])
+    y = Inches(4.58)
     for ref in REFERENCES:
-        text(s, x2, y, Inches(5.6), Inches(0.5), [(ref, 10.5, MUTED, False, UI)],
-             line_spacing=1.25)
-        y += Inches(0.62)
+        text(s, x2, y, Inches(5.6), Inches(0.4), [(ref, 10.5, MUTED, False, UI)],
+             line_spacing=1.22)
+        y += Inches(0.42)
 
     page(s, n)
 
@@ -885,20 +815,15 @@ TEAM = [
 ]
 
 REFERENCES = [
-    "Voogt, J. A. & Oke, T. R. Thermal remote sensing of urban climates. "
-    "Remote Sensing of Environment 86(3), 2003.",
-    "Weng, Q. Thermal infrared remote sensing for urban climate and environmental "
-    "studies. ISPRS Journal of Photogrammetry and Remote Sensing 64(4), 2009.",
+    "Gorelick, N. et al. Google Earth Engine: planetary-scale geospatial analysis. "
+    "Remote Sensing of Environment 202, 2017.",
     "Akbari, H., Pomerantz, M. & Taha, H. Cool surfaces and shade trees to reduce "
-    "energy use and improve air quality in urban areas. Solar Energy 70(3), 2001.",
-    "Santamouris, M. Cooling the cities — a review of reflective and green roof "
-    "mitigation technologies. Solar Energy 103, 2014.",
-    "Norton, B. A. et al. Planning for cooler cities: a framework to prioritise green "
-    "infrastructure. Landscape and Urban Planning 134, 2015.",
-    "Gorelick, N. et al. Google Earth Engine: planetary-scale geospatial analysis for "
-    "everyone. Remote Sensing of Environment 202, 2017.",
-    "Roberts, D. R. et al. Cross-validation strategies for data with spatial structure. "
-    "Ecography 40, 2017.",
+    "energy use in urban areas. Solar Energy 70(3), 2001.",
+    "Santamouris, M. Cooling the cities — reflective and green roof mitigation "
+    "technologies. Solar Energy 103, 2014.",
+    "Pedregosa, F. et al. Scikit-learn: machine learning in Python. JMLR 12, 2011.",
+    "Roberts, D. R. et al. Cross-validation strategies for data with spatial "
+    "structure. Ecography 40, 2017.",
 ]
 
 
@@ -906,12 +831,10 @@ REFERENCES = [
 BUILDERS = [
     slide_title,
     slide_problem,
-    slide_literature,
     slide_method,
     slide_architecture,
     slide_data,
     slide_algorithm,
-    slide_validation,
     slide_dashboard,
     slide_outcomes,
     slide_limits,

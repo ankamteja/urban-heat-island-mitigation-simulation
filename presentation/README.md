@@ -17,25 +17,21 @@ python presentation/build_deck.py
 
 ## Structure
 
-Twelve slides, in the section order a technical panel reads. Section titles state
-what the slide contains; the evidence carries the argument.
+Ten slides. Section numbers are derived from the slide index, so removing a
+section cannot leave the rest misnumbered.
 
-| # | Section | Carries |
-|---|---|---|
-| 1 | Title | Problem statement, headline figures, team and contributions, links |
-| 2 | Problem understanding & motivation | Why urban heat matters, stated generally |
-| 3 | Literature review & existing approaches | Four prior strands and the identified gap |
-| 4 | Proposed methodology & technical approach | Five stages, then the distinguishing choices |
-| 5 | System architecture & processing pipeline | The layered diagram plus design notes |
-| 6 | Data sources & preprocessing | Datasets, steps, derived fields, QC |
-| 7 | Selection algorithm & worked example | Cost model, ordering rule, one cell traced |
-| 8 | Validation & comparative evaluation | Three ordering strategies at one budget |
-| 9 | Dashboard & decision interface | Interface screenshot and capabilities |
-| 10 | Expected outcomes & impact | Outcomes, scalability, sustainability relevance |
-| 11 | Limitations & future work | Four each, side by side |
-| 12 | Appendix: links & references | Project links, data sources, cited work |
-
-Team and contributions sit on the title slide, not a separate one.
+| # | Section |
+|---|---|
+| 1 | Title — problem statement, headline figures, team and contributions, links |
+| 2 | Problem understanding & motivation |
+| 3 | Proposed methodology & technical approach |
+| 4 | System architecture & processing pipeline |
+| 5 | Data sources & preprocessing |
+| 6 | Selection algorithm & worked example |
+| 7 | Dashboard & decision interface |
+| 8 | Expected outcomes & impact |
+| 9 | Limitations & future work |
+| 10 | Appendix: links & references |
 
 ## Visual system
 
