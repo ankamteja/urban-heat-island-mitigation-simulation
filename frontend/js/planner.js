@@ -20,17 +20,28 @@ function renderBudget() {
   const el = document.getElementById('budget-control');
   if (!el) return;
 
-  const ceiling = Math.max(App.stats ? App.stats.eligibleCost : 0, App.budget);
+  const needed = Math.max(App.stats ? App.stats.eligibleCost : 0, App.budget);
+
+  /* Round the top of the range up to a whole step.
+     A range input only lands on min + n*step, so a max that is not itself on
+     that grid is unreachable: with the exact cost of every eligible cell
+     (₹167.46 Cr) as max and ₹1 Cr as step, the slider stopped at ₹167.00 Cr.
+     The plan could then never fund the last five cells however far the handle
+     was dragged, and committed spend capped at ₹166.95 Cr against a programme
+     that costs ₹167.46 Cr. */
+  const ceiling = Math.ceil(needed / BUDGET_STEP) * BUDGET_STEP;
+
   const spent = App.plan ? App.plan.spent : 0;
-  const pct = ceiling ? Math.min(100, (spent / ceiling) * 100) : 0;
+  const pct = needed ? Math.min(100, (spent / needed) * 100) : 0;
+  const fundsEverything = App.plan && App.plan.count === App.plan.available;
 
   el.innerHTML = `
     <div class="field-row">
       <label for="budget-input">Available budget</label>
       <output id="budget-value">${inrCrore(App.budget)}</output>
     </div>
-    <input id="budget-input" type="range" min="0" max="${Math.round(ceiling)}"
-           step="10000000" value="${App.budget}"
+    <input id="budget-input" type="range" min="0" max="${ceiling}"
+           step="${BUDGET_STEP}" value="${Math.min(App.budget, ceiling)}"
            aria-label="Available budget in rupees">
     <div class="budget-bar" aria-hidden="true"><i style="width:${pct}%"></i></div>
     <div class="field-row sub">
@@ -38,8 +49,8 @@ function renderBudget() {
       <b>${inrCrore(spent)}</b>
     </div>
     <div class="field-row sub">
-      <span>Unspent</span>
-      <b>${inrCrore(App.plan ? App.plan.remaining : 0)}</b>
+      <span>${fundsEverything ? 'Every eligible cell funded' : 'Unspent'}</span>
+      <b>${fundsEverything ? '—' : inrCrore(App.plan ? App.plan.remaining : 0)}</b>
     </div>
     <div class="preset-row" role="group" aria-label="Budget scenarios">
       ${BUDGET_PRESETS.map(p => `
