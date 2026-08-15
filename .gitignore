@@ -18,6 +18,5 @@ __pycache__/
 # in seconds and read by nothing but the next two scripts.
 Machine Learning & Prediction/Results/preprocessed.csv
 
-# Generated deck, rebuilt in a second by presentation/build_deck.py. The
-# generator and its diagram are committed; the binary it emits is not.
+# The deck is a large binary and is maintained outside the repository.
 *.pptx
