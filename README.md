@@ -19,7 +19,7 @@ python3 -m http.server 8000
 | Landing page | `http://localhost:8000/` |
 | Dashboard | `http://localhost:8000/frontend/` |
 
-Live at **[urban-heat-island-guwahati.vercel.app](https://urban-heat-island-guwahati.vercel.app)**.
+Live at **[urban-heat-island-mitigation-simula.vercel.app](https://urban-heat-island-mitigation-simula.vercel.app/)**.
 
 ## Modules
 
