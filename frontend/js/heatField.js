@@ -11,7 +11,8 @@ const FIELD = {
   scale: 0.4,      // accumulator resolution vs. CSS pixels
   blend: 5.5,      // blur radius as a multiple of cell spacing
   padding: 0.14,   // offscreen margin so panning does not reveal edges
-  opacity: 0.84,
+  opacity: 0.62,   // the cloud reads as a layer over the city, not a lid on it
+  gridOpacity: 0.34, // the lattice is a reference view, so it sits back further
   alphaRef: 0.30,  // fraction of peak density that counts as solid cloud
   alphaK: 2.6,     // how fast the cloud reaches full opacity
   passes: 3,       // box-blur passes; 3 approximates a true Gaussian
@@ -59,6 +60,7 @@ const HeatField = L.Layer.extend({
     this._cells = cells || [];
     L.setOptions(this, options || {});
     this._index = null;
+    this._mode = (options && options.mode) === 'grid' ? 'grid' : 'field';
   },
 
   onAdd(map) {
@@ -66,7 +68,7 @@ const HeatField = L.Layer.extend({
     const canvas = this._canvas = L.DomUtil.create('canvas', 'heat-field');
     canvas.style.position = 'absolute';
     canvas.style.pointerEvents = 'none';
-    canvas.style.opacity = FIELD.opacity;
+    canvas.style.opacity = this._layerOpacity();
     this._ctx = canvas.getContext('2d');
 
     map.getPanes().overlayPane.appendChild(canvas);
@@ -89,6 +91,28 @@ const HeatField = L.Layer.extend({
     this._index = null;
     if (this._map) this._reset();
     return this;
+  },
+
+  _layerOpacity() {
+    return this._mode === 'grid' ? FIELD.gridOpacity : FIELD.opacity;
+  },
+
+  /* 'field' blends the lattice into a continuous surface; 'grid' draws the real
+     100 m cells the field is interpolating over. Same ramp either way, so a
+     colour still means the same temperature in both. */
+  setMode(mode) {
+    const next = mode === 'grid' ? 'grid' : 'field';
+    if (next === this._mode) return this;
+    this._mode = next;
+    if (this._canvas) {
+      this._canvas.style.opacity = this._layerOpacity();
+      this._reset();
+    }
+    return this;
+  },
+
+  getMode() {
+    return this._mode;
   },
 
   _animateZoom(e) {
@@ -138,7 +162,65 @@ const HeatField = L.Layer.extend({
     const ctx = this._ctx;
     ctx.clearRect(0, 0, w, h);
     if (!this._cells.length) return;
+    if (this._mode === 'grid') this._drawGrid(w, h, padX, padY);
+    else this._drawField(w, h, padX, padY);
+  },
 
+  /* One rectangle per real cell. No accumulator, no blur: this view exists to
+     show the 100 m lattice the blended field smooths away, so the squares stay
+     square and the colour comes straight off the same ramp. */
+  _drawGrid(w, h, padX, padY) {
+    const ctx = this._ctx;
+    const map = this._map;
+    const cells = this._cells;
+
+    /* The lattice is regular, so one probe sizes every box and each cell then
+       costs a single projection instead of two.
+
+       map.project(), not latLngToContainerPoint(): the latter calls _round() on
+       the way through, so measuring a cell with it yields a whole number of
+       pixels and throws away the fraction that decides whether a given pair of
+       neighbours sits 5 or 6 px apart. */
+    const c0 = cells[0];
+    const tl0 = map.project(L.latLng(c0.bounds[1][0], c0.bounds[0][1]));
+    const br0 = map.project(L.latLng(c0.bounds[0][0], c0.bounds[1][1]));
+    const cw = Math.max(1, br0.x - tl0.x);
+    const ch = Math.max(1, br0.y - tl0.y);
+
+    /* Below ~7 px the gap between boxes is most of the box, so the grid reads as
+       a mesh of lines rather than a temperature map. Butt the cells together
+       instead and let the colour carry it; above it, inset by a pixel so the
+       lattice is legible as a lattice. */
+    const spaced = Math.min(cw, ch) >= 7;
+
+    /* Round UP when butting cells together, and accept up to a pixel of overlap.
+       Leaflet's latLngToContainerPoint calls _round() internally, so p.x arrives
+       already snapped to an integer and the true fractional position is gone.
+       Neighbouring cells therefore step by either floor(cw) or ceil(cw) px while
+       a fixed-width rect can only be one of the two — every time the fraction
+       accumulates past a pixel, the wider step leaves a one-pixel hole and the
+       basemap shows through. Those holes line up into vertical seams across the
+       field (measured: every ~22 px at city zoom, cells being ~5.2 px).
+       Overlapping is free here because the fills are opaque within the layer —
+       the canvas is composited once, at FIELD.gridOpacity — so a cell painted
+       over its neighbour's edge changes nothing but which colour wins on that
+       boundary pixel. */
+    const fw = spaced ? Math.max(1, Math.round(cw) - 1) : Math.ceil(cw);
+    const fh = spaced ? Math.max(1, Math.round(ch) - 1) : Math.ceil(ch);
+
+    for (const cell of cells) {
+      const p = map.latLngToContainerPoint(L.latLng(cell.bounds[1][0], cell.bounds[0][1]));
+      const x = Math.round(p.x + padX);
+      const y = Math.round(p.y + padY);
+      if (x + fw < 0 || y + fh < 0 || x > w || y > h) continue;
+      const rgb = rampColor(normTemp(cell.temp));
+      ctx.fillStyle = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+      ctx.fillRect(x, y, fw, fh);
+    }
+  },
+
+  _drawField(w, h, padX, padY) {
+    const ctx = this._ctx;
     const map = this._map;
     const S = FIELD.scale;
     const bw = Math.max(1, Math.ceil(w * S));

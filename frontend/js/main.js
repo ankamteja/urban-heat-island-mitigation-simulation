@@ -12,7 +12,7 @@ initChartDefaults();
 loadCurrentGrid()
   .then(data => {
     initCompareView(data);
-    renderLegend('legend');
+    renderLegend('legend', setHeatMode, view.heatMode);
     renderTopbarStats(data.cells);
     setupFilters(data.cells, renderCompareLayers);
     setupAnalyticsToggle(data.cells);

@@ -30,7 +30,7 @@ that no longer existed.
   water, wetland, or already-forested land.
 - **Both recommendation engines agree on every cell**, because they call one
   shared rule.
-- **129 tests pass**, and CI regenerates every artefact and fails if the
+- **133 tests pass**, and CI regenerates every artefact and fails if the
   committed copies differ.
 
 Current recommendation set, 8,144 cells:
