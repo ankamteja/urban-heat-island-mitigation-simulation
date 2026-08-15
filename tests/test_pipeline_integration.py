@@ -193,8 +193,8 @@ def test_decision_support_ranking_is_deterministically_ordered():
 
     With pandas' default (unstable) quicksort the order within a tie was
     arbitrary, and ranking.csv failed to reproduce: 4,154 of 4,157 rows moved
-    between identical runs. CI caught it. The fix is a stable sort plus an
-    explicit grid_id tie-break, which this asserts.
+    between identical runs. CI caught it. The fix is a stable sort plus explicit
+    tie-breaks -- LST descending, then grid_id -- which this asserts.
     """
     path = DS_DIR / "ranking.csv"
     if not path.exists():
@@ -202,16 +202,90 @@ def test_decision_support_ranking_is_deterministically_ordered():
     ranking = pd.read_csv(path)
 
     expected = ranking.sort_values(
-        ["cooling_per_rupee", "grid_id"],
-        ascending=[False, True],
+        ["cooling_per_rupee", "LST", "grid_id"],
+        ascending=[False, False, True],
         kind="mergesort",
     ).reset_index(drop=True)
 
     assert list(ranking["grid_id"]) == list(expected["grid_id"]), (
-        "ranking.csv is not in (cooling_per_rupee desc, grid_id asc) order -- "
-        "the sort lost its tie-break and the file will not reproduce"
+        "ranking.csv is not in (cooling_per_rupee desc, LST desc, grid_id asc) "
+        "order -- the sort lost its tie-break and the file will not reproduce"
     )
     assert list(ranking["rank"]) == list(range(1, len(ranking) + 1))
+
+
+def test_grid_plan_rank_reproduces_the_decision_support_ranking():
+    """
+    The dashboard re-runs the budget client-side when a planner filters by area
+    or priority, so it needs the funding order in the browser. It reads
+    plan_rank from grid.geojson and sorts on nothing else.
+
+    That only stays honest if plan_rank IS the pipeline's order. Deriving it in
+    JavaScript from the exported fields does not work -- temperature ships at
+    1 dp and cooling_per_rupee has three distinct values, so cells tie at a
+    precision the pipeline never saw, and the browser funded a set with the same
+    size, cost and mean cooling as ranking.csv and not one cell in common.
+
+    This asserts the two orders agree cell for cell.
+    """
+    grid_path = REPO_DIR / "frontend" / "data" / "grid.geojson"
+    ranking_path = DS_DIR / "ranking.csv"
+    if not grid_path.exists() or not ranking_path.exists():
+        pytest.skip("grid or Decision-Support outputs not built")
+
+    grid = json.loads(grid_path.read_text(encoding="utf-8"))
+    plan_rank = {
+        f["properties"]["grid_id"]: f["properties"]["plan_rank"]
+        for f in grid["features"]
+    }
+    ranking = pd.read_csv(ranking_path)
+
+    # Non-actionable cells are never funded at any budget.
+    idle = [f for f in grid["features"]
+            if f["properties"]["recommended_action"] == "None"]
+    assert all(f["properties"]["plan_rank"] == 0 for f in idle)
+
+    mismatched = [
+        (row.grid_id, plan_rank.get(row.grid_id), row.rank)
+        for row in ranking.itertuples()
+        if plan_rank.get(row.grid_id) != row.rank
+    ]
+    assert not mismatched, (
+        f"{len(mismatched)} cells rank differently in grid.geojson than in "
+        f"ranking.csv, e.g. {mismatched[:3]} -- the dashboard would fund a "
+        "different set than the committed plan"
+    )
+
+
+def test_funded_shortlist_is_heat_prioritised():
+    """
+    The budget cut-off should spend on the hottest eligible cells, not the ones
+    that happen to sort first spatially.
+
+    Before LST entered the sort, cooling_per_rupee's three distinct values (one
+    per action, because cost is a flat cell area) left 3,494 cool-roof cells tied
+    and grid_id decided the funded 249. Their mean temperature was 28.69 C while
+    the 249 hottest cool-roof cells averaged 30.16 C -- the shortlist was
+    reproducible but not heat-prioritised, which is the property the product
+    actually claims.
+    """
+    path = DS_DIR / "ranking.csv"
+    if not path.exists():
+        pytest.skip("Decision-Support outputs not built")
+    ranking = pd.read_csv(path)
+
+    funded = ranking[ranking["within_budget"]]
+    assert len(funded) > 0
+
+    # Within each action group the funded cells must be the hottest available.
+    for action, group in ranking.groupby("recommended_action"):
+        picked = group[group["within_budget"]]
+        if picked.empty or len(picked) == len(group):
+            continue
+        assert picked["LST"].min() >= group[~group["within_budget"]]["LST"].max(), (
+            f"funded {action} cells are not the hottest ones available -- "
+            "the budget is being spent by scan order, not by heat"
+        )
 
 
 def test_ml_readme_quotes_the_committed_metrics():

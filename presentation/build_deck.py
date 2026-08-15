@@ -38,28 +38,31 @@ OUT = ROOT / "UHI-Presentation.pptx"
 
 # ---------------------------------------------------------------- palette ---
 # frontend/style.css :root tokens. Keep these in step with that file.
-BG = RGBColor(0x0B, 0x11, 0x20)          # --bg
-SURFACE = RGBColor(0x13, 0x1C, 0x2E)     # --surface
-SURFACE_3 = RGBColor(0x1F, 0x2A, 0x40)   # --surface-3
-FG = RGBColor(0xF1, 0xF5, 0xF9)          # --fg
-MUTED = RGBColor(0x94, 0xA3, 0xB8)       # --fg-muted
-DIM = RGBColor(0x64, 0x74, 0x8B)         # --fg-dim
-PRIMARY = RGBColor(0x3B, 0x82, 0xF6)     # --primary
-ACCENT = RGBColor(0xFB, 0xBF, 0x24)      # --accent
-SUCCESS = RGBColor(0x34, 0xD3, 0x99)     # --success
-DANGER = RGBColor(0xF8, 0x71, 0x71)      # --danger
+BG = RGBColor(0x0C, 0x10, 0x17)          # --bg
+SURFACE = RGBColor(0x11, 0x16, 0x1F)     # --surface
+SURFACE_3 = RGBColor(0x1C, 0x24, 0x31)   # --surface-3
+FG = RGBColor(0xE8, 0xEA, 0xF0)          # --fg
+MUTED = RGBColor(0x9A, 0xA6, 0xBC)       # --fg-2
+DIM = RGBColor(0x6B, 0x78, 0x91)         # --fg-3
+PRIMARY = RGBColor(0x4C, 0x8D, 0xD9)     # --accent, the one interface accent
+ACCENT = RGBColor(0xE0, 0xA2, 0x3C)      # --warn, reserved for emphasis
+SUCCESS = RGBColor(0x5E, 0x9E, 0x7E)     # --ok
+DANGER = RGBColor(0xD8, 0x63, 0x5F)      # --danger
 
-# config.js HEAT_RAMP
+# config.js HEAT_RAMP — magma, the same sequential ramp the dashboard uses.
+# Deliberately not a rainbow: equal steps in temperature are equal steps in
+# perceived brightness, so the title bar reads as a scale rather than decoration.
 RAMP = [
-    RGBColor(0x25, 0x63, 0xEB),
-    RGBColor(0x22, 0xD3, 0xEE),
-    RGBColor(0xFD, 0xE0, 0x47),
-    RGBColor(0xFB, 0x92, 0x3C),
-    RGBColor(0xEF, 0x44, 0x44),
+    RGBColor(0x28, 0x10, 0x4A),
+    RGBColor(0x5E, 0x17, 0x6C),
+    RGBColor(0x94, 0x28, 0x6C),
+    RGBColor(0xCC, 0x3E, 0x5B),
+    RGBColor(0xF6, 0x6E, 0x5C),
+    RGBColor(0xFC, 0xBB, 0x8C),
 ]
 
-UI = "Fira Sans"
-DATA = "Fira Code"
+UI = "Inter"
+DATA = "IBM Plex Mono"
 
 W, H = Inches(13.333), Inches(7.5)
 MARGIN = Inches(0.72)
@@ -100,9 +103,16 @@ FIGURES = {
     "r2_blocked": "0.513",       # metrics.json, spatial-block split
     "funded_cr": "9.99",         # Decision-Support/ranking.csv, capped at 10 Cr
     "funded_cells": "249",       # ditto
-    "drop_treated": "0.99",      # docs/08-limitations.md
-    "drop_grid": "0.51",         # ditto
+    # The 10 Cr plan, not the whole programme. Pairing the 249-cell headline
+    # with the all-4,157-cells drop was the exact denominator mismatch the
+    # dashboard exists to prevent.
+    "drop_treated": "1.00",      # dashboard, 249 funded cells at 10 Cr
+    "drop_grid": "0.03",         # same plan, averaged over all 8,144 cells
+    "drop_all_treated": "0.99",  # if all 4,157 eligible were treated
+    "drop_all_grid": "0.51",     # ditto, over the whole grid
     "tests": "133",              # pytest tests/
+    "hotspots_before": "530",    # top decile of the observed range
+    "hotspots_after": "350",     # same, after the funded plan
     "excluded_green": "3,752",   # STATUS.md, already tree cover
     "excluded_water": "193",     # STATUS.md, 149 water + 44 wetland
 }
@@ -390,13 +400,19 @@ def slide_result(prs, f, n, total):
 
     text(s, MARGIN, Inches(4.4), Inches(5.6), Inches(1.2),
          [[("−%s °C" % FIGURES["drop_treated"], 26, FG, True, UI)],
-          [("modelled drop on treated cells", 12, DIM, False, DATA)]], line_spacing=1.2)
+          [("on the 249 funded cells", 12, DIM, False, DATA)]], line_spacing=1.2)
     text(s, MARGIN + Inches(6.18), Inches(4.4), Inches(5.6), Inches(1.2),
          [[("−%s °C" % FIGURES["drop_grid"], 26, MUTED, True, UI)],
-          [("same plan, averaged over the whole grid", 12, DIM, False, DATA)]],
+          [("same plan, averaged over all 8,144 cells", 12, DIM, False, DATA)]],
          line_spacing=1.2)
 
-    claim(s, Inches(5.66),
+    text(s, MARGIN, Inches(5.5), Inches(11.9), Inches(0.4),
+         [("Hotspot cells (top decile) fall from ", 14, FG, False, UI),
+          (f"{FIGURES['hotspots_before']} to {FIGURES['hotspots_after']}", 14, ACCENT, True, UI),
+          (" — the plan now buys the hottest eligible roofs, not the ones that "
+           "happened to sort first.", 14, FG, False, UI)], line_spacing=1.4)
+
+    claim(s, Inches(6.06),
           "Cooling values are planning assumptions used to compare scenarios, "
           "not measured guarantees.", colour=DANGER, size=15)
     footer(s, n, total)
@@ -405,7 +421,7 @@ def slide_result(prs, f, n, total):
 def slide_demo(prs, f, n, total):
     s = add_slide(prs)
     eyebrow(s, "05 — interactive demo")
-    heading(s, "Select an area. See both surfaces.")
+    heading(s, "Click a cell. Get a defensible answer.")
 
     png = ASSETS / "dash-compare.jpg"
     if png.exists():
@@ -417,8 +433,8 @@ def slide_demo(prs, f, n, total):
                              width=int(pic_w), height=int(pic_h))
 
     text(s, MARGIN, Inches(6.46), Inches(11.9), Inches(0.4),
-         [("Shown in grid mode — every square is one real 100 m cell. Click any of "
-           "them for its place name and a Google Street View link.",
+         [("Click any cell for why it ranks, what the rule engine proposes, what it "
+           "costs, and a Street View link to go and look at the roof.",
            13, MUTED, False, UI)], align=PP_ALIGN.CENTER)
     footer(s, n, total, link=LINKS["dashboard"], link_label="try it live")
 

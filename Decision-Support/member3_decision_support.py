@@ -169,14 +169,19 @@ def rank_within_budget(recommendation: pd.DataFrame) -> pd.DataFrame:
     # and the committed ranking.csv failed to reproduce: 4,154 of 4,157 rows
     # moved between runs. CI caught it.
     #
-    # A stable mergesort plus an explicit grid_id tie-break makes the order a
-    # deterministic function of the data alone, independent of row order or
-    # platform. grid_id is arbitrary as a priority signal, but the ranking has
-    # to break the tie somehow, and an arbitrary-but-fixed rule beats an
-    # arbitrary-and-changing one.
+    # A stable mergesort plus explicit tie-breaks makes the order a deterministic
+    # function of the data alone, independent of row order or platform.
+    #
+    # LST descending is the tie-break that decides the funded set. Determinism
+    # alone was not enough: with grid_id as the only tie-break the budget funded
+    # the first 249 cool-roof cells in spatial scan order, whose mean temperature
+    # was 28.69 C against 30.16 C for the 249 hottest - the shortlist left ~1.5 C
+    # of mean heat unaddressed while claiming to be heat-prioritised. Sorting the
+    # tie by temperature spends the same money on the hottest eligible cells.
+    # grid_id stays as the final tie-break so the file still reproduces exactly.
     ranking = recommendation.sort_values(
-        ["cooling_per_rupee", "grid_id"],
-        ascending=[False, True],
+        ["cooling_per_rupee", "LST", "grid_id"],
+        ascending=[False, False, True],
         kind="mergesort",
     ).reset_index(drop=True)
     ranking["rank"] = ranking.index + 1
@@ -232,7 +237,10 @@ def main() -> None:
         OUTPUT_RANKING,
         index=False,
         columns=[
-            "rank", "grid_id", "lat", "lon", "recommended_action",
+            # LST rides along because it is now a sort key: without it in the
+            # file the ranking cannot be re-derived from its own output, and
+            # "why is this cell funded and that one not?" has no answer.
+            "rank", "grid_id", "lat", "lon", "LST", "recommended_action",
             "cost_estimate", "cooling_c", "cooling_per_rupee",
             "cumulative_cost", "within_budget",
         ],
