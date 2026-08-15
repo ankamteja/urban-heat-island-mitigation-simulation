@@ -39,20 +39,20 @@ OUT = ROOT / "UHI-Presentation.pptx"
 
 # ---------------------------------------------------------------- palette ---
 # frontend/style.css :root tokens. Keep these in step with that file.
-BG = RGBColor(0x0C, 0x10, 0x17)          # --bg
-SURFACE = RGBColor(0x11, 0x16, 0x1F)     # --surface
-SURFACE_3 = RGBColor(0x1C, 0x24, 0x31)   # --surface-3
-FG = RGBColor(0xE8, 0xEA, 0xF0)          # --fg
-MUTED = RGBColor(0x9A, 0xA6, 0xBC)       # --fg-2
-DIM = RGBColor(0x6B, 0x78, 0x91)         # --fg-3
-PRIMARY = RGBColor(0x4C, 0x8D, 0xD9)     # --accent, the one interface accent
-ACCENT = RGBColor(0xE0, 0xA2, 0x3C)      # --warn, reserved for emphasis
-SUCCESS = RGBColor(0x5E, 0x9E, 0x7E)     # --ok
-DANGER = RGBColor(0xD8, 0x63, 0x5F)      # --danger
+# Taken from the layout reference deck: a light, warm editorial system.
+BG = RGBColor(0xFF, 0xFF, 0xFF)          # page
+SURFACE = RGBColor(0xED, 0xEA, 0xE2)     # card / panel fill, warm grey
+SURFACE_3 = RGBColor(0xD3, 0xD0, 0xC8)   # rules and hairlines
+FG = RGBColor(0x18, 0x1C, 0x20)          # ink
+MUTED = RGBColor(0x5C, 0x63, 0x69)       # secondary text
+DIM = RGBColor(0x8A, 0x90, 0x96)         # captions, page numbers
+ACCENT = RGBColor(0xDE, 0x5C, 0x2D)      # the one accent - burnt orange
+PRIMARY = RGBColor(0x37, 0x64, 0x91)     # secondary, used sparingly
+SUCCESS = RGBColor(0x26, 0x77, 0x6F)     # teal, for the forward-looking panels
+DANGER = RGBColor(0xB2, 0x3A, 0x2A)      # deeper red, semantic only
 
-# config.js HEAT_RAMP — magma, the same sequential ramp the dashboard uses.
-# Deliberately not a rainbow: equal steps in temperature are equal steps in
-# perceived brightness, so the title bar reads as a scale rather than decoration.
+# The dashboard's magma ramp, kept as the title rule. It encodes temperature and
+# is the one place a data palette appears in the chrome.
 RAMP = [
     RGBColor(0x28, 0x10, 0x4A),
     RGBColor(0x5E, 0x17, 0x6C),
@@ -62,8 +62,9 @@ RAMP = [
     RGBColor(0xFC, 0xBB, 0x8C),
 ]
 
-UI = "Inter"
-DATA = "IBM Plex Mono"
+UI = "Aptos"
+DATA = "Aptos"
+DISPLAY = "Aptos Display"
 
 W, H = Inches(13.333), Inches(7.5)
 MARGIN = Inches(0.72)
@@ -257,7 +258,7 @@ def section(slide, index_label, title, standfirst=None):
     text(slide, MARGIN, Inches(0.38), Inches(6.0), Inches(0.25),
          [(index_label.upper(), 10, ACCENT, True, DATA)])
     text(slide, MARGIN, Inches(0.95), COL_W, Inches(0.65),
-         [(title, 30, FG, True, UI)])
+         [(title, 30, FG, True, DISPLAY)])
     if standfirst:
         text(slide, Inches(0.67), Inches(1.73), Inches(11.4), Inches(0.55),
              [(standfirst, 13.5, MUTED, False, UI)], line_spacing=1.3)
@@ -349,49 +350,55 @@ def slide_title(prs, f, n, total):
         bar.fill.solid(); bar.fill.fore_color.rgb = c
         bar.line.fill.background(); bar.shadow.inherit = False
 
-    text(s, MARGIN, Inches(0.72), Inches(8.0), Inches(0.25),
-         [("SUSTAINABILITY HACKATHON  ·  URBAN CLIMATE", 10, ACCENT, True, DATA)])
+    text(s, MARGIN, Inches(0.62), Inches(8.0), Inches(0.25),
+         [("SUSTAINABILITY HACKATHON  /  URBAN CLIMATE", 10, MUTED, False, DATA)])
 
-    text(s, MARGIN, Inches(1.28), Inches(11.5), Inches(0.9),
-         [("Heatwise", 46, FG, True, UI)])
-    text(s, MARGIN, Inches(2.06), Inches(11.5), Inches(0.5),
-         [("Urban Heat Island Mitigation Simulation", 22, MUTED, False, UI)])
+    text(s, MARGIN, Inches(1.05), Inches(11.5), Inches(0.8),
+         [("HEATWISE", 44, FG, True, DISPLAY)])
+    text(s, MARGIN, Inches(1.78), Inches(11.5), Inches(0.5),
+         [("Urban Heat Island Mitigation Simulation", 20, ACCENT, True, DISPLAY)])
 
-    card(s, MARGIN, Inches(2.78), Inches(11.9), Inches(1.15), fill=SURFACE)
-    text(s, MARGIN + Inches(0.3), Inches(2.98), Inches(11.3), Inches(0.24),
-         [("PROBLEM STATEMENT", 10, ACCENT, True, DATA)])
-    text(s, MARGIN + Inches(0.3), Inches(3.26), Inches(11.3), Inches(0.5),
-         [("Identify where urban surface heat is most severe in Guwahati, and "
-           "decide which mitigation measures to fund first under a fixed "
-           "municipal budget.", 14.5, FG, False, UI)], line_spacing=1.3)
-
-    rule(s, MARGIN, Inches(4.24), COL_W)
-
-    text(s, MARGIN, Inches(4.5), Inches(6.5), Inches(0.24),
-         [("TEAM  ·  " + TEAM_NAME.upper().replace("TEAM ", ""), 10, DIM, False, DATA)])
-    text(s, MARGIN, Inches(4.8), Inches(7.2), Inches(0.9),
-         [(", ".join(name for name, _ in TEAM), 13, MUTED, False, UI)],
-         line_spacing=1.35)
-
-    text(s, Inches(8.4), Inches(4.5), Inches(4.2), Inches(0.24),
-         [("PROJECT", 10, DIM, False, DATA)])
-    text(s, Inches(8.4), Inches(4.8), Inches(4.25), Inches(1.0),
-         [[("↗ Live dashboard", 11.5, ACCENT, False, DATA, LINKS["dashboard"])],
-          [("↗ Source repository", 11.5, ACCENT, False, DATA, LINKS["repo"])],
-          [("↗ Documentation", 11.5, ACCENT, False, DATA, LINKS["docs"])]],
-         line_spacing=1.45)
+    card(s, MARGIN, Inches(2.36), COL_W, Inches(1.06), fill=SURFACE)
+    text(s, MARGIN + Inches(0.3), Inches(2.54), Inches(11.3), Inches(0.22),
+         [("PROBLEM STATEMENT", 9, ACCENT, True, DATA)])
+    text(s, MARGIN + Inches(0.3), Inches(2.8), Inches(11.3), Inches(0.5),
+         [("Identify where urban surface heat is most severe in Guwahati, and decide "
+           "which mitigation measures to fund first under a fixed municipal budget.",
+           14, FG, False, UI)], line_spacing=1.3)
 
     cols = [
-        (f"{f['cells']:,}", "cells mapped at 100 m"),
-        (f"{f['treatable']:,}", "eligible after land-cover rules"),
-        (f"₹{FIGURES['funded_cr']} Cr", "committed at ₹10 Cr budget"),
-        (FIGURES["funded_cells"], "sites in the shortlist"),
+        (f"{f['cells']:,}", "CELLS MAPPED AT 100 M", FG),
+        (f"{f['treatable']:,}", "ELIGIBLE AFTER LAND-COVER RULES", FG),
+        (f"₹{FIGURES['funded_cr']} Cr", "COMMITTED AT ₹10 CR BUDGET", ACCENT),
+        (FIGURES["funded_cells"], "SITES IN THE SHORTLIST", FG),
     ]
-    for i, (v, l) in enumerate(cols):
-        stat(s, MARGIN + Inches(3.0) * i, Inches(5.9), Inches(2.9), v, l, value_pt=21)
+    for i, (v, l, c) in enumerate(cols):
+        x = MARGIN + Inches(3.0) * i
+        text(s, x, Inches(3.72), Inches(2.9), Inches(0.45),
+             [(v, 26, c, True, DISPLAY)])
+        text(s, x, Inches(4.22), Inches(2.9), Inches(0.22),
+             [(l, 8, MUTED, False, DATA)])
+
+    rule(s, MARGIN, Inches(4.68), COL_W)
+
+    text(s, MARGIN, Inches(4.92), Inches(7.0), Inches(0.22),
+         [("TEAM & CONTRIBUTIONS", 9, MUTED, False, DATA)])
+    y = Inches(5.2)
+    for name, role in TEAM:
+        text(s, MARGIN, y, Inches(3.3), Inches(0.24), [(name, 12, FG, True, UI)])
+        text(s, Inches(4.05), y, Inches(4.4), Inches(0.24), [(role, 12, MUTED, False, UI)])
+        y += Inches(0.28)
+
+    text(s, Inches(9.0), Inches(4.92), Inches(3.65), Inches(0.22),
+         [("PROJECT", 9, MUTED, False, DATA)])
+    text(s, Inches(9.0), Inches(5.2), Inches(3.65), Inches(1.0),
+         [[("Live dashboard", 11.5, ACCENT, False, DATA, LINKS["dashboard"])],
+          [("Source repository", 11.5, ACCENT, False, DATA, LINKS["repo"])],
+          [("Documentation", 11.5, ACCENT, False, DATA, LINKS["docs"])]],
+         line_spacing=1.5)
 
     text(s, Inches(11.9), Inches(7.02), Inches(0.75), Inches(0.22),
-         [("01", 9, DIM, False, DATA)], align=PP_ALIGN.RIGHT)
+         [("01", 9, MUTED, False, DATA)], align=PP_ALIGN.RIGHT)
 
 
 def slide_problem(prs, f, n, total):
@@ -402,6 +409,12 @@ def slide_problem(prs, f, n, total):
 
     png = ASSETS / "dash-overview.jpg"
     if png.exists():
+        frame = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(6.47), Inches(2.21),
+                                   Inches(6.21), Inches(3.54))
+        frame.fill.background()
+        frame.line.color.rgb = SURFACE_3
+        frame.line.width = Pt(0.75)
+        frame.shadow.inherit = False
         s.shapes.add_picture(str(png), Inches(6.5), Inches(2.24), width=Inches(6.15))
 
     blocks = [
@@ -508,11 +521,35 @@ def slide_method(prs, f, n, total):
 def slide_architecture(prs, f, n, total):
     s = add_slide(prs)
     section(s, "05 — system architecture & processing pipeline",
-            "Module boundaries and the artefacts that cross them")
+            "Six layers, and the artefacts that cross between them")
 
     png = ASSETS / "architecture.png"
     if png.exists():
-        s.shapes.add_picture(str(png), MARGIN, Inches(1.9), width=COL_W)
+        # 1.28:1, so it is sized on height and sits in the left column.
+        pic_h = Inches(4.62)
+        pic_w = Inches(4.62 * 2400 / 1880)
+        s.shapes.add_picture(str(png), MARGIN, Inches(2.02),
+                             width=int(pic_w), height=int(pic_h))
+
+    x2 = Inches(7.35)
+    notes = [
+        ("Separation of concerns",
+         "Acquisition, suitability and selection are distinct modules with a file "
+         "contract between them. Each can be re-run without the others."),
+        ("Rules precede ranking",
+         "Layer 3 removes ineligible cells before any ordering happens, so an "
+         "unsuitable site cannot surface however hot it is."),
+        ("Cost enters the objective",
+         "The unit cost model runs alongside the gate, making cooling per rupee the "
+         "quantity layer 4 optimises."),
+        ("The loop is closed",
+         "A scheduled monthly Earth Engine refresh re-enters at layer 2, and CI "
+         "regenerates every downstream artefact."),
+    ]
+    y = Inches(2.1)
+    for lead, body in notes:
+        y = para(s, x2, y, Inches(5.3), lead, body, size=12, gap=0.26)
+
     page(s, n, link=LINKS["docs"], link_label="docs/01-architecture.md")
 
 
@@ -664,22 +701,30 @@ def slide_dashboard(prs, f, n, total):
 
     png = ASSETS / "dash-compare.jpg"
     if png.exists():
-        pic_h = Inches(4.1)
-        pic_w = Inches(4.1 * 1680 / 892)
-        s.shapes.add_picture(str(png), int((W - pic_w) / 2), Inches(2.16),
-                             width=int(pic_w), height=int(pic_h))
+        pic_h = Inches(3.86)
+        pic_w = Inches(3.86 * 1680 / 892)
+        px = int((W - pic_w) / 2)
+        # Hairline frame: the screenshot is dark and would otherwise float on the
+        # white page with no edge.
+        frame = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, px - Inches(0.03), Inches(2.09),
+                                   int(pic_w) + Inches(0.06), pic_h + Inches(0.06))
+        frame.fill.background()
+        frame.line.color.rgb = SURFACE_3
+        frame.line.width = Pt(0.75)
+        frame.shadow.inherit = False
+        s.shapes.add_picture(str(png), px, Inches(2.12), width=int(pic_w), height=int(pic_h))
 
+    # One line each, so the row cannot run into the footer rule.
     items = [
-        "Cell inspection: rank, land cover, indices, measure, cost",
-        "Budget scenarios from ₹10 Cr to ₹100 Cr, recomputed live",
-        "Current versus post-plan surface on a draggable divider",
-        "Street View link at each cell's coordinates",
+        "Per-cell inspection with rank and cost",
+        "Budget scenarios, ₹10 Cr to ₹100 Cr",
+        "Current vs post-plan on a divider",
+        "Street View at each coordinate",
     ]
     x = MARGIN
     for it in items:
-        text(s, x, Inches(6.42), Inches(2.85), Inches(0.44),
-             [("· ", 11.5, ACCENT, True, UI), (it, 11.5, MUTED, False, UI)],
-             line_spacing=1.28)
+        text(s, x, Inches(6.26), Inches(2.9), Inches(0.26),
+             [("· ", 11, ACCENT, True, UI), (it, 11, MUTED, False, UI)])
         x += Inches(3.0)
 
     page(s, n, link=LINKS["dashboard"], link_label="live dashboard")
@@ -787,29 +832,6 @@ def slide_limits(prs, f, n, total):
     page(s, n, link=LINKS["docs"], link_label="docs/08-limitations.md")
 
 
-def slide_team(prs, f, n, total):
-    s = add_slide(prs)
-    section(s, "12 — team composition & contributions",
-            "Five contributors",
-            "Roles reflect each member's commit history in the repository.")
-
-    y = Inches(2.5)
-    for name, role in TEAM:
-        text(s, MARGIN, y, Inches(0.2), Inches(0.28), [("·", 14, ACCENT, True, UI)])
-        text(s, MARGIN + Inches(0.24), y, Inches(4.0), Inches(0.28),
-             [(name, 14, FG, True, UI)])
-        text(s, Inches(5.2), y, Inches(7.45), Inches(0.28),
-             [(role, 13, MUTED, False, UI)])
-        y += Inches(0.62)
-
-    rule(s, MARGIN, Inches(5.9), COL_W)
-    text(s, MARGIN, Inches(6.12), COL_W, Inches(0.5),
-         [("The repository records 79 commits across five contributors, with CI running "
-           "the full test suite on every push.", 12, DIM, False, UI)])
-
-    page(s, n, link=LINKS["repo"], link_label="commit history")
-
-
 def slide_references(prs, f, n, total):
     s = add_slide(prs)
     section(s, "13 — appendix: links & references",
@@ -893,7 +915,6 @@ BUILDERS = [
     slide_dashboard,
     slide_outcomes,
     slide_limits,
-    slide_team,
     slide_references,
 ]
 

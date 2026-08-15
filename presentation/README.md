@@ -17,35 +17,52 @@ python presentation/build_deck.py
 
 ## Structure
 
-Thirteen slides, in the section order a technical panel reads. Section titles
-state what the slide contains; the evidence carries the argument.
+Twelve slides, in the section order a technical panel reads. Section titles state
+what the slide contains; the evidence carries the argument.
 
 | # | Section | Carries |
 |---|---|---|
-| 1 | Title | Problem statement, team, project links, headline figures |
+| 1 | Title | Problem statement, headline figures, team and contributions, links |
 | 2 | Problem understanding & motivation | Why urban heat matters, stated generally |
 | 3 | Literature review & existing approaches | Four prior strands and the identified gap |
 | 4 | Proposed methodology & technical approach | Five stages, then the distinguishing choices |
-| 5 | System architecture & processing pipeline | The eight-stage diagram |
-| 6 | Data sources & preprocessing | Datasets, preprocessing steps, derived fields, QC |
+| 5 | System architecture & processing pipeline | The layered diagram plus design notes |
+| 6 | Data sources & preprocessing | Datasets, steps, derived fields, QC |
 | 7 | Selection algorithm & worked example | Cost model, ordering rule, one cell traced |
 | 8 | Validation & comparative evaluation | Three ordering strategies at one budget |
 | 9 | Dashboard & decision interface | Interface screenshot and capabilities |
 | 10 | Expected outcomes & impact | Outcomes, scalability, sustainability relevance |
 | 11 | Limitations & future work | Four each, side by side |
-| 12 | Team composition & contributions | Roles from commit history |
-| 13 | Appendix: links & references | Project links, data sources, cited work |
+| 12 | Appendix: links & references | Project links, data sources, cited work |
 
-Layout follows the reference deck: content column 0.65–12.65 in, eyebrow 0.38,
-title 0.95 at 30pt, standfirst 1.73, body from 2.20, footer rule 6.88, page
-number at 12.10.
+Team and contributions sit on the title slide, not a separate one.
 
-Two positions the content holds deliberately:
+## Visual system
 
-- **Cooling values are planning assumptions, not measured guarantees.** Slide 7
-  labels the basis of every figure in the worked example; slide 11 leads with it.
-- **The model is not the decision-maker.** The recommendation comes from the rule
-  and cost engine. Slide 4 states it as a design choice.
+Taken from the layout reference deck — a light editorial system, not the
+dashboard's dark one:
+
+| Role | Value |
+|---|---|
+| Page | `#FFFFFF` |
+| Ink | `#181C20` |
+| Secondary text | `#5C6369` |
+| Card / panel fill | `#EDEAE2` |
+| Rules | `#D3D0C8` |
+| Accent | `#DE5C2D` |
+| Teal (forward-looking panels) | `#26776F` |
+| Blue (secondary) | `#376491` |
+| Type | Aptos, Aptos Display for headings |
+
+Geometry: content column 0.65–12.65 in, eyebrow 0.38, title 0.95 at 30pt,
+standfirst 1.73, body from 2.20, footer rule 6.88, page number at 12.10.
+
+The magma temperature ramp appears only as the title-slide rule; it encodes data
+and is kept out of the chrome elsewhere.
+
+The pipeline diagram follows the content reference's form: numbered layers top to
+bottom, pastel fills with matching borders, a tinted container where one layer
+holds two sub-stages, and a feedback edge for the scheduled data refresh.
 
 ## Regenerating the validation table
 
