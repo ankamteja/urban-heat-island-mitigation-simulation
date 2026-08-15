@@ -638,63 +638,80 @@ def feature_group(slide, x, y, w, heading, items, *, size=10.5, tint=None):
     return cy + Inches(0.2)
 
 
+def shot(slide, path, x, y, w, caption, sub):
+    """A framed screenshot with its label above. The frame matters because the
+    captures are dark and would otherwise float on the white page."""
+    h = int(w * 988 / 1720)
+    text(slide, x, y, w, Inches(0.2), [(caption, 10, ACCENT, True, DATA)])
+    text(slide, x, y + Inches(0.22), w, Inches(0.2), [(sub, 10.5, MUTED, False, UI)])
+    top = y + Inches(0.48)
+    frame = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, x - Inches(0.03), top - Inches(0.03),
+                                   w + Inches(0.06), h + Inches(0.06))
+    frame.fill.background()
+    frame.line.color.rgb = SURFACE_3
+    frame.line.width = Pt(0.75)
+    frame.shadow.inherit = False
+    if Path(path).exists():
+        slide.shapes.add_picture(str(path), x, top, width=int(w), height=int(h))
+    return top + h
+
+
 def slide_dashboard(prs, f, n, total):
     s = add_slide(prs)
     section(s, n, "dashboard & decision interface",
-            "What the interface exposes to a planner")
+            "One interface, two budget scenarios")
 
-    png = ASSETS / "dash-compare.jpg"
-    if png.exists():
-        pic_w = Inches(5.3)
-        pic_h = Inches(5.3 * 892 / 1680)
-        frame = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, MARGIN - Inches(0.03), Inches(2.07),
-                                   pic_w + Inches(0.06), pic_h + Inches(0.06))
-        frame.fill.background()
-        frame.line.color.rgb = SURFACE_3
-        frame.line.width = Pt(0.75)
-        frame.shadow.inherit = False
-        s.shapes.add_picture(str(png), MARGIN, Inches(2.1), width=int(pic_w), height=int(pic_h))
+    # 5.2in wide keeps the pair under 3in tall, which is what the feature block
+    # below needs; at full width they ran into it.
+    w = Inches(5.2)
+    shot(s, ASSETS / "dash-scenario-10cr.jpg", Inches(0.75), Inches(1.86), w,
+         "SCENARIO A  ·  ₹10 CR", "249 sites funded · hotspot cells 530 → 350")
+    shot(s, ASSETS / "dash-scenario-max.jpg", Inches(7.4), Inches(1.86), w,
+         "SCENARIO B  ·  ₹167 CR", "4,152 sites funded · hotspot cells 530 → 113")
 
-    # left column, under the screenshot
-    feature_group(s, MARGIN, Inches(5.06), Inches(5.3),
-                  "Scenario comparison", [
-                      "Draggable Current → Mitigation divider over a single map, "
-                      "operable from the keyboard",
-                      "Decision summary: current and projected mean, cells treated, "
-                      "hotspot change, committed investment",
-                  ])
+    text(s, MARGIN, Inches(5.4), COL_W, Inches(0.22),
+         [("The same selection rule under two ceilings — moving the budget slider "
+           "re-runs it live, nothing is pre-rendered.", 11.5, MUTED, False, UI)])
 
-    # middle column
-    y = Inches(2.1)
-    y = feature_group(s, Inches(6.25), y, Inches(3.15), "Map and layers", [
-        "Interpolated thermal field or the raw 100 m cells",
-        "Layer toggles for temperature, funded sites and place labels",
-        "Priority filter and drag-box area selection",
-        "Sequential temperature ramp with a scale legend",
-    ])
-    feature_group(s, Inches(6.25), y, Inches(3.15), "Planning and optimisation", [
-        "Budget slider with ₹10, 25, 50 and 100 Cr presets",
-        "Per-measure toggles showing funded count, cost and cooling",
-        "Greedy budget fill in the pipeline's own rank order",
-        "Measures the rules never propose are shown as unavailable, with the reason",
-    ])
+    rule(s, MARGIN, Inches(5.66), COL_W)
 
-    # right column
-    y = Inches(2.1)
-    y = feature_group(s, Inches(9.6), y, Inches(3.05), "Cell inspection", [
-        "Grid ID, reverse-geocoded place name, coordinates and priority tier",
-        "Why this cell: temperature, built-up intensity and vegetation ranked "
-        "against the study area",
-        "Recommended measure with cooling, cost, plan rank and funded state",
-        "Street View and Google Maps links; cell extent drawn on the map",
-    ])
-    feature_group(s, Inches(9.6), y, Inches(3.05), "Analysis and output", [
-        "Temperature distribution, current against plan",
-        "Vegetation against temperature with a least-squares fit",
-        "Cooling efficiency per crore by measure",
-        "Methodology drawer and a printable report export",
-        "Release manifest binds the interface to one dataset hash",
-    ])
+    cols = [
+        ("Map and layers", [
+            "Interpolated field or raw 100 m cells",
+            "Layer toggles and priority filter",
+            "Drag-box area selection, place search",
+            "Temperature ramp with scale legend",
+        ]),
+        ("Planning", [
+            "Budget slider, ₹10 Cr to ₹167 Cr",
+            "Per-measure toggles with counts",
+            "Greedy fill in pipeline rank order",
+            "Unavailable measures show the reason",
+        ]),
+        ("Cell inspection", [
+            "Grid ID, place name, priority tier",
+            "Why this cell: LST, NDBI, NDVI ranked",
+            "Measure, cooling, cost, plan rank",
+            "Street View link and cell extent box",
+        ]),
+        ("Analysis and output", [
+            "Distribution, current against plan",
+            "Vegetation against temperature",
+            "Cooling efficiency per crore",
+            "Methodology drawer, report export",
+        ]),
+    ]
+    x = MARGIN
+    for heading, items in cols:
+        text(s, x, Inches(5.82), Inches(2.9), Inches(0.2),
+             [(heading.upper(), 8.5, ACCENT, True, DATA)])
+        cy = Inches(6.04)
+        for it in items:
+            text(s, x, cy, Inches(0.12), Inches(0.18), [("·", 9.5, ACCENT, True, UI)])
+            text(s, x + Inches(0.13), cy, Inches(2.85), Inches(0.2),
+                 [(it, 9.5, MUTED, False, UI)])
+            cy += Inches(0.2)
+        x += Inches(3.1)
 
     page(s, n, link=LINKS["dashboard"], link_label="live dashboard")
 
