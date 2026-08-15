@@ -417,8 +417,8 @@ def slide_demo(prs, f, n, total):
                              width=int(pic_w), height=int(pic_h))
 
     text(s, MARGIN, Inches(6.46), Inches(11.9), Inches(0.4),
-         [("Current surface on the left, planning scenario on the right — with the "
-           "selection's cell count, mean temperature and cost read out live.",
+         [("Shown in grid mode — every square is one real 100 m cell. Click any of "
+           "them for its place name and a Google Street View link.",
            13, MUTED, False, UI)], align=PP_ALIGN.CENTER)
     footer(s, n, total, link=LINKS["dashboard"], link_label="try it live")
 
@@ -430,28 +430,31 @@ def slide_safety(prs, f, n, total):
 
     blocks = [
         ("NO WORK ON WATER OR WETLAND", SUCCESS,
-         f"{FIGURES['excluded_water']} water and wetland cells are excluded in code, "
-         "not by convention. ESA WorldCover land cover gates every measure."),
+         f"{FIGURES['excluded_water']} water and wetland cells excluded in code, not "
+         "by convention. ESA WorldCover gates every measure."),
         ("NO PLANTING ON EXISTING CANOPY", SUCCESS,
-         f"{FIGURES['excluded_green']} cells already classified as tree cover receive "
-         "no planting recommendation. The gate is asserted by tests."),
+         f"{FIGURES['excluded_green']} cells already classified as tree cover get no "
+         "planting recommendation. The gate is asserted by tests."),
+        ("CHECK IT ON THE GROUND", ACCENT,
+         "Every cell links straight to Google Street View at its own coordinates, "
+         "with the place name and the 100 m box it covers."),
         ("REPRODUCIBLE AND OPEN", PRIMARY,
          f"{FIGURES['tests']} passing tests. CI regenerates every artefact and fails "
-         "if a committed copy differs. MIT licensed, data attributed in NOTICE.md."),
+         "if a committed copy differs. MIT licensed."),
     ]
-    w = Inches(3.76)
+    w, gap = Inches(2.78), Inches(0.26)
     for i, (label, colour, body) in enumerate(blocks):
-        x = MARGIN + (w + Inches(0.31)) * i
+        x = MARGIN + (w + gap) * i
         card(s, x, Inches(2.5), w, Inches(2.72), fill=SURFACE)
         tab = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, x, Inches(2.5), Inches(0.05), Inches(2.72))
         tab.fill.solid()
         tab.fill.fore_color.rgb = colour
         tab.line.fill.background()
         tab.shadow.inherit = False
-        text(s, x + Inches(0.34), Inches(2.8), w - Inches(0.68), Inches(0.5),
-             [(label, 10, colour, True, DATA)], line_spacing=1.3)
-        text(s, x + Inches(0.34), Inches(3.42), w - Inches(0.68), Inches(1.7),
-             [(body, 13, FG, False, UI)], line_spacing=1.4)
+        text(s, x + Inches(0.3), Inches(2.8), w - Inches(0.6), Inches(0.5),
+             [(label, 9.5, colour, True, DATA)], line_spacing=1.3)
+        text(s, x + Inches(0.3), Inches(3.42), w - Inches(0.6), Inches(1.8),
+             [(body, 12.5, FG, False, UI)], line_spacing=1.4)
 
     claim(s, Inches(5.52),
           "A tool a city can act on has to be wrong safely. These rules are the "

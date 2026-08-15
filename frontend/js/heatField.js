@@ -175,24 +175,44 @@ const HeatField = L.Layer.extend({
     const cells = this._cells;
 
     /* The lattice is regular, so one probe sizes every box and each cell then
-       costs a single projection instead of two. */
+       costs a single projection instead of two.
+
+       map.project(), not latLngToContainerPoint(): the latter calls _round() on
+       the way through, so measuring a cell with it yields a whole number of
+       pixels and throws away the fraction that decides whether a given pair of
+       neighbours sits 5 or 6 px apart. */
     const c0 = cells[0];
-    const tl0 = map.latLngToContainerPoint(L.latLng(c0.bounds[1][0], c0.bounds[0][1]));
-    const br0 = map.latLngToContainerPoint(L.latLng(c0.bounds[0][0], c0.bounds[1][1]));
+    const tl0 = map.project(L.latLng(c0.bounds[1][0], c0.bounds[0][1]));
+    const br0 = map.project(L.latLng(c0.bounds[0][0], c0.bounds[1][1]));
     const cw = Math.max(1, br0.x - tl0.x);
     const ch = Math.max(1, br0.y - tl0.y);
 
     /* Below ~7 px the gap between boxes is most of the box, so the grid reads as
        a mesh of lines rather than a temperature map. Butt the cells together
-       instead and let the colour carry it. */
+       instead and let the colour carry it; above it, inset by a pixel so the
+       lattice is legible as a lattice. */
     const spaced = Math.min(cw, ch) >= 7;
-    const fw = spaced ? cw - 1 : cw + 0.5;
-    const fh = spaced ? ch - 1 : ch + 0.5;
+
+    /* Round UP when butting cells together, and accept up to a pixel of overlap.
+       Leaflet's latLngToContainerPoint calls _round() internally, so p.x arrives
+       already snapped to an integer and the true fractional position is gone.
+       Neighbouring cells therefore step by either floor(cw) or ceil(cw) px while
+       a fixed-width rect can only be one of the two — every time the fraction
+       accumulates past a pixel, the wider step leaves a one-pixel hole and the
+       basemap shows through. Those holes line up into vertical seams across the
+       field (measured: every ~22 px at city zoom, cells being ~5.2 px).
+       Overlapping is free here because the fills are opaque within the layer —
+       the canvas is composited once, at FIELD.gridOpacity — so a cell painted
+       over its neighbour's edge changes nothing but which colour wins on that
+       boundary pixel. */
+    const fw = spaced ? Math.max(1, Math.round(cw) - 1) : Math.ceil(cw);
+    const fh = spaced ? Math.max(1, Math.round(ch) - 1) : Math.ceil(ch);
 
     for (const cell of cells) {
       const p = map.latLngToContainerPoint(L.latLng(cell.bounds[1][0], cell.bounds[0][1]));
-      const x = p.x + padX, y = p.y + padY;
-      if (x + cw < 0 || y + ch < 0 || x > w || y > h) continue;
+      const x = Math.round(p.x + padX);
+      const y = Math.round(p.y + padY);
+      if (x + fw < 0 || y + fh < 0 || x > w || y > h) continue;
       const rgb = rampColor(normTemp(cell.temp));
       ctx.fillStyle = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
       ctx.fillRect(x, y, fw, fh);
