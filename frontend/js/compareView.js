@@ -169,9 +169,10 @@ function renderSelectionPanel(cells, message) {
       <div class="sel-cell"><b>${s.n.toLocaleString()}</b><span>cells</span></div>
       <div class="sel-cell"><b>${s.meanTemp.toFixed(1)}°C</b><span>mean now</span></div>
       <div class="sel-cell is-drop"><b>${s.meanAfter.toFixed(1)}°C</b><span>mean after</span></div>
-      <div class="sel-cell is-drop"><b>−${s.meanDrop.toFixed(2)}°C</b><span>avg drop</span></div>
+      <div class="sel-cell is-drop"><b>−${s.meanDropTreated.toFixed(2)}°C</b><span>drop, treated</span></div>
+      <div class="sel-cell is-drop"><b>−${s.meanDrop.toFixed(2)}°C</b><span>drop, all cells</span></div>
       <div class="sel-cell"><b>${s.treated.toLocaleString()}</b><span>actionable</span></div>
-      <div class="sel-cell"><b>${inrShort(s.cost)}</b><span>est. cost</span></div>
+      <div class="sel-cell"><b>${inrShort(s.cost)}</b><span>cost if all treated</span></div>
     </div>
     <div class="sel-actions">
       <button class="btn btn-sm btn-ghost" type="button" id="btn-clear-sel">Clear</button>
@@ -183,7 +184,7 @@ function renderSelectionPanel(cells, message) {
     if (view.selection) view.mapBefore.fitBounds(view.selection.bounds, { padding: [24, 24], maxZoom: 16 });
   });
 
-  if (deltaChip) deltaChip.textContent = `−${s.meanDrop.toFixed(2)}°C avg`;
+  if (deltaChip) deltaChip.textContent = `−${s.meanDrop.toFixed(2)}°C avg over all cells`;
 }
 
 /* Priority filter feeds both the field and whatever selection is live. */

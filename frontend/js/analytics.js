@@ -30,10 +30,16 @@ function renderKpis(containerId, stats) {
     { cls: '', v: stats.n.toLocaleString(), k: 'Cells analysed' },
     { cls: 'k-hot', v: stats.meanTemp.toFixed(1) + '°C', k: 'Mean surface temp' },
     { cls: 'k-hot', v: stats.maxTemp.toFixed(1) + '°C', k: 'Peak hotspot' },
-    { cls: 'k-cool', v: '−' + stats.meanDrop.toFixed(2) + '°C', k: 'Modelled mean drop' },
-    { cls: 'k-cool', v: stats.meanAfter.toFixed(1) + '°C', k: 'Projected mean' },
+    // Every cooling and cost card below names its denominator. The previous
+    // labels did not, so "Modelled mean drop -0.50°C" sat beside "Programme
+    // cost ₹167 Cr" and read as the price of half a degree. They are not the
+    // same population: the cost treats 4,157 cells, the drop is averaged over
+    // all 8,144.
+    { cls: 'k-cool', v: '−' + stats.meanDropTreated.toFixed(2) + '°C', k: 'Mean drop, treated cells' },
+    { cls: 'k-cool', v: '−' + stats.meanDrop.toFixed(2) + '°C', k: 'Mean drop, whole grid' },
+    { cls: 'k-cool', v: stats.meanAfter.toFixed(1) + '°C', k: 'Projected grid mean' },
     { cls: '', v: stats.treated.toLocaleString(), k: 'Actionable cells' },
-    { cls: 'k-cost', v: inrShort(stats.cost), k: 'Programme cost' }
+    { cls: 'k-cost', v: inrShort(stats.cost), k: 'Cost if all treated' }
   ];
   el.innerHTML = cards.map(c => `<div class="kpi ${c.cls}"><b>${c.v}</b><span>${c.k}</span></div>`).join('');
 }
