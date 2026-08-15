@@ -116,8 +116,8 @@ function renderEcologyMarkers(map, sites) {
       <div class="pop-title">${site.type}</div>
       <div class="pop-sub">${site.cell.lat.toFixed(4)}, ${site.cell.lon.toFixed(4)}</div>
       <div class="pop-row"><span>Current temp</span><b>${site.cell.temp.toFixed(1)}°C</b></div>
-      <div class="pop-row"><span>Expected drop</span><b>−${site.cooling.toFixed(1)}°C</b></div>
-      <div class="pop-row"><span>After measure</span><b>${(site.cell.temp - site.cooling).toFixed(1)}°C</b></div>
+      <div class="pop-row"><span>Scenario drop (assumed)</span><b>−${site.cooling.toFixed(1)}°C</b></div>
+      <div class="pop-row"><span>Scenario surface temp</span><b>${(site.cell.temp - site.cooling).toFixed(1)}°C</b></div>
       <div class="pop-row"><span>NDVI</span><b>${site.cell.ndvi === null ? 'N/A' : site.cell.ndvi.toFixed(3)}</b></div>
       <div class="pop-row"><span>Est. cost</span><b>${inrShort(site.cell.cost)}</b></div>
       <div class="pop-row"><span>Similar cells here</span><b>${site.catchment}</b></div>

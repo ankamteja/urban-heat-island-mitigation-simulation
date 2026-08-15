@@ -97,15 +97,43 @@ cost_estimate`), assigns a rank, accumulates cost, and flags each cell as
 
 The budget is `budget_rupees` in `shared/constants.json`, currently **₹10 crore**.
 
-At that cap, 323 of 4,157 actionable cells are funded: 249 `Tree cover` and 74
-`Green park`. `Cool roof` never enters the funded set — at 60 INR/m² for 1.0 °C
-it is the least cost-effective option in the catalogue, so the greedy rank puts
-all 3,494 of them below the cut. That is the model working as specified, not a
-bug, but it is worth stating plainly: **under this budget the recommendation is
-"plant things on open land", and the 3,494 built-up cells get nothing.**
+At that cap, **249 of 4,157 actionable cells are funded, and every one of them
+is `Cool roof`.** Neither `Tree cover` nor `Green park` reaches the cut — a cool
+roof delivers 1.0 °C for ~₹401k a cell, and the budget is exhausted before the
+ranking gets past it.
 
-That is a direct consequence of the placeholder cooling figures. A cool roof
-being 3.5× less cost-effective than a park is an assumption nobody measured.
+That is the model working as specified, not a bug, but state it plainly:
+**under this budget the recommendation is "coat roofs in the hottest built-up
+areas", and the 589 open-land cells get nothing.**
+
+Note what changed here and what did not. This funded set was 299 cells of pure
+`Tree cover` until the cool-roof rate was corrected from 400 to 300 INR/m² —
+and before that, a park-led mix, until the park rate was corrected. Neither
+correction touched the satellite data, the model, or the cooling assumptions.
+The greedy ranking sorts on cooling per rupee, and the rupee is doing almost
+all of the work:
+
+| Action | Cost/cell | Cooling | Cooling per rupee |
+|---|---:|---:|---:|
+| `Cool roof` | ₹401,310 | 1.0 °C | 2.49 × 10⁻⁶ |
+| `Tree cover` | ₹334,425 | 0.8 °C | 2.39 × 10⁻⁶ |
+| `Green park` | ₹1,025,570 | 2.0 °C | 1.95 × 10⁻⁶ |
+
+Cool roof leads tree cover by 4%. A 4% error in either unit rate reverses the
+recommendation, and one of the two rates is still unvalidated. Read the funded
+set as "these are roughly the right cells", never as "these are the right cells
+and those are not." See [`08-limitations.md`](./08-limitations.md).
+
+This ordering changed on 2026-08-14 and the reason is worth recording. The
+`Green park` rate was 250 INR/m², roughly 5–9× below every real municipal
+comparable, which made parks look like the most cost-effective intervention
+available — the previous funded set was 249 `Tree cover` plus 74 `Green park`.
+Re-anchoring the rate on Gujarat AMRUT 2.0 garden projects (₹1,152–2,250/m²)
+moved parks below tree cover, and the parks dropped out entirely.
+
+**One wrong unit rate silently reordered the entire investment priority.** The
+cooling figures are still unmeasured assumptions, and they carry the same power
+over this ranking. See [08 — Limitations](./08-limitations.md).
 
 ---
 

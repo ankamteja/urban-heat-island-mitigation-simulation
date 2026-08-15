@@ -8,8 +8,8 @@ Guwahati is divided into 8,144 cells of roughly 100 m. Google Earth Engine
 measures each cell's surface temperature, vegetation and land cover. A Python
 rule engine ranks each cell by heat risk and assigns it a costed mitigation
 action, refusing to place work on water, wetland or already-forested land. A
-Leaflet page draws the result twice — as it is, and as it would be after every
-recommendation was carried out.
+Leaflet page draws the result twice — as measured, and as a clearly labelled
+planning scenario after every recommendation is applied.
 
 The largest remaining caveat: the cooling figures behind the "after" map are
 planning assumptions, not measurements. See [08 — Limitations](./08-limitations.md).
@@ -29,6 +29,9 @@ planning assumptions, not measurements. See [08 — Limitations](./08-limitation
 | [06 — Frontend](./06-frontend.md) | The dashboard's files and how the heat surface is actually drawn. |
 | [07 — Data contracts](./07-data-contracts.md) | Every schema, who writes it, who reads it, what breaks if it changes. |
 | [08 — Limitations](./08-limitations.md) | Which numbers are measurements and which are assumptions. |
+| [09 — Automated refresh](./09-automated-refresh.md) | How the satellite data keeps itself current, and the one-time setup to enable it. |
+| [10 — Tree-cover temperature check](./10-tree-cover-check.md) | The reproducible nearby-cell contrast check, and why it is not a causal intervention estimate. |
+| [11 — Roadmap to 9/10](./11-roadmap-to-9.md) | Prioritized, testable improvements for scientific validity, product quality and operational readiness. |
 
 ## Reading order
 

@@ -1,5 +1,11 @@
 # Spec Compliance Audit - Machine Learning & Prediction
 
+> **Superseded — kept for the record.** This audit describes the module as it
+> stood before the corrected Earth Engine export and the land-cover fix landed.
+> Several of its findings have since been closed and some of its statements are
+> no longer true of the committed code or data. For current status see
+> [`STATUS.md`](../STATUS.md). Nothing here is maintained.
+
 **Audited:** 2026-08-12
 **Repo:** `ankamteja/urban-heat-island-mitigation-simulation`
 **Scope:** the Machine Learning & Prediction module spec - *"Turn the grid dataset into

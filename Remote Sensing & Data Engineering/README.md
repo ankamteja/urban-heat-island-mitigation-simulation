@@ -352,7 +352,6 @@ Contains grid-wise extracted features.
 ## Grid Boundary File
 
 ```
-Results/grid.geojson
 ```
 
 

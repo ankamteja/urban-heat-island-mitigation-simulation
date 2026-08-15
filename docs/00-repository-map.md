@@ -34,7 +34,7 @@ one file, `frontend/data/grid.geojson`, and nothing else.
 | `STATUS.md` | source | The current state of the project — what works, what is assumed, what is still open. The one document to trust about status; it replaced five overlapping audit files that had drifted out of date. |
 | `LICENSE` | source | MIT for the source, plus attribution terms for geoBoundaries, Landsat, ESA WorldCover and OpenStreetMap, which carry their own licences. |
 | `index.html` | source | The public landing page (the thing at the root of the deployed site). Static; links through to the dashboard. Not the dashboard itself. |
-| `vercel.json` | source | Deployment config: a `/dashboard` redirect and a one-day cache header on `frontend/data/*`. |
+| `vercel.json` | source | Deployment config: a `/dashboard` redirect and `no-store` delivery for dashboard data. |
 | `.vercelignore` | source | Keeps the analysis modules out of the deployment. Only the dashboard needs to ship; the ML module alone is ~180 MB with a trained model. |
 | `.gitignore` | source | Excludes the trained model (~170 MB, over GitHub's blob limit and fully regenerable) and Python bytecode. |
 
@@ -68,7 +68,6 @@ Editor in a browser, not on your machine.
 | `Dataset/dataset.csv` | generated (by hand, via Earth Engine) | The 8,144-cell export. **The single source of truth, and the one artefact that cannot be regenerated without a Google Earth Engine account.** Columns: `grid_id`, `LST`, `NDVI`, `NDBI`, `Vegetation`, `LandCover`, `Heat_Risk`, `Latitude`, `Longitude`, `.geo`. |
 | `Boundary/guwahati_boundary.geojson` | source | The study-area outline used to clip every raster. |
 | `Results/temperature.tif`, `Results/ndvi.tif` | generated | Raster exports from the same script — for GIS work, not read by any code here. |
-| `Results/grid.geojson` | generated | The grid with raw measured columns, before any tiering or recommendation. Not the file the dashboard reads. |
 | `QGIS/guwahati_heat_project.qgz` | source | A QGIS project for inspecting the rasters. Known issue: it references layers by paths that no longer resolve — see `STATUS.md`. |
 | `README.md`, `SPEC_AUDIT.md` | source | Module documentation and its spec-by-spec self-assessment. |
 
@@ -83,10 +82,9 @@ The module that feeds the dashboard. Run its four scripts in order.
 | `scripts/preprocess.py` | source | **Step 1.** Reads `dataset.csv`, parses the polygon geometry, derives cell centroids, attaches a readable `land_cover` label, and writes a tidy table. Carries `LandCover`, `NDBI` and `Vegetation` forward — it used to drop them, which is what blinded the rule engine. |
 | `scripts/train_regression.py` | source | **Step 2.** Fits Linear Regression and Random Forest against LST under two feature sets and two train/test splits. Writes metrics and plots, saves one canonical model. Read the spatial-block score, not the random-split one. |
 | `scripts/tier_and_recommend.py` | source | **Step 3.** Assigns each cell a priority tier from its Heat_Risk quantile, then an action via the shared suitability rule, then a cost and an assumed cooling. Asserts that no never-touch cell received an intervention. |
-| `scripts/export_grid_geojson.py` | source | **Step 4.** Emits the GeoJSON the dashboard renders, validates every feature against the frontend's contract, and writes both `Results/grid.geojson` and `frontend/data/grid.geojson`. |
-| `Results/preprocessed.csv` | generated | Output of step 1. Input to steps 2 and 3. |
+| `scripts/export_grid_geojson.py` | source | **Step 4.** Emits the GeoJSON the dashboard renders, validates every feature against the frontend's contract, and writes it to `frontend/data/grid.geojson` - the single copy. |
+| `Results/preprocessed.csv` | generated, gitignored | Output of step 1, input to steps 2 and 3. A pure intermediate: 3.3 MB, regenerated in seconds, read by nothing else. |
 | `Results/tiered.csv` | generated | Output of step 3 — every cell with its tier, action, cost and cooling. The most useful file for analysis. |
-| `Results/grid.geojson` | generated | Output of step 4. Byte-identical to `frontend/data/grid.geojson`. |
 | `Results/metrics.md`, `Results/metrics.json` | generated | Model scores under both splits. |
 | `Results/tiering_summary.md` | generated | Cell counts, land-cover breakdown, why cells were excluded, total programme cost. |
 | `Results/pred_vs_actual.png`, `feature_importances.png`, `priority_map.png` | generated | Plots. Not byte-reproducible across matplotlib versions, so CI does not diff them. |
@@ -125,7 +123,7 @@ open it over HTTP and it runs. Libraries load from CDNs at pinned versions.
 | `index.html` | source | The dashboard page: layout, panels, and the script tags. |
 | `style.css` | source | All styling. |
 | `data/grid.geojson` | generated | **The only data file the browser loads.** Written by the ML module's step 4. |
-| `mock_data/grid.geojson`, `mock_data/generate_mock.py` | source | 900 synthetic cells, kept only as a fallback if the real fetch fails. Superseded — real data is the default. |
+| `data/release.json` | generated | Content hash, cell count, costs and action mix for the matching grid. The browser fetches this first so a deployment cannot silently reuse a stale grid. |
 | `js/main.js` | source | Bootstrap: loads the grid, then wires up every other module. Start reading here. |
 | `js/config.js` | source | The colour ramp, the intervention catalogue (labels, glyph colours, fallback cooling), priority colours, and currency formatting. The temperature domain is derived from the data's 2nd/98th percentiles at load time, so the legend cannot drift out of step with the data. |
 | `js/dataLoader.js` | source | Fetches the GeoJSON and reduces each polygon to the flat record the renderer uses. Also computes the summary statistics behind every KPI. |
@@ -138,6 +136,17 @@ open it over HTTP and it runs. Libraries load from CDNs at pinned versions.
 | `js/popup.js` | source | The per-cell popup markup. |
 | `js/ecology.js` | source | Derives illustrative planting sites within a selection and renders their markers. |
 | `README.md` | source | Frontend documentation, including the data contract. |
+
+---
+
+## `backend/` — the automated data refresh
+
+| Path | Kind | What it is |
+|---|---|---|
+| `backend/refresh_dataset.py` | source | Re-measures every committed grid cell from Earth Engine headlessly, against a service account, and rewrites `dataset.csv`. **Deliberately does not regenerate the grid** — it recomputes over the existing cell polygons so `grid_id` stays stable and every downstream join keeps working. |
+| `backend/requirements.txt` | source | The Earth Engine client, on top of the ML module's dependencies. |
+
+Driven by `.github/workflows/refresh-data.yml` monthly. See [09 — Automated refresh](./09-automated-refresh.md).
 
 ---
 
@@ -166,6 +175,7 @@ Run them with `pytest tests/` from the repository root.
 | `docs/06-frontend.md` | The dashboard's files and rendering approach. |
 | `docs/07-data-contracts.md` | Every schema, who writes it, who reads it, and what breaks if it changes. |
 | `docs/08-limitations.md` | Which numbers are measurements and which are assumptions. |
+| `docs/09-automated-refresh.md` | The scheduled satellite-data refresh and its setup. |
 
 ---
 
@@ -182,7 +192,7 @@ Do not hand-edit these. Regenerate them, then commit the result:
 
 ```
 Machine Learning & Prediction/Results/*        (all of it)
-frontend/data/grid.geojson
+frontend/data/grid.geojson                    (the dashboard's only data file)
 Decision-Support/recommendation.csv
 Decision-Support/excluded.csv
 Decision-Support/ranking.csv

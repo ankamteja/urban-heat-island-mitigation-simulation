@@ -107,7 +107,7 @@ python scripts/export_grid_geojson.py
 | `preprocess.py` | `../Remote Sensing & Data Engineering/Dataset/Guwahati_Urban_Heat_Dataset.csv` | `Results/preprocessed.csv` (2.9 MB) | seconds |
 | `train_regression.py` | `Results/preprocessed.csv` | `Results/metrics.json`, `metrics.md`, `pred_vs_actual.png`, `feature_importances.png`, and `Models/heat_risk_model.pkl` (~170 MB, gitignored) | a minute or two |
 | `tier_and_recommend.py` | `Results/preprocessed.csv` | `Results/tiered.csv` (3.3 MB), `tiering_summary.md`, `priority_map.png` | seconds |
-| `export_grid_geojson.py` | `Results/tiered.csv` | `Results/grid.geojson` (3.7 MB, 8,144 features) | seconds |
+| `export_grid_geojson.py` | `Results/tiered.csv` | `frontend/data/grid.geojson` (3.6 MB, 8,144 features) | seconds |
 
 Each script resolves its own paths from `__file__`, so they run correctly from any working directory. `cd` into the module only for convenience.
 
@@ -130,7 +130,6 @@ If the feature count is not 8,144, or `validate()` raises, something upstream ch
 **Then copy the result to the dashboard.** This is a manual step on purpose:
 
 ```bash
-cp "Machine Learning & Prediction/Results/grid.geojson" frontend/data/grid.geojson
 ```
 
 Regenerating `grid.geojson` does **not** update what the dashboard shows until you copy it across. The alternative — having the browser fetch across `../Machine Learning & Prediction/Results/` — means URL-encoding a path containing a space and an ampersand, which is fragile. The copy is the deliberate trade.
@@ -172,7 +171,7 @@ Open <http://localhost:8000/>.
 
 **What you should see:** two maps side by side, "Current" and "After Intervention", roughly 8,000 coloured squares over Guwahati, four filter buttons across the top, a four-band legend bottom-right, and a search box on the left map. Clicking a cell opens a popup with its temperature, NDVI, priority, recommended action and cost.
 
-To work offline without the real data, edit the first `loadGrid(...)` line of `frontend/js/main.js` to point at `'mock_data/grid.geojson'` — 900 synthetic cells, no internet needed beyond the map tiles.
+The dashboard needs `frontend/data/grid.geojson`, which step 4 writes directly. There is no synthetic fallback: a mock grid used to exist, but a failed fetch silently rendering invented numbers as measurements was judged worse than an error message.
 
 ---
 

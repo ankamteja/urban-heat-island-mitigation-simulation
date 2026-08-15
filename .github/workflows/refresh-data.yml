@@ -1,0 +1,107 @@
+name: refresh-data
+
+# Automated satellite-data refresh.
+#
+# Landsat 8 revisits Guwahati roughly every 16 days, so there is no such thing
+# as live satellite temperature here -- the honest ceiling is "always showing
+# the freshest scene available". That is what this does.
+#
+# Monthly, or on demand:
+#   1. re-measure every committed grid cell from Earth Engine
+#   2. re-run the ML pipeline and Decision-Support over the new dataset
+#   3. run the tests, so a bad refresh cannot be committed
+#   4. commit and push -- Vercel redeploys automatically on the push
+#
+# The grid itself is never regenerated; see backend/refresh_dataset.py for why
+# that matters (grid_id is the join key for every downstream file).
+#
+# Requires one repository secret: EE_SERVICE_ACCOUNT_JSON.
+# Setup: docs/09-automated-refresh.md
+
+on:
+  schedule:
+    # 03:00 UTC on the 1st of each month. Landsat's 16-day cycle means a monthly
+    # run always has at least one new scene to work with.
+    - cron: "0 3 1 * *"
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "Length of the date window ending today"
+        required: false
+        default: "365"
+      dry_run:
+        description: "Measure and report without committing"
+        type: boolean
+        required: false
+        default: false
+
+concurrency:
+  group: refresh-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r "Machine Learning & Prediction/requirements.txt"
+          pip install -r backend/requirements.txt
+          pip install pytest
+
+      - name: Refresh the dataset from Earth Engine
+        env:
+          EE_SERVICE_ACCOUNT_JSON: ${{ secrets.EE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          python backend/refresh_dataset.py \
+            --days "${{ github.event.inputs.days || '365' }}" \
+            ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
+
+      - name: Re-run the ML pipeline
+        if: github.event.inputs.dry_run != 'true'
+        working-directory: "Machine Learning & Prediction"
+        run: |
+          python scripts/preprocess.py
+          python scripts/tier_and_recommend.py
+          python scripts/export_grid_geojson.py
+
+      - name: Re-run Decision-Support
+        if: github.event.inputs.dry_run != 'true'
+        working-directory: Decision-Support
+        run: python member3_decision_support.py
+
+      - name: Test the refreshed data before committing
+        if: github.event.inputs.dry_run != 'true'
+        run: pytest tests/ -v
+
+      - name: Commit and push if anything changed
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet -- '*.csv' '*.geojson' '*.md'; then
+            echo "No change in the satellite data since the last refresh."
+            exit 0
+          fi
+
+          git add -A
+          git commit -m "Refresh satellite data $(date -u +%Y-%m-%d)
+
+          Automated run of backend/refresh_dataset.py followed by the full
+          pipeline. Grid geometry and cell ids are unchanged by construction;
+          only the measured bands and everything derived from them moved.
+
+          Tests passed before this was committed."
+          git push
+          echo "Pushed. Vercel will redeploy from this commit."

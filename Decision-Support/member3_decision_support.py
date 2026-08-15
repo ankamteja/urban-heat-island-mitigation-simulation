@@ -162,8 +162,22 @@ def rank_within_budget(recommendation: pd.DataFrame) -> pd.DataFrame:
     recommendation["cooling_per_rupee"] = (
         recommendation["cooling_c"] / recommendation["cost_estimate"]
     )
+    # Ties are the normal case here, not an edge case: cost uses a flat cell
+    # area, so every cell sharing an action has an identical cooling_per_rupee -
+    # all 3,494 cool-roof cells score exactly the same. pandas' default sort is
+    # quicksort, which is not stable, so the order within a tie was arbitrary
+    # and the committed ranking.csv failed to reproduce: 4,154 of 4,157 rows
+    # moved between runs. CI caught it.
+    #
+    # A stable mergesort plus an explicit grid_id tie-break makes the order a
+    # deterministic function of the data alone, independent of row order or
+    # platform. grid_id is arbitrary as a priority signal, but the ranking has
+    # to break the tie somehow, and an arbitrary-but-fixed rule beats an
+    # arbitrary-and-changing one.
     ranking = recommendation.sort_values(
-        "cooling_per_rupee", ascending=False
+        ["cooling_per_rupee", "grid_id"],
+        ascending=[False, True],
+        kind="mergesort",
     ).reset_index(drop=True)
     ranking["rank"] = ranking.index + 1
     ranking["cumulative_cost"] = ranking["cost_estimate"].cumsum()

@@ -1,0 +1,21 @@
+{
+  "source_dataset": "Remote Sensing & Data Engineering/Dataset/dataset.csv",
+  "method": "one-to-one greedy nearest-neighbour match",
+  "tree_cover_code": 10,
+  "built_up_code": 50,
+  "match_radius_m": 500.0,
+  "candidate_built_up_cells_per_tree": 8,
+  "matched_pairs": 1391,
+  "mean_distance_m": 126.45631260836035,
+  "max_distance_m": 490.7955923465564,
+  "mean_tree_cover_lst_c": 26.931167810911745,
+  "mean_built_up_lst_c": 27.629276735912324,
+  "mean_observed_contrast_c": 0.6981089250005766,
+  "median_observed_contrast_c": 0.49963002825421654,
+  "bootstrap_95_interval_c": [
+    0.6503422510779023,
+    0.7453269395877566
+  ],
+  "bootstrap_replicates": 10000,
+  "bootstrap_seed": 20260815
+}

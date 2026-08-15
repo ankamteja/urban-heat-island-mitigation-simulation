@@ -154,8 +154,8 @@ Both come from `shared/constants.json`.
 | Action | INR/m² | Coverage | Effective INR/m² | Assumed cooling |
 |---|---|---|---|---|
 | Tree cover | 150 | 25% | 37.5 | 0.8 °C |
-| Cool roof | 400 | 15% | 60.0 | 1.0 °C |
-| Green park | 250 | 10% | 25.0 | 2.0 °C |
+| Cool roof | 300 | 15% | 45.0 | 1.0 °C |
+| Green park | 1,150 | 10% | 115.0 | 2.0 °C |
 | None | 0 | 0% | 0 | 0 °C |
 
 Coverage is the share of a ~8,916 m² cell actually treated — you cannot plant
@@ -186,8 +186,8 @@ priority.
 
 ## Step 4 — `export_grid_geojson.py`
 
-Reads `Results/tiered.csv`, writes `Results/grid.geojson` **and**
-`frontend/data/grid.geojson`.
+Reads `Results/tiered.csv`, writes `frontend/data/grid.geojson` - the single
+copy the dashboard loads.
 
 Renames `LST → temperature` and `NDVI → ndvi`, rounds temperature and cooling to
 1 dp and NDVI to 3, and carries the source polygon through verbatim so no

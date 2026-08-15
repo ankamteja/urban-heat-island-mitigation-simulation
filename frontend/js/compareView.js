@@ -1,7 +1,7 @@
 /* Orchestrates the two map panes.
 
-   The prediction pane stays collapsed until the user selects an area; selecting
-   one renders the post-mitigation field for that area and drops ecology pointers. */
+   The planning-scenario pane stays collapsed until the user selects an area.
+   It subtracts stated assumptions from LST; it is not a forecast. */
 
 const view = {
   mapBefore: null,
@@ -46,7 +46,7 @@ function initCompareView(data) {
     if (cell) {
       L.popup({ closeButton: true })
         .setLatLng([cell.lat, cell.lon])
-        .setContent(buildPopupContent(cell, { title: 'After mitigation' }))
+        .setContent(buildPopupContent(cell, { title: 'Planning scenario' }))
         .openOn(view.mapAfter);
     }
   });
@@ -157,7 +157,7 @@ function renderSelectionPanel(cells, message) {
     body.innerHTML = `
       <svg viewBox="0 0 24 24" aria-hidden="true" class="empty-icon"><rect x="3.5" y="3.5" width="17" height="17" rx="2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="3 2.5"/></svg>
       <p>${message ? 'Selection too small.' : 'No area selected.'}</p>
-      <p class="muted">${message || 'Drag a box on the map to model interventions and reveal the predicted surface.'}</p>`;
+      <p class="muted">${message || 'Drag a box on the map to view the planning scenario; cooling values are assumptions.'}</p>`;
     if (deltaChip) deltaChip.textContent = '';
     return;
   }
@@ -168,10 +168,11 @@ function renderSelectionPanel(cells, message) {
     <div class="sel-grid">
       <div class="sel-cell"><b>${s.n.toLocaleString()}</b><span>cells</span></div>
       <div class="sel-cell"><b>${s.meanTemp.toFixed(1)}°C</b><span>mean now</span></div>
-      <div class="sel-cell is-drop"><b>${s.meanAfter.toFixed(1)}°C</b><span>mean after</span></div>
-      <div class="sel-cell is-drop"><b>−${s.meanDrop.toFixed(2)}°C</b><span>avg drop</span></div>
+      <div class="sel-cell is-drop"><b>${s.meanAfter.toFixed(1)}°C</b><span>scenario mean</span></div>
+      <div class="sel-cell is-drop"><b>−${s.meanDropTreated.toFixed(2)}°C</b><span>assumed drop, treated</span></div>
+      <div class="sel-cell is-drop"><b>−${s.meanDrop.toFixed(2)}°C</b><span>assumed drop, all cells</span></div>
       <div class="sel-cell"><b>${s.treated.toLocaleString()}</b><span>actionable</span></div>
-      <div class="sel-cell"><b>${inrShort(s.cost)}</b><span>est. cost</span></div>
+      <div class="sel-cell"><b>${inrShort(s.cost)}</b><span>cost if all treated</span></div>
     </div>
     <div class="sel-actions">
       <button class="btn btn-sm btn-ghost" type="button" id="btn-clear-sel">Clear</button>
@@ -183,7 +184,7 @@ function renderSelectionPanel(cells, message) {
     if (view.selection) view.mapBefore.fitBounds(view.selection.bounds, { padding: [24, 24], maxZoom: 16 });
   });
 
-  if (deltaChip) deltaChip.textContent = `−${s.meanDrop.toFixed(2)}°C avg`;
+  if (deltaChip) deltaChip.textContent = `−${s.meanDrop.toFixed(2)}°C avg over all cells`;
 }
 
 /* Priority filter feeds both the field and whatever selection is live. */

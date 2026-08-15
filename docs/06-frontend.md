@@ -48,14 +48,17 @@ introducing a build step.
 
 ## Data loading
 
-`main.js` declares two sources:
+`main.js` declares one source:
 
 ```js
-const DATA_SOURCES = ['data/grid.geojson', 'mock_data/grid.geojson'];
+const DATA_SOURCES = ['data/grid.geojson'];
 ```
 
-The real grid first, the 900-cell synthetic mock only as a fallback if that
-fetch fails. `data/grid.geojson` is written by the ML module's step 4 — see
+There used to be a second entry: a fallback to a hand-written mock grid of 900
+synthetic cells spanning a fabricated 28–42 °C. It was removed — if the real
+fetch ever failed, the dashboard would quietly render invented numbers as though
+they were measurements, which is worse than showing nothing. A failed fetch now
+surfaces the error message instead. `data/grid.geojson` is written by the ML module's step 4 — see
 [07 — Data contracts](./07-data-contracts.md#contract-4--gridgeojson-the-frontend-contract)
 for the exact schema.
 
@@ -65,11 +68,9 @@ the 3.7 MB of ring coordinates the browser downloads are averaged down to a
 point and discarded. Shipping centroids plus bounds instead would cut the
 payload several-fold with no visual change.
 
-It also handles two data quirks defensively: an action of `'nan'` or `'NaN'`
-(from a historical pandas round-trip defect) is coerced to `'None'`, and a
-missing `cooling_c` falls back to the per-action table in `config.js` — which
-only ever applies to the legacy mock grid, since the pipeline always emits the
-field.
+It also coerces an action of `'nan'` or `'NaN'` (from a historical pandas
+round-trip defect) to `'None'`. The `cooling_c` fallback table in `config.js` is
+now unreachable in practice, since the pipeline always emits the field.
 
 ---
 
@@ -161,12 +162,16 @@ is required and present.
 ## Deployment
 
 Vercel, from the repository root. `vercel.json` adds a `/dashboard` redirect and
-a one-day cache header with a week of stale-while-revalidate on
-`frontend/data/*`. `.vercelignore` keeps the analysis modules out of the bundle —
-only the dashboard needs to ship.
+marks `frontend/data/*` as `no-store`. The export script writes a
+content-addressed `frontend/data/release.json`; the dashboard reads that
+manifest first and requests `grid.geojson` with its SHA-256 checksum in the
+query string. A newly deployed dashboard therefore cannot keep using an old
+grid response from a browser cache. `.vercelignore` keeps the analysis modules
+out of the bundle — only the landing page and `frontend/` ship.
 
-Repeat visits are therefore cheap. It is the first paint that carries the full
-3.7 MB.
+If the public dashboard still reports an old total after this change is merged,
+that deployment is not built from this repository revision. Deploy the current
+repository root to the Vercel project that owns the public domain.
 
 ---
 

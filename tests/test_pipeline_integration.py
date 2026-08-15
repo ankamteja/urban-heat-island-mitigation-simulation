@@ -157,17 +157,6 @@ def test_no_action_cells_carry_no_cost_and_no_cooling(frontend_cells):
     assert (idle["cost_estimate"] == 0).all()
 
 
-def test_frontend_grid_matches_the_ml_export():
-    """
-    export_grid_geojson.py writes both copies. If they diverge, somebody
-    reintroduced the manual copy step.
-    """
-    ml_copy = ML_RESULTS / "grid.geojson"
-    if not (ml_copy.exists() and FRONTEND_GEOJSON.exists()):
-        pytest.skip("grid.geojson not built")
-    assert ml_copy.read_bytes() == FRONTEND_GEOJSON.read_bytes()
-
-
 # --------------------------------------------------------------------------
 # The two recommendation engines must agree
 # --------------------------------------------------------------------------
@@ -194,6 +183,66 @@ def test_ml_and_decision_support_agree_on_every_cell(tiered):
         merged["recommended_action_ds"] != merged["recommended_action_ml"]
     ]
     assert mismatched.empty, f"{len(mismatched)} cells disagree between modules"
+
+
+def test_decision_support_ranking_is_deterministically_ordered():
+    """
+    Ties are the normal case in this ranking, not an edge case: cost uses a flat
+    cell area, so every cell sharing an action has an identical
+    cooling_per_rupee -- all 3,494 cool-roof cells score exactly the same.
+
+    With pandas' default (unstable) quicksort the order within a tie was
+    arbitrary, and ranking.csv failed to reproduce: 4,154 of 4,157 rows moved
+    between identical runs. CI caught it. The fix is a stable sort plus an
+    explicit grid_id tie-break, which this asserts.
+    """
+    path = DS_DIR / "ranking.csv"
+    if not path.exists():
+        pytest.skip("Decision-Support outputs not built")
+    ranking = pd.read_csv(path)
+
+    expected = ranking.sort_values(
+        ["cooling_per_rupee", "grid_id"],
+        ascending=[False, True],
+        kind="mergesort",
+    ).reset_index(drop=True)
+
+    assert list(ranking["grid_id"]) == list(expected["grid_id"]), (
+        "ranking.csv is not in (cooling_per_rupee desc, grid_id asc) order -- "
+        "the sort lost its tie-break and the file will not reproduce"
+    )
+    assert list(ranking["rank"]) == list(range(1, len(ranking) + 1))
+
+
+def test_ml_readme_quotes_the_committed_metrics():
+    """
+    The module README documents the model scores in prose. Prose does not
+    regenerate when the pipeline does, so it silently rots -- the README spent a
+    while quoting an R2 of 0.1510 against a committed metrics.json saying 0.5130,
+    which is the difference between "barely beats the mean" and "usable".
+
+    Asserting the numbers appear verbatim is crude but catches exactly that.
+    """
+    metrics_path = ML_RESULTS / "metrics.json"
+    readme_path = REPO_DIR / "Machine Learning & Prediction" / "README.md"
+    if not (metrics_path.exists() and readme_path.exists()):
+        pytest.skip("metrics.json not built")
+
+    metrics = json.loads(metrics_path.read_text(encoding="utf-8"))
+    readme = readme_path.read_text(encoding="utf-8")
+
+    missing = [
+        f"{r['split']}/{r['features']}/{r['model']} R2={r['r2']:.4f}"
+        for r in metrics["results"]
+        if f"{r['r2']:.4f}" not in readme
+    ]
+    assert not missing, f"README does not quote these committed scores: {missing}"
+
+    stale = [
+        value for value in ("0.9010", "0.1510", "-0.0245", "0.179546")
+        if value in readme
+    ]
+    assert not stale, f"README still quotes superseded figures: {stale}"
 
 
 def test_tiered_costs_match_the_shared_rate_table(tiered):

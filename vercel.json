@@ -2,14 +2,13 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "trailingSlash": true,
   "redirects": [
-    { "source": "/dashboard", "destination": "/frontend/", "permanent": false },
     { "source": "/dashboard/", "destination": "/frontend/", "permanent": false }
   ],
   "headers": [
     {
       "source": "/frontend/data/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }
+        { "key": "Cache-Control", "value": "no-store, max-age=0" }
       ]
     }
   ]

@@ -5,7 +5,7 @@ async function loadGrid(paths) {
   let lastErr;
   for (const path of list) {
     try {
-      const res = await fetch(path);
+      const res = await fetch(path, { cache: 'no-store' });
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
       return normalize(await res.json(), path);
     } catch (err) {
@@ -87,7 +87,7 @@ function summarize(cells) {
   const n = cells.length;
   if (!n) {
     return { n: 0, meanTemp: 0, maxTemp: 0, minTemp: 0, meanNdvi: 0,
-             cost: 0, treated: 0, meanDrop: 0, meanAfter: 0,
+             cost: 0, treated: 0, meanDrop: 0, meanDropTreated: 0, meanAfter: 0,
              byPriority: {}, byAction: {} };
   }
 
@@ -122,7 +122,21 @@ function summarize(cells) {
     meanNdvi: nNdvi ? sumN / nNdvi : 0,
     cost,
     treated,
+    // Two different averages, deliberately both exposed.
+    //
+    // meanDrop divides by every cell in the set, including the ~49% that are
+    // water, existing tree cover or low priority and are never treated. It is
+    // the honest city-wide figure and it is small: ~0.5 degC.
+    //
+    // meanDropTreated divides by the treated cells only, and is ~1.0 degC.
+    //
+    // Reporting only the first next to a crore-scale cost invites the obvious
+    // reaction - "that much money for half a degree?" - by pairing a total
+    // spent on 4,157 cells with an average spread over 8,144. Reporting only
+    // the second overstates what the programme does to the city. The UI names
+    // the denominator on both. See docs/08-limitations.md.
     meanDrop: sumDrop / n,
+    meanDropTreated: treated ? sumDrop / treated : 0,
     meanAfter: meanTemp - sumDrop / n,
     byPriority,
     byAction
