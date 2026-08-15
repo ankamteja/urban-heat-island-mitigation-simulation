@@ -112,7 +112,7 @@ all cool roof.** See the caveat on costs below.
 
 | # | Item | Effort |
 |---|---|---|
-| 1 | **Cooling values are unvalidated.** Even a crude check — do cells WorldCover calls tree cover run measurably cooler than adjacent built-up cells? — would turn an assumption into an estimate. The data to do it is already committed. | days |
+| 1 | **Cooling values are not intervention-validated.** The new reproducible nearby-cell check finds existing tree cover 0.70 °C cooler than matched built-up cells in this one scene, but it is cross-sectional and cannot estimate the effect of planting trees. Cool roofs and parks still have no empirical check. | field study |
 | 2 | **The ₹10 crore budget funds only cool roofs — 249 cells, no trees, no parks.** Correct per the model, but it means the 589 open-land cells get nothing. This ordering has now flipped twice, both times on a rate correction: the park rate was 5–9× too low, then the cool-roof rate was 33% too high. Cool roof now leads tree cover by just 4%, and the tree-cover rate is still unvalidated (item 1). Treat the funded set as approximately right, not decisively right. | decision |
 | 3 | **QGIS project has three unresolvable layers.** `guwahati_heat_project.qgz` references `./guwahati_boundary.geojson` (wrong directory), a `.shp` that exists nowhere, and an absolute path into a `Downloads/` folder on the original author's machine. Needs opening in QGIS to relink and re-save. | hour |
 | 4 | **Dashboard downloads 3.7 MB to render centroids.** The renderer discards every polygon ring. A centroid-plus-bounds export would cut the payload several-fold with no visual change. | hours |

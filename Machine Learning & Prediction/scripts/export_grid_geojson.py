@@ -39,6 +39,7 @@ from __future__ import annotations
 
 import json
 import sys
+from hashlib import sha256
 from pathlib import Path
 
 import pandas as pd
@@ -97,6 +98,10 @@ RESULTS_DIR = MODULE_DIR / "Results"
 INPUT_CSV = RESULTS_DIR / "tiered.csv"
 # The dashboard's copy, and the only one. frontend/js/main.js loads it.
 OUTPUT_GEOJSON = REPO_DIR / "frontend" / "data" / "grid.geojson"
+# A tiny manifest is written with the grid. The browser fetches it without a
+# cache, then requests the grid under its content hash. This makes a new Vercel
+# deployment visibly and mechanically different from a stale grid response.
+OUTPUT_RELEASE = REPO_DIR / "frontend" / "data" / "release.json"
 
 
 def build_feature(row: pd.Series) -> dict:
@@ -178,9 +183,21 @@ def main() -> None:
     print(f"Built and validated {len(features):,} features")
 
     collection = {"type": "FeatureCollection", "features": features}
+    payload = json.dumps(collection, separators=(",", ":")).encode("utf-8")
+    grid_sha256 = sha256(payload).hexdigest()
+    actions = pd.Series([f["properties"]["recommended_action"] for f in features])
+    release = {
+        "schema_version": 1,
+        "grid_sha256": grid_sha256,
+        "release_id": grid_sha256[:12],
+        "cell_count": len(features),
+        "total_cost_inr": int(sum(f["properties"]["cost_estimate"] for f in features)),
+        "action_counts": {str(k): int(v) for k, v in actions.value_counts().items()},
+    }
 
     OUTPUT_GEOJSON.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_GEOJSON.write_text(json.dumps(collection), encoding="utf-8")
+    OUTPUT_GEOJSON.write_bytes(payload)
+    OUTPUT_RELEASE.write_text(json.dumps(release, indent=2) + "\n", encoding="utf-8")
 
     size_mb = OUTPUT_GEOJSON.stat().st_size / 1_048_576
     print(
@@ -193,8 +210,8 @@ def main() -> None:
     print(f"temperature range: {min(temps):.1f} to {max(temps):.1f} C")
     coolings = [f["properties"]["cooling_c"] for f in features]
     print(f"cooling range: {min(coolings):.1f} to {max(coolings):.1f} C (assumed)")
-    actions = pd.Series([f["properties"]["recommended_action"] for f in features])
     print(f"action mix: {actions.value_counts().to_dict()}")
+    print(f"Dashboard release: {release['release_id']} ({OUTPUT_RELEASE.relative_to(REPO_DIR)})")
     print(
         "NOTE: frontend/js/config.js derives its colour domain from the 2nd/98th "
         "percentiles of whatever it loads, so no legend retuning is needed when "

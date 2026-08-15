@@ -8,7 +8,7 @@
     {
       "source": "/frontend/data/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, no-cache, must-revalidate" }
+        { "key": "Cache-Control", "value": "no-store, max-age=0" }
       ]
     }
   ]

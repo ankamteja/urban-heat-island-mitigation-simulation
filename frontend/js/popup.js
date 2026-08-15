@@ -13,8 +13,8 @@ function buildPopupContent(cell, opts) {
   ];
 
   if (cell.cooling > 0) {
-    rows.push(['Expected drop', `−${cell.cooling.toFixed(1)}°C`]);
-    rows.push(['After mitigation', `${(cell.temp - cell.cooling).toFixed(1)}°C`]);
+    rows.push(['Scenario drop (assumed)', `−${cell.cooling.toFixed(1)}°C`]);
+    rows.push(['Scenario surface temp', `${(cell.temp - cell.cooling).toFixed(1)}°C`]);
     rows.push(['Est. cost', inrShort(cell.cost)]);
   }
 

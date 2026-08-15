@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "grid_sha256": "ffb88868b2a267fcdf51af2bd7f9022373ff79cbf5a95c6eb842c0daa8d11f4d",
+  "release_id": "ffb88868b2a2",
+  "cell_count": 8144,
+  "total_cost_inr": 1674616910,
+  "action_counts": {
+    "None": 3987,
+    "Cool roof": 3494,
+    "Tree cover": 589,
+    "Green park": 74
+  }
+}

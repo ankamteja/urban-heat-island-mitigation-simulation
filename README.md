@@ -28,7 +28,7 @@ Live at **[urban-heat-island-guwahati.vercel.app](https://urban-heat-island-guwa
 | **[Remote Sensing & Data Engineering](./Remote%20Sensing%20%26%20Data%20Engineering/)** | Study-area boundary, Google Earth Engine workflow producing LST / NDVI / NDBI / land cover, the 100 m grid, and the exported grid dataset every other module consumes. | [README](./Remote%20Sensing%20%26%20Data%20Engineering/README.md) · [spec audit](./Remote%20Sensing%20%26%20Data%20Engineering/SPEC_AUDIT.md) · [guide](./docs/03-remote-sensing.md) |
 | **[Machine Learning & Prediction](./Machine%20Learning%20%26%20Prediction/)** | LST regression, quantile-based priority tiering, the rule-based action/cost/cooling engine, and the `grid.geojson` the dashboard renders. | [README](./Machine%20Learning%20%26%20Prediction/README.md) · [spec audit](./Machine%20Learning%20%26%20Prediction/SPEC_AUDIT.md) · [guide](./docs/04-machine-learning.md) |
 | **[Decision-Support](./Decision-Support/)** | An independent cooling-per-rupee recommender with hard suitability rules and a budget-constrained greedy ranking. | [README](./Decision-Support/README.md) · [guide](./docs/05-decision-support.md) |
-| **[frontend](./frontend/)** | Leaflet dashboard rendering the grid as a continuous blended thermal surface, with a selection-gated prediction of post-mitigation temperature, ecology pointers and analytics. | [README](./frontend/README.md) · [guide](./docs/06-frontend.md) |
+| **[frontend](./frontend/)** | Leaflet dashboard rendering the grid as a continuous blended thermal surface, with a selection-gated planning scenario, ecology pointers and analytics. | [README](./frontend/README.md) · [guide](./docs/06-frontend.md) |
 
 ## Data flow
 
@@ -69,7 +69,9 @@ over the cells actually treated. The larger number is not the more optimistic
 one, it is the more narrowly scoped one.
 
 Cooling values come from the pipeline's own `cooling_c` field and are planning
-assumptions, not measurements — see the honesty notes below.
+assumptions, not measurements. A nearby-cell tree-cover check finds a 0.70 °C
+observed contrast in this scene, but it is not a planting-effect estimate — see
+[the check](./docs/10-tree-cover-check.md) and the honesty notes below.
 
 ## Honesty notes
 
@@ -94,10 +96,12 @@ The web layer is fully static. [`vercel.json`](./vercel.json) and
 [`.vercelignore`](./.vercelignore) configure a Vercel deployment that ships only
 the landing page and `frontend/` (~2.7 MB); no build step is required.
 
-The Vercel project is not connected to this repository (it is owned by another
-account), so pushes do not auto-deploy. Ship changes with `vercel deploy --prod`
-from the repository root.
+The Vercel project is connected to this repository. Pushing to `main` triggers
+the production deployment; the dashboard fetches a content-hashed grid manifest
+so each deployment loads its matching data release.
 
 ## Licence
 
-[MIT](./LICENSE) for the code. Third-party data (geoBoundaries, Landsat, ESA WorldCover, OpenStreetMap) carries its own terms — see the attribution section of the licence file.
+[MIT License](./LICENSE) for the code and project-written documentation.
+Third-party data and map services carry their own terms; retained attribution is
+listed in [NOTICE.md](./NOTICE.md).

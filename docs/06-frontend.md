@@ -162,12 +162,16 @@ is required and present.
 ## Deployment
 
 Vercel, from the repository root. `vercel.json` adds a `/dashboard` redirect and
-a one-day cache header with a week of stale-while-revalidate on
-`frontend/data/*`. `.vercelignore` keeps the analysis modules out of the bundle —
-only the dashboard needs to ship.
+marks `frontend/data/*` as `no-store`. The export script writes a
+content-addressed `frontend/data/release.json`; the dashboard reads that
+manifest first and requests `grid.geojson` with its SHA-256 checksum in the
+query string. A newly deployed dashboard therefore cannot keep using an old
+grid response from a browser cache. `.vercelignore` keeps the analysis modules
+out of the bundle — only the landing page and `frontend/` ship.
 
-Repeat visits are therefore cheap. It is the first paint that carries the full
-3.7 MB.
+If the public dashboard still reports an old total after this change is merged,
+that deployment is not built from this repository revision. Deploy the current
+repository root to the Vercel project that owns the public domain.
 
 ---
 

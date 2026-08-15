@@ -34,7 +34,7 @@ one file, `frontend/data/grid.geojson`, and nothing else.
 | `STATUS.md` | source | The current state of the project — what works, what is assumed, what is still open. The one document to trust about status; it replaced five overlapping audit files that had drifted out of date. |
 | `LICENSE` | source | MIT for the source, plus attribution terms for geoBoundaries, Landsat, ESA WorldCover and OpenStreetMap, which carry their own licences. |
 | `index.html` | source | The public landing page (the thing at the root of the deployed site). Static; links through to the dashboard. Not the dashboard itself. |
-| `vercel.json` | source | Deployment config: a `/dashboard` redirect and a one-day cache header on `frontend/data/*`. |
+| `vercel.json` | source | Deployment config: a `/dashboard` redirect and `no-store` delivery for dashboard data. |
 | `.vercelignore` | source | Keeps the analysis modules out of the deployment. Only the dashboard needs to ship; the ML module alone is ~180 MB with a trained model. |
 | `.gitignore` | source | Excludes the trained model (~170 MB, over GitHub's blob limit and fully regenerable) and Python bytecode. |
 
@@ -123,6 +123,7 @@ open it over HTTP and it runs. Libraries load from CDNs at pinned versions.
 | `index.html` | source | The dashboard page: layout, panels, and the script tags. |
 | `style.css` | source | All styling. |
 | `data/grid.geojson` | generated | **The only data file the browser loads.** Written by the ML module's step 4. |
+| `data/release.json` | generated | Content hash, cell count, costs and action mix for the matching grid. The browser fetches this first so a deployment cannot silently reuse a stale grid. |
 | `js/main.js` | source | Bootstrap: loads the grid, then wires up every other module. Start reading here. |
 | `js/config.js` | source | The colour ramp, the intervention catalogue (labels, glyph colours, fallback cooling), priority colours, and currency formatting. The temperature domain is derived from the data's 2nd/98th percentiles at load time, so the legend cannot drift out of step with the data. |
 | `js/dataLoader.js` | source | Fetches the GeoJSON and reduces each polygon to the flat record the renderer uses. Also computes the summary statistics behind every KPI. |

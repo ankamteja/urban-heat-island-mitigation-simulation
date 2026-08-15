@@ -74,10 +74,12 @@ directories — the ML module's path contains a space and an ampersand, which is
 fragile to URL-encode from the browser. It also means **regenerating the file
 does not update the dashboard until you copy it across.**
 
-There is no synthetic fallback: the dashboard loads
-`data/grid.geojson` or shows an error. It is excluded from production deploys via `.vercelignore`, so a
-data failure in production surfaces as an error rather than silently rendering
-mock values.
+There is no synthetic fallback: the dashboard loads `data/release.json` first,
+then requests `data/grid.geojson` using that file's SHA-256 checksum as a cache
+key. Both requests use `no-store`; a release therefore cannot silently retain a
+previous grid in a browser cache. The mock data is excluded from production via
+`.vercelignore`, so a data failure surfaces as an error rather than rendering
+invented values.
 
 ## Data contract
 
@@ -89,7 +91,7 @@ a file that does not match — so if the dashboard renders, the contract held.
 |----------------------|---------|--------------|----------------------------------------------------|
 | `grid_id`            | string  | `"+102027+29089"` | Unique ID per cell (join key)                 |
 | `temperature`        | number  | `27.7`       | °C. Real range 20.9–33.1. Cells without one are skipped |
-| `ndvi`               | number  | `0.246`      | Vegetation index. **Uncorrected — see below**      |
+| `ndvi`               | number  | `0.246`      | Vegetation index from the corrected Landsat export |
 | `priority`           | string  | `"High"` / `"Medium"` / `"Low"` | Drives the filter buttons       |
 | `recommended_action` | string  | `"Tree cover"` / `"Cool roof"` / `"Green park"` / `"None"` | Selects the measure |
 | `cost_estimate`      | number  | `334350`     | ₹ INR, integer                                     |
@@ -105,7 +107,7 @@ exactly 100 m × 100 m.
 
 ## Cooling model
 
-The predicted surface subtracts each cell's own **`cooling_c`** from its
+The planning-scenario surface subtracts each cell's own **`cooling_c`** from its
 temperature, wherever `recommended_action` is present and not `"None"`. A
 `cooling_c` of `0` is respected as a real zero, not treated as missing.
 
@@ -118,18 +120,19 @@ Values currently carried by the pipeline:
 
 | Measure    | `cooling_c` | Cells |
 |------------|-------------|-------|
-| Green park | 2.0 °C      | 4,072 |
-| Cool roof  | 1.0 °C      | 81    |
-| Tree cover | 0.8 °C      | 1,955 |
-| None       | 0.0 °C      | 2,036 |
+| Green park | 2.0 °C      | 74 |
+| Cool roof  | 1.0 °C      | 3,494 |
+| Tree cover | 0.8 °C      | 589 |
+| None       | 0.0 °C      | 3,987 |
 
-**These are assumptions, not predictions.** They set relative priority and are
-not a performance guarantee.
+**These are planning assumptions, not measured intervention outcomes.** The
+tree-cover direction has a limited nearby-cell check, but not an intervention
+estimate; see [`../docs/10-tree-cover-check.md`](../docs/10-tree-cover-check.md).
 
 ## Features
 
 - Continuous blended thermal surface over a dark basemap
-- Prediction pane revealed only after an area is selected
+- Planning-scenario pane revealed only after an area is selected
 - Ecology pointers per measure, with cooling, cost and NDVI in the popup
 - Analytics: distribution shift, priority mix, NDVI vs. temperature, cooling vs. cost
 - Priority filter, location search, click any point for cell detail
@@ -137,10 +140,9 @@ not a performance guarantee.
 
 ## Known limitations
 
-- `ndvi` values shown in popups are uncorrected and compressed low (max 0.386
-  across the whole city, where 0.7–0.85 would be expected). The fix is
-  committed in the Earth Engine script but the data has not been regenerated.
-  See [`../docs/08-limitations.md`](../docs/08-limitations.md).
+- The scenario subtracts assumed `cooling_c` values from a single daytime LST
+  scene. It is not a forecast or a measure of felt air-temperature change; see
+  [`../docs/08-limitations.md`](../docs/08-limitations.md).
 - `cost_estimate` figures are order-of-magnitude planning placeholders, not
   procured or tendered costs.
 - Coverage is the geoBoundaries ADM3 "Guwahati" polygon (~81 km²), which is

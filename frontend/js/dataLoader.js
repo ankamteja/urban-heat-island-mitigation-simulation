@@ -5,7 +5,7 @@ async function loadGrid(paths) {
   let lastErr;
   for (const path of list) {
     try {
-      const res = await fetch(path);
+      const res = await fetch(path, { cache: 'no-store' });
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
       return normalize(await res.json(), path);
     } catch (err) {

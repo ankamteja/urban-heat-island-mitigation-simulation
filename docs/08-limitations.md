@@ -19,12 +19,26 @@ the method can support. Open defects live in [`../STATUS.md`](../STATUS.md).
 | Priority tier | **A relative rank** within Guwahati, not a calibrated risk level. |
 | Recommended action | **A rule**, not a prediction. No ground truth exists. |
 | `cost_estimate` | **Mostly assumptions.** Only the park rate has a real comparable. |
-| `cooling_c` | **An assumption.** Not measured, not fitted, not validated. |
+| `cooling_c` | **A planning assumption.** A tree-cover cross-sectional check exists, but it is not an intervention-effect validation. |
 | The "after intervention" map | **A claim about a plan**, not a forecast. |
 
 ---
 
-## 1. Cooling values are assumptions, and they are load-bearing
+## 1. A tree-cover sanity check exists; it does not validate an intervention
+
+The repository now runs a reproducible comparison of existing tree-cover cells
+against one-to-one nearby built-up cells in the committed Landsat scene. The
+current result is a **0.70 °C** mean contrast (built-up minus tree cover; 1,391
+pairs; descriptive bootstrap interval 0.65–0.75 °C). The full method, outputs
+and reproduction command are in [10 — Tree-cover temperature check](./10-tree-cover-check.md).
+
+This is evidence for the *direction* of a tree-cover cooling scenario, not a
+measurement of the effect of planting trees. It is cross-sectional, contains
+confounding by surface type and urban form, uses a single overpass, and says
+nothing about cool roofs or green parks. The 0.8 °C tree-cover value therefore
+remains a planning assumption.
+
+## 2. Cooling values are assumptions, and they are load-bearing
 
 The single most important caveat in the project.
 
@@ -69,9 +83,10 @@ Two unit rates, two complete reorderings of the investment priority, no change
 to the satellite data or the model in between. The cooling figures have exactly
 the same leverage and, unlike those two rates, still have nothing behind them.
 
-**Fixing this is the highest-value work available.** A crude first pass — do
-cells WorldCover classifies as tree cover run measurably cooler than adjacent
-built-up cells? — needs no new data.
+The first available check — whether tree-cover cells run cooler than nearby
+built-up cells — is now automated and documented in
+[10 — Tree-cover temperature check](./10-tree-cover-check.md). A causal
+intervention estimate still needs new, repeated observations or a field trial.
 
 ## 2. One of the three unit rates is still unvalidated
 
