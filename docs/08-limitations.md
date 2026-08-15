@@ -49,35 +49,82 @@ intervention" surface, and the cost-effectiveness ranking that decides which
 cells get funded. A different set of plausible numbers would produce a different
 funded shortlist.
 
-This is not hypothetical — it has already happened once, via the cost side of
-the same ratio. The `Green park` rate sat at 250 INR/m², around 5–9× below every
-real municipal comparable, and that single wrong number made parks the most
-cost-effective option in the catalogue: the ₹10 crore budget funded 249 tree-cover
-cells and 74 parks. Re-anchoring the rate on real Gujarat AMRUT 2.0 garden
-projects (₹1,152–2,250/m²) moved parks below tree cover, and the funded set
-became 299 cells, **all tree cover, no parks at all**.
+This is not hypothetical — it has already happened twice, both times via the
+cost side of the same ratio.
 
-One unit rate reordered the entire investment priority. The cooling figures have
-exactly the same leverage and, unlike that rate, still have nothing behind them.
+The `Green park` rate sat at 250 INR/m², around 5–9× below every real municipal
+comparable, and that single wrong number made parks the most cost-effective
+option in the catalogue: the ₹10 crore budget funded 249 tree-cover cells and 74
+parks. Re-anchoring it on real Gujarat AMRUT 2.0 garden projects (₹1,152–2,250/m²)
+moved parks below tree cover, and the funded set became 299 cells, **all tree
+cover, no parks at all**.
+
+Then the `Cool roof` rate came down from 400 to 300 INR/m² on Telangana's Cool
+Roof Policy. Cool roof is assigned to 3,494 of the 4,157 actionable cells, so it
+carried 87% of the programme total: correcting it took the all-cells figure from
+₹214.2 Cr to ₹167.5 Cr, moved cool roof from **last to first** on cooling per
+rupee, and made the funded set **249 cells, all cool roof**.
+
+Two unit rates, two complete reorderings of the investment priority, no change
+to the satellite data or the model in between. The cooling figures have exactly
+the same leverage and, unlike those two rates, still have nothing behind them.
 
 **Fixing this is the highest-value work available.** A crude first pass — do
 cells WorldCover classifies as tree cover run measurably cooler than adjacent
 built-up cells? — needs no new data.
 
-## 2. Two of the three unit rates are still unvalidated
+## 2. One of the three unit rates is still unvalidated
 
-150 / 400 / 1,150 INR per m² for tree cover / cool roof / green park, at
+150 / 300 / 1,150 INR per m² for tree cover / cool roof / green park, at
 25% / 15% / 10% coverage of a ~8,916 m² cell.
 
 | Rate | Status |
 |---|---|
+| `Cool roof` 300 INR/m² | **Sourced.** Telangana's Cool Roof Policy 2023–28 — India's first — states ₹300/m² for cool roof painting or tiles, recoverable in about two years through energy savings. A state government's own figure for exactly this scope. Ahmedabad's lime wash (~₹16/m², reapplied annually) sits below it; commercial application quoted at ₹970–1,510/m² bundles waterproofing this action does not. |
 | `Green park` 1,150 INR/m² | **Sourced.** Anchored on the lower of two Gujarat AMRUT 2.0 municipal garden projects (₹1,152/m² and ₹2,250/m²), deliberately, because those are ~10,000 m² civic gardens with paths, lighting and boundary walls while this action treats ~892 m² of soft landscaping. |
-| `Tree cover` 150 INR/m² | **Unvalidated.** ≈₹3,750/tree at one tree per 25 m². Bulk Indian plantation runs ₹200–500/tree, but that is rural bulk planting without pits, guards, staking or tanker watering — not a comparable. |
-| `Cool roof` 400 INR/m² | **Unvalidated.** Sits between coating materials at ~₹173/m² and quoted professional application at ₹970–1,510/m², which includes waterproofing this action does not. Neither bounds it. |
+| `Tree cover` 150 INR/m² | **Unvalidated, but bounded below.** ≈₹3,750/tree at one tree per 25 m². Bulk Indian plantation runs ₹200–500/tree, but that is rural bulk planting without pits, guards, staking or tanker watering — not a comparable. Municipal tree-guard tenders alone have run ₹1,280–2,250 *per guard*, before the sapling, so ₹3,750/tree is not obviously wrong. It is 9% of the programme total. |
 
-The total programme cost of ₹2.14 billion is therefore two-thirds assumption.
-Quote it as a scale indicator, never as a budget. No tender, no survey, no
-municipal schedule of rates.
+### The rates decide the answer; the model does not
+
+The greedy ranking sorts on cooling per rupee, so the cost inputs — not the
+regression — choose which cells get funded. The ordering has now flipped twice,
+both times on a cost correction, and never once on a model result:
+
+| | Ordering by cooling per rupee | ₹10 Cr funded set |
+|---|---|---|
+| Original | Green park > Tree cover > Cool roof | park-led |
+| After the park rate was corrected | Tree cover > Green park > Cool roof | 299 tree cover cells |
+| After the cool-roof rate was corrected | **Cool roof > Tree cover > Green park** | **249 cool roof cells** |
+
+Same satellite data, same cooling assumptions, three different recommendations.
+That sensitivity is the honest headline of this project: it is a cost model
+wearing a machine-learning coat. Pinned in
+`tests/test_suitability.py::test_cost_effectiveness_ordering_is_what_the_docs_claim`.
+
+### Cooling is credited to the whole cell; cost is not
+
+Cost scales with `coverage_fraction` — a cool roof is priced for 15% of a cell —
+but `cooling_c` is not. The full 1.0 °C is credited to the entire ~8,918 m²
+cell. That is optimistic, and it is the single largest unstated assumption left
+in the pipeline: scaling cooling by coverage the way cost is scaled would take
+the whole-grid mean drop from ~0.51 °C to roughly 0.1 °C.
+
+It is left as stated rather than fixed because `cooling_c` is a placeholder to
+begin with (§1) — refitting a made-up number to be more internally consistent
+would buy the appearance of rigour, not rigour.
+
+### What the totals mean
+
+- **₹167.5 Cr** is what treating all 4,157 actionable cells would cost. It is an
+  upper bound. Nothing in this repository recommends it, and for scale it is
+  roughly the order of a large chunk of Guwahati Municipal Corporation's annual
+  budget — not a plausible line item.
+- **₹9.99 Cr** is the actual recommendation: the top 249 cells by cooling per
+  rupee, in `Decision-Support/ranking.csv`. It delivers ~1.0 °C on ~2.2 km² of
+  treated area, which is ~0.03 °C spread across the whole 72 km² grid.
+
+Quote either as a scale indicator, never as a budget. No tender, no survey, no
+municipal schedule of rates has been consulted for the tree-cover rate.
 
 ## 3. One scene is one moment
 

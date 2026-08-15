@@ -52,9 +52,21 @@ Full detail, including every column of every file crossing a module boundary, is
 | Grid cells | 8,144 at 100 m |
 | Surface temperature | 20.9 – 33.1 °C (mean 27.0 °C) |
 | Canonical model | RandomForest, R² 0.901, RMSE 0.52 °C (random split) |
-| Actionable cells | 6,108 |
-| Modelled mean drop | −1.20 °C |
-| Notional programme cost | ₹160.5 Cr (placeholder unit rates) |
+| Actionable cells | 4,157 of 8,144 (the rest are water, existing tree cover, or low priority) |
+| Modelled drop, treated cells | −0.99 °C |
+| Modelled drop, whole grid | −0.51 °C |
+| **Recommended programme** | **₹9.99 Cr — 249 cells, all cool roof** |
+| Cost if every actionable cell were treated | ₹167.5 Cr (upper bound, not a proposal) |
+
+Read the two cost lines together. ₹167.5 Cr is what treating all 4,157
+actionable cells would cost; nothing here recommends that. The recommendation
+is the budget-capped set in [`Decision-Support/ranking.csv`](Decision-Support/ranking.csv)
+— ₹10 Cr, 249 cells — chosen greedily by cooling per rupee.
+
+Read the two cooling lines together as well. −0.51 °C is averaged over the
+whole grid including the 3,987 cells nothing is done to; −0.99 °C is averaged
+over the cells actually treated. The larger number is not the more optimistic
+one, it is the more narrowly scoped one.
 
 Cooling values come from the pipeline's own `cooling_c` field and are planning
 assumptions, not measurements — see the honesty notes below.
