@@ -1,16 +1,20 @@
-"""Builds UHI-Presentation.pptx.
+"""Builds UHI-Presentation.pptx — a 10-slide hackathon deck.
 
-The previous deck was 16 slides and 4 MB, most of it dashboard screenshots. This
-one is 9 slides and carries one image: the architecture diagram. Everything else
-is native PowerPoint shapes, so the file stays small and stays editable.
+Structure follows the judging brief: problem, solution, data + architecture,
+key result, live demo, safety and trust, impact, limitations and next step,
+wrapped in a title and a close.
+
+Two rules the deck holds to, because both are credibility risks:
+
+  1. Cooling values are planning assumptions used to compare scenarios, never
+     measured guarantees. Every slide that shows a degree figure says so.
+  2. The model is not the decision-maker. The visible recommendation comes from
+     an auditable rule and cost engine, and the deck says that plainly rather
+     than implying "AI predicts the future".
 
 Palette and type come from frontend/style.css, so the deck and the dashboard it
-describes look like the same product.
-
-Figures are read from shared/constants.json, frontend/data/release.json and the
-ML metrics where possible, so a pipeline re-run cannot silently leave the deck
-quoting stale numbers. Anything not machine-readable is listed in FIGURES below
-with the document it came from.
+describes look like the same product. Figures are read from the pipeline's own
+outputs where possible; the rest are in FIGURES with their source.
 
     python presentation/build_deck.py
 """
@@ -20,10 +24,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from lxml import etree
 from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
+from pptx.oxml.ns import qn
 from pptx.util import Emu, Inches, Pt
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -58,6 +64,14 @@ DATA = "Fira Code"
 W, H = Inches(13.333), Inches(7.5)
 MARGIN = Inches(0.72)
 
+REPO = "https://github.com/ankamteja/urban-heat-island-mitigation-simulation"
+LINKS = {
+    "repo": REPO,
+    "docs": f"{REPO}/tree/main/docs",
+    "site": "https://urban-heat-island-mitigation-simula.vercel.app",
+    "dashboard": "https://urban-heat-island-mitigation-simula.vercel.app/frontend",
+}
+
 
 # ------------------------------------------------------------------ figures ---
 def load_figures() -> dict:
@@ -79,22 +93,46 @@ def load_figures() -> dict:
 
 
 # Figures with no machine-readable source, and where each one comes from.
-# If one of these changes, change it here and re-run.
 FIGURES = {
     "mean_lst": "27.0",          # STATUS.md / index.html
     "peak_lst": "33.2",          # index.html
     "mean_ndvi": "0.449",        # Machine Learning & Prediction/README.md
-    "r2_random": "0.895",        # metrics.json, random split
     "r2_blocked": "0.513",       # metrics.json, spatial-block split
     "funded_cr": "9.99",         # Decision-Support/ranking.csv, capped at 10 Cr
     "funded_cells": "249",       # ditto
     "drop_treated": "0.99",      # docs/08-limitations.md
     "drop_grid": "0.51",         # ditto
-    "deploy_url": "urban-heat-island-mitigation-simula.vercel.app",  # README.md
+    "tests": "133",              # pytest tests/
+    "excluded_green": "3,752",   # STATUS.md, already tree cover
+    "excluded_water": "193",     # STATUS.md, 149 water + 44 wetland
 }
 
 
 # ------------------------------------------------------------- primitives ---
+HLINK_CLR_NS = "http://schemas.microsoft.com/office/drawing/2018/hyperlinkcolor"
+HLINK_EXT_URI = "{A12FA001-AC4F-418D-AE19-62706E023703}"
+
+
+def link_uses_text_colour(run):
+    """Stop PowerPoint repainting a link run in theme blue with an underline.
+
+    A run's own <a:solidFill> loses to the theme's hyperlink colour, so setting
+    font.color alone has no visible effect. The 2018 hlinkClr extension is the
+    supported way to say "use the text colour", which is what keeps the links on
+    the deck's palette instead of Office default blue.
+    """
+    rPr = run._r.get_or_add_rPr()
+    rPr.set("u", "none")
+    hlink = rPr.find(qn("a:hlinkClick"))
+    if hlink is None:
+        return
+    ext_lst = etree.SubElement(hlink, qn("a:extLst"))
+    ext = etree.SubElement(ext_lst, qn("a:ext"))
+    ext.set("uri", HLINK_EXT_URI)
+    clr = etree.SubElement(ext, f"{{{HLINK_CLR_NS}}}hlinkClr")
+    clr.set("val", "tx")
+
+
 def add_slide(prs: Presentation):
     s = prs.slides.add_slide(prs.slide_layouts[6])  # blank
     bg = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, W, H)
@@ -107,7 +145,10 @@ def add_slide(prs: Presentation):
 
 def text(slide, x, y, w, h, runs, *, align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP,
          line_spacing=None, space_after=0):
-    """runs: list of (string, size_pt, colour, bold, font) or list-of-lists for paragraphs."""
+    """runs: (body, size, colour, bold, font) or (..., font, link) per chunk.
+
+    A list of chunks is one paragraph; a list of lists is several.
+    """
     box = slide.shapes.add_textbox(x, y, w, h)
     tf = box.text_frame
     tf.word_wrap = True
@@ -122,13 +163,17 @@ def text(slide, x, y, w, h, runs, *, align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP,
             p.line_spacing = line_spacing
         p.space_after = Pt(space_after)
         for chunk in para:
-            body, size, colour, bold, font = chunk
+            body, size, colour, bold, font = chunk[:5]
+            link = chunk[5] if len(chunk) > 5 else None
             r = p.add_run()
             r.text = body
             r.font.size = Pt(size)
-            r.font.color.rgb = colour
             r.font.bold = bold
             r.font.name = font
+            r.font.color.rgb = colour
+            if link:
+                r.hyperlink.address = link
+                link_uses_text_colour(r)
     return box
 
 
@@ -137,17 +182,22 @@ def eyebrow(slide, label):
          [(label.upper(), 11, ACCENT, True, DATA)])
 
 
-def heading(slide, title, sub=None):
-    text(slide, MARGIN, Inches(0.98), Inches(11.4), Inches(0.9),
-         [(title, 40, FG, True, UI)])
+def heading(slide, title, sub=None, *, size=40):
+    text(slide, MARGIN, Inches(0.98), Inches(11.9), Inches(0.9),
+         [(title, size, FG, True, UI)])
     if sub:
-        text(slide, MARGIN, Inches(1.86), Inches(10.4), Inches(0.5),
+        text(slide, MARGIN, Inches(1.86), Inches(10.8), Inches(0.5),
              [(sub, 15, MUTED, False, UI)], line_spacing=1.35)
 
 
-def footer(slide, n, total):
-    text(slide, MARGIN, Inches(6.86), Inches(7), Inches(0.3),
-         [("URBAN HEAT ISLAND MITIGATION · GUWAHATI", 9, DIM, False, DATA)])
+def footer(slide, n, total, *, link=None, link_label=None):
+    if link:
+        text(slide, MARGIN, Inches(6.86), Inches(9), Inches(0.3),
+             [("↗ ", 9, ACCENT, False, DATA),
+              (link_label or link, 9, ACCENT, False, DATA, link)])
+    else:
+        text(slide, MARGIN, Inches(6.86), Inches(7), Inches(0.3),
+             [("URBAN HEAT ISLAND MITIGATION · GUWAHATI", 9, DIM, False, DATA)])
     text(slide, Inches(10.6), Inches(6.86), Inches(2.05), Inches(0.3),
          [(f"{n} / {total}", 9, DIM, False, DATA)], align=PP_ALIGN.RIGHT)
 
@@ -168,14 +218,12 @@ def card(slide, x, y, w, h, *, fill=SURFACE, line=None, line_w=1.0):
 
 
 def stat(slide, x, y, w, value, label, *, colour=FG, value_pt=34):
-    """One big number over a small mono caption."""
-    text(slide, x, y, w, Inches(0.62),
-         [(value, value_pt, colour, True, UI)])
+    text(slide, x, y, w, Inches(0.62), [(value, value_pt, colour, True, UI)])
     text(slide, x, y + Inches(0.62), w, Inches(0.3),
          [(label.upper(), 9.5, DIM, False, DATA)])
 
 
-def rule(slide, x, y, w, colour=RGBColor(0x1F, 0x2A, 0x40)):
+def rule(slide, x, y, w, colour=SURFACE_3):
     ln = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, x, y, w, Emu(9525))
     ln.fill.solid()
     ln.fill.fore_color.rgb = colour
@@ -184,12 +232,21 @@ def rule(slide, x, y, w, colour=RGBColor(0x1F, 0x2A, 0x40)):
     return ln
 
 
+def claim(slide, y, body, *, colour=ACCENT, size=17):
+    """The one-line assertion a judge should leave the slide with."""
+    bar = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, MARGIN, y, Inches(0.05), Inches(0.62))
+    bar.fill.solid()
+    bar.fill.fore_color.rgb = colour
+    bar.line.fill.background()
+    bar.shadow.inherit = False
+    text(slide, MARGIN + Inches(0.28), y + Inches(0.04), Inches(11.4), Inches(0.6),
+         [(body, size, colour, False, UI)], line_spacing=1.35)
+
+
 # ----------------------------------------------------------------- slides ---
 def slide_title(prs, f, n, total):
     s = add_slide(prs)
 
-    # heat ramp as a rule across the top — the deck's one piece of decoration,
-    # and it is the dashboard's actual colour scale.
     seg = W / len(RAMP)
     for i, c in enumerate(RAMP):
         bar = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, int(seg * i), 0, int(seg) + 1, Inches(0.09))
@@ -198,337 +255,320 @@ def slide_title(prs, f, n, total):
         bar.line.fill.background()
         bar.shadow.inherit = False
 
-    text(s, MARGIN, Inches(1.5), Inches(9), Inches(0.3),
+    text(s, MARGIN, Inches(1.24), Inches(9), Inches(0.3),
          [("REMOTE SENSING · DECISION SUPPORT · URBAN PLANNING", 11, ACCENT, True, DATA)])
-    text(s, MARGIN, Inches(2.1), Inches(10.6), Inches(1.9),
-         [[("Urban Heat Island", 60, FG, True, UI)],
-          [("Mitigation Simulation", 60, MUTED, False, UI)]], line_spacing=1.02)
-    text(s, MARGIN, Inches(4.34), Inches(8.6), Inches(0.7),
-         [("A screening and prioritisation pipeline that turns Landsat thermal "
-           "imagery into a ranked, costed shortlist of 100 m cells.", 15, MUTED, False, UI)],
+    text(s, MARGIN, Inches(1.82), Inches(11.4), Inches(1.7),
+         [[("Urban Heat Island", 56, FG, True, UI)],
+          [("Mitigation Simulation", 56, MUTED, False, UI)]], line_spacing=1.02)
+
+    text(s, MARGIN, Inches(3.96), Inches(11.2), Inches(0.9),
+         [("We turn satellite-derived urban heat data into a ", 18, FG, False, UI),
+          ("safe, ranked, cost-aware mitigation plan", 18, ACCENT, True, UI),
+          (" that a city planner can explore immediately.", 18, FG, False, UI)],
          line_spacing=1.4)
 
-    rule(s, MARGIN, Inches(5.34), Inches(11.9))
+    rule(s, MARGIN, Inches(5.16), Inches(11.9))
 
     cols = [
-        (f"{f['cells']:,}", "grid cells"),
-        ("100 m", "resolution"),
-        (f"{FIGURES['peak_lst']} °C", "peak hotspot"),
-        ("Landsat 8", "source"),
+        (f"{f['cells']:,}", "cells mapped"),
+        (f"{f['treatable']:,}", "actionable"),
+        (f"₹{FIGURES['funded_cr']} Cr", "ranked shortlist"),
+        (FIGURES["funded_cells"], "cells funded"),
     ]
     for i, (v, l) in enumerate(cols):
-        stat(s, MARGIN + Inches(3.0) * i, Inches(5.62), Inches(2.8), v, l, value_pt=26)
+        stat(s, MARGIN + Inches(3.0) * i, Inches(5.44), Inches(2.8), v, l, value_pt=26)
 
+    text(s, MARGIN, Inches(6.86), Inches(11.9), Inches(0.3),
+         [("↗ live dashboard  ", 10, ACCENT, False, DATA, LINKS["dashboard"]),
+          ("   ·   ", 10, DIM, False, DATA),
+          ("↗ source", 10, ACCENT, False, DATA, LINKS["repo"])])
+    text(s, Inches(10.6), Inches(6.86), Inches(2.05), Inches(0.3),
+         [(f"{n} / {total}", 9, DIM, False, DATA)], align=PP_ALIGN.RIGHT)
+
+
+def slide_problem(prs, f, n, total):
+    s = add_slide(prs)
+    eyebrow(s, "01 — the problem")
+    heading(s, "Heat is uneven. Budgets are not infinite.")
+
+    png = ASSETS / "dash-overview.jpg"
+    if png.exists():
+        s.shapes.add_picture(str(png), Inches(6.2), Inches(1.98), width=Inches(6.42))
+
+    text(s, MARGIN, Inches(2.06), Inches(5.1), Inches(2.6),
+         [("Guwahati's surface temperature spans "
+           f"{FIGURES['mean_lst']} °C on average and peaks at {FIGURES['peak_lst']} °C — "
+           "and the hot ground is not where you would guess. It clusters, block "
+           "by block, on built-up surface.", 15, FG, False, UI)], line_spacing=1.45)
+
+    text(s, MARGIN, Inches(4.06), Inches(5.1), Inches(1.6),
+         [("A city cannot cool every block. It has to choose a few hundred, "
+           "defend the choice, and price it.", 15, MUTED, False, UI)],
+         line_spacing=1.45)
+
+    claim(s, Inches(5.42),
+          "Choosing well needs a map at the scale of the decision — 100 m, not district averages.")
     footer(s, n, total)
 
 
-def slide_positioning(prs, f, n, total):
+def slide_solution(prs, f, n, total):
     s = add_slide(prs)
-    eyebrow(s, "01 — positioning")
-    heading(s, "What this is, and what it is not",
-            "Naming it precisely matters more than naming it ambitiously.")
+    eyebrow(s, "02 — the solution")
+    heading(s, "Four steps, each one auditable")
 
-    y = Inches(2.62)
-    h = Inches(2.5)
-    w = Inches(5.72)
-
-    card(s, MARGIN, y, w, h, line=SUCCESS, line_w=1.25)
-    text(s, MARGIN + Inches(0.4), y + Inches(0.34), w - Inches(0.8), Inches(0.3),
-         [("WHAT IT IS", 10.5, SUCCESS, True, DATA)])
-    text(s, MARGIN + Inches(0.4), y + Inches(0.82), w - Inches(0.8), Inches(1.5),
-         [("A city-wide heat screening and prioritisation pipeline. It measures "
-           "where Guwahati is hottest, ranks 8,144 cells, and prices a shortlist "
-           "against a budget.", 14, FG, False, UI)], line_spacing=1.4)
-
-    x2 = MARGIN + w + Inches(0.46)
-    card(s, x2, y, w, h, line=DANGER, line_w=1.25)
-    text(s, x2 + Inches(0.4), y + Inches(0.34), w - Inches(0.8), Inches(0.3),
-         [("WHAT IT IS NOT", 10.5, DANGER, True, DATA)])
-    text(s, x2 + Inches(0.4), y + Inches(0.82), w - Inches(0.8), Inches(1.5),
-         [("A physical simulation. Nothing models heat transfer, evapotranspiration "
-           "or albedo response. The post-mitigation map is arithmetic on assumed "
-           "constants.", 14, FG, False, UI)], line_spacing=1.4)
-
-    text(s, MARGIN, Inches(5.5), Inches(11.9), Inches(0.5),
-         [("The measurement layer is real and tested. The intervention layer is a "
-           "placeholder we can now describe exactly.", 13.5, MUTED, False, UI)])
-    footer(s, n, total)
-
-
-def slide_data(prs, f, n, total):
-    s = add_slide(prs)
-    eyebrow(s, "02 — the data")
-    heading(s, f"{f['cells']:,} cells, one thermal snapshot",
-            "Earth Engine composites Landsat 8 surface temperature, NDVI, NDBI and "
-            "ESA WorldCover land cover onto a 100 m grid.")
-
-    stats = [
-        (f"{f['cells']:,}", "grid cells", FG),
-        (f"{FIGURES['mean_lst']} °C", "mean LST", FG),
-        (f"{FIGURES['peak_lst']} °C", "peak hotspot", RAMP[4]),
-        (FIGURES["mean_ndvi"], "mean NDVI", SUCCESS),
+    steps = [
+        ("SATELLITE", "Landsat 8 + ESA\nWorldCover", PRIMARY),
+        ("HEAT-RISK GRID", f"{f['cells']:,} cells\nat 100 m", RAMP[3]),
+        ("SUITABILITY RULES", "gated on real\nland cover", SUCCESS),
+        ("RANKED PLAN", "cooling per rupee,\ncapped at budget", ACCENT),
     ]
-    for i, (v, l, c) in enumerate(stats):
-        stat(s, MARGIN + Inches(3.0) * i, Inches(2.72), Inches(2.8), v, l, colour=c)
 
-    rule(s, MARGIN, Inches(3.94), Inches(11.9))
+    y = Inches(2.6)
+    cw, gap = Inches(2.72), Inches(0.36)
+    for i, (label, body, colour) in enumerate(steps):
+        x = MARGIN + (cw + gap) * i
+        card(s, x, y, cw, Inches(1.98), fill=SURFACE,
+             line=colour if colour == ACCENT else None, line_w=1.25)
+        tab = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, x, y, cw, Inches(0.05))
+        tab.fill.solid()
+        tab.fill.fore_color.rgb = colour
+        tab.line.fill.background()
+        tab.shadow.inherit = False
 
-    text(s, MARGIN, Inches(4.24), Inches(11.9), Inches(0.3),
-         [("RECOMMENDED ACTION, ALL CELLS", 10, DIM, False, DATA)])
+        text(s, x + Inches(0.3), y + Inches(0.34), cw - Inches(0.6), Inches(0.3),
+             [(label, 10, colour, True, DATA)])
+        text(s, x + Inches(0.3), y + Inches(0.82), cw - Inches(0.6), Inches(1.0),
+             [(body, 14, FG, False, UI)], line_spacing=1.35)
 
-    order = ["Cool roof", "Tree cover", "Green park", "None"]
-    colours = {"Cool roof": PRIMARY, "Tree cover": SUCCESS,
-               "Green park": RGBColor(0x4A, 0xDE, 0x80), "None": DIM}
-    total_cells = f["cells"]
-    x = MARGIN
-    bar_y = Inches(4.68)
-    bar_w = Inches(11.9)
-    for name in order:
-        v = f["counts"][name]
-        seg_w = int(bar_w * v / total_cells)
-        seg = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, x, bar_y, seg_w, Inches(0.4))
-        seg.fill.solid()
-        seg.fill.fore_color.rgb = colours[name]
-        seg.line.fill.background()
-        seg.shadow.inherit = False
-        x += seg_w
+        if i < len(steps) - 1:
+            text(s, x + cw, y + Inches(0.82), gap, Inches(0.4),
+                 [("→", 16, DIM, False, UI)], align=PP_ALIGN.CENTER)
 
-    lx = MARGIN
-    for name in order:
-        v = f["counts"][name]
-        dot = s.shapes.add_shape(MSO_SHAPE.OVAL, lx, Inches(5.32), Inches(0.13), Inches(0.13))
-        dot.fill.solid()
-        dot.fill.fore_color.rgb = colours[name]
-        dot.line.fill.background()
-        dot.shadow.inherit = False
-        text(s, lx + Inches(0.24), Inches(5.26), Inches(2.6), Inches(0.3),
-             [(f"{name}  ", 12, FG, False, UI), (f"{v:,}", 12, MUTED, False, DATA)])
-        lx += Inches(2.9)
+    text(s, MARGIN, Inches(5.02), Inches(11.9), Inches(0.9),
+         [("No step is a black box. Every funded cell can be traced back to its "
+           "temperature, its land cover, the rule that admitted it and the rate "
+           "that priced it.", 15, FG, False, UI)], line_spacing=1.45)
 
-    text(s, MARGIN, Inches(5.86), Inches(11.9), Inches(0.6),
-         [("Interventions are gated on real ESA WorldCover land cover: nothing is "
-           "proposed on water, wetland or existing tree cover. That gate is why "
-           f"{f['counts']['None']:,} cells receive no action.", 13, MUTED, False, UI)],
-         line_spacing=1.4)
+    claim(s, Inches(5.94),
+          "Decision support, not prediction — the planner stays in the loop at every step.")
     footer(s, n, total)
 
 
 def slide_architecture(prs, f, n, total):
     s = add_slide(prs)
-    eyebrow(s, "03 — architecture")
-    heading(s, "Four modules — and where the model is not")
+    eyebrow(s, "03 — data and architecture")
+    heading(s, "Real data in, auditable plan out")
 
     png = ASSETS / "architecture.png"
     if png.exists():
-        # Size on width and let the 1440x560 canvas land clear of the footer.
-        pic_w = Inches(11.9)
-        s.shapes.add_picture(str(png), MARGIN, Inches(2.24), width=pic_w)
+        s.shapes.add_picture(str(png), MARGIN, Inches(2.24), width=Inches(11.9))
     else:
         text(s, MARGIN, Inches(3.0), Inches(11.9), Inches(0.4),
-             [("architecture.png missing — run the render step in presentation/README.md",
+             [("architecture.png missing — see presentation/README.md",
                13, DANGER, False, DATA)])
-    footer(s, n, total)
+    footer(s, n, total, link=LINKS["docs"], link_label="full technical docs")
 
 
-def slide_model(prs, f, n, total):
+def slide_result(prs, f, n, total):
     s = add_slide(prs)
-    eyebrow(s, "04 — machine learning")
-    heading(s, "Two scores, and we quote the lower one")
-
-    y = Inches(2.66)
-    card(s, MARGIN, y, Inches(5.72), Inches(1.86), fill=SURFACE)
-    text(s, MARGIN + Inches(0.4), y + Inches(0.32), Inches(5), Inches(0.6),
-         [(f"R² {FIGURES['r2_random']}", 38, MUTED, True, UI)])
-    text(s, MARGIN + Inches(0.4), y + Inches(1.06), Inches(5), Inches(0.5),
-         [("random split — what a naive report would quote", 12.5, DIM, False, UI)])
-
-    x2 = MARGIN + Inches(6.18)
-    card(s, x2, y, Inches(5.72), Inches(1.86), fill=SURFACE, line=ACCENT, line_w=1.25)
-    text(s, x2 + Inches(0.4), y + Inches(0.32), Inches(5), Inches(0.6),
-         [(f"R² {FIGURES['r2_blocked']}", 38, ACCENT, True, UI)])
-    text(s, x2 + Inches(0.4), y + Inches(1.06), Inches(5), Inches(0.5),
-         [("spatial-block split — the honest score", 12.5, MUTED, False, UI)])
-
-    text(s, MARGIN, Inches(4.96), Inches(11.9), Inches(1.2),
-         [("Adjacent 100 m cells are near-duplicates, so a random split leaks most "
-           "test answers through their neighbours. The blocked score is what the "
-           "model would do on ground it has not seen.", 15, FG, False, UI)],
-         line_spacing=1.45)
-    text(s, MARGIN, Inches(5.92), Inches(11.9), Inches(0.5),
-         [("And nothing downstream consumes either number — the plan comes from the "
-           "rule engine, not the model.", 13.5, DANGER, False, UI)])
-    footer(s, n, total)
-
-
-def slide_recommendation(prs, f, n, total):
-    s = add_slide(prs)
-    eyebrow(s, "05 — the recommendation")
-    heading(s, "₹10 crore buys 249 roofs",
-            "Every actionable cell is ranked on cooling per rupee, then funded until "
+    eyebrow(s, "04 — key result")
+    heading(s, "₹10 crore, spent where it is defensible",
+            "Every actionable cell ranked on cooling per rupee, then funded until "
             "the budget runs out.")
 
-    y = Inches(2.72)
     items = [
-        (f"{f['treatable']:,}", "cells treatable", FG),
-        (f"₹{f['upper_bound_cr']:.1f} Cr", "cost if all treated", MUTED),
-        (f"₹{FIGURES['funded_cr']} Cr", "recommended spend", ACCENT),
+        (f"{f['cells']:,}", "cells mapped", FG),
+        (f"{f['treatable']:,}", "actionable after safety rules", FG),
+        (f"₹{FIGURES['funded_cr']} Cr", "ranked shortlist", ACCENT),
         (FIGURES["funded_cells"], "cells funded", ACCENT),
     ]
     for i, (v, l, c) in enumerate(items):
-        stat(s, MARGIN + Inches(3.0) * i, y, Inches(2.8), v, l, colour=c, value_pt=32)
+        stat(s, MARGIN + Inches(3.0) * i, Inches(2.72), Inches(2.9), v, l,
+             colour=c, value_pt=32)
 
-    rule(s, MARGIN, Inches(4.02), Inches(11.9))
+    rule(s, MARGIN, Inches(4.08), Inches(11.9))
 
-    text(s, MARGIN, Inches(4.34), Inches(5.6), Inches(1.5),
+    text(s, MARGIN, Inches(4.4), Inches(5.6), Inches(1.2),
          [[("−%s °C" % FIGURES["drop_treated"], 26, FG, True, UI)],
-          [("assumed drop on treated cells", 12, DIM, False, DATA)]], line_spacing=1.2)
-    text(s, MARGIN + Inches(6.18), Inches(4.34), Inches(5.6), Inches(1.5),
+          [("modelled drop on treated cells", 12, DIM, False, DATA)]], line_spacing=1.2)
+    text(s, MARGIN + Inches(6.18), Inches(4.4), Inches(5.6), Inches(1.2),
          [[("−%s °C" % FIGURES["drop_grid"], 26, MUTED, True, UI)],
-          [("same programme, averaged over the whole grid", 12, DIM, False, DATA)]],
+          [("same plan, averaged over the whole grid", 12, DIM, False, DATA)]],
          line_spacing=1.2)
 
-    text(s, MARGIN, Inches(5.72), Inches(11.9), Inches(0.8),
-         [("Both numbers describe the same plan. Quoting the first alone overstates "
-           "what the city feels; quoting the second next to a crore-scale cost "
-           "understates what the money buys. The dashboard names the denominator on "
-           "each.", 13, MUTED, False, UI)], line_spacing=1.4)
+    claim(s, Inches(5.66),
+          "Cooling values are planning assumptions used to compare scenarios, "
+          "not measured guarantees.", colour=DANGER, size=15)
     footer(s, n, total)
 
 
-def slide_real(prs, f, n, total):
+def slide_demo(prs, f, n, total):
     s = add_slide(prs)
-    eyebrow(s, "06 — what is real")
-    heading(s, "Real, qualified, placeholder")
+    eyebrow(s, "05 — interactive demo")
+    heading(s, "Select an area. See both surfaces.")
+
+    png = ASSETS / "dash-compare.jpg"
+    if png.exists():
+        # Height-constrained: the space under the heading is ~4.3in, so sizing on
+        # width would run the image off the bottom of the slide.
+        pic_h = Inches(4.32)
+        pic_w = Inches(4.32 * 1600 / 838)
+        s.shapes.add_picture(str(png), int((W - pic_w) / 2), Inches(1.98),
+                             width=int(pic_w), height=int(pic_h))
+
+    text(s, MARGIN, Inches(6.46), Inches(11.9), Inches(0.4),
+         [("Current surface on the left, planning scenario on the right — with the "
+           "selection's cell count, mean temperature and cost read out live.",
+           13, MUTED, False, UI)], align=PP_ALIGN.CENTER)
+    footer(s, n, total, link=LINKS["dashboard"], link_label="try it live")
+
+
+def slide_safety(prs, f, n, total):
+    s = add_slide(prs)
+    eyebrow(s, "06 — safety and trust")
+    heading(s, "The rules that stop a bad recommendation")
 
     blocks = [
-        ("REAL", SUCCESS,
-         "Corrected Earth Engine export: NDVI to 0.781, real ESA WorldCover, NDBI "
-         "and Vegetation. Land-cover-gated recommendations. 133 tests, and CI "
-         "regenerates every artefact."),
-        ("QUALIFIED", ACCENT,
-         "The model. R² 0.895 random, 0.513 blocked — and nothing downstream "
-         "consumes it. It reports; it does not decide."),
-        ("PLACEHOLDER", DANGER,
-         "Every cooling value, and one of three unit rates. The °C figures were "
-         "never fitted to Guwahati or validated against a field trial."),
+        ("NO WORK ON WATER OR WETLAND", SUCCESS,
+         f"{FIGURES['excluded_water']} water and wetland cells are excluded in code, "
+         "not by convention. ESA WorldCover land cover gates every measure."),
+        ("NO PLANTING ON EXISTING CANOPY", SUCCESS,
+         f"{FIGURES['excluded_green']} cells already classified as tree cover receive "
+         "no planting recommendation. The gate is asserted by tests."),
+        ("REPRODUCIBLE AND OPEN", PRIMARY,
+         f"{FIGURES['tests']} passing tests. CI regenerates every artefact and fails "
+         "if a committed copy differs. MIT licensed, data attributed in NOTICE.md."),
     ]
     w = Inches(3.76)
     for i, (label, colour, body) in enumerate(blocks):
         x = MARGIN + (w + Inches(0.31)) * i
-        card(s, x, Inches(2.62), w, Inches(2.86), fill=SURFACE)
-        tab = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, x, Inches(2.62), Inches(0.05), Inches(2.86))
+        card(s, x, Inches(2.5), w, Inches(2.72), fill=SURFACE)
+        tab = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, x, Inches(2.5), Inches(0.05), Inches(2.72))
         tab.fill.solid()
         tab.fill.fore_color.rgb = colour
         tab.line.fill.background()
         tab.shadow.inherit = False
-        text(s, x + Inches(0.36), Inches(2.94), w - Inches(0.7), Inches(0.3),
-             [(label, 10.5, colour, True, DATA)])
-        text(s, x + Inches(0.36), Inches(3.42), w - Inches(0.7), Inches(1.8),
+        text(s, x + Inches(0.34), Inches(2.8), w - Inches(0.68), Inches(0.5),
+             [(label, 10, colour, True, DATA)], line_spacing=1.3)
+        text(s, x + Inches(0.34), Inches(3.42), w - Inches(0.68), Inches(1.7),
              [(body, 13, FG, False, UI)], line_spacing=1.4)
 
-    text(s, MARGIN, Inches(5.86), Inches(11.9), Inches(0.5),
-         [("STATUS.md and docs/08-limitations.md name every assumption in the "
-           "repository itself.", 13, MUTED, False, UI)])
-    footer(s, n, total)
+    claim(s, Inches(5.52),
+          "A tool a city can act on has to be wrong safely. These rules are the "
+          "difference between a demo and a proposal.")
+    footer(s, n, total, link=LINKS["docs"], link_label="limitations and data contracts")
 
 
-def slide_gap(prs, f, n, total):
+def slide_impact(prs, f, n, total):
     s = add_slide(prs)
-    eyebrow(s, "07 — the structural gap")
-    heading(s, "The rates decide the answer, not the model")
+    eyebrow(s, "07 — impact")
+    heading(s, "What a planner can do on Monday")
 
-    text(s, MARGIN, Inches(2.5), Inches(11.9), Inches(1.2),
-         [("Cooling per rupee has been reordered twice. Both times it was a cost "
-           "correction, never a model result — and each reordering replaced the "
-           "funded set wholesale.", 17, FG, False, UI)], line_spacing=1.45)
-
-    y = Inches(3.9)
-    steps = [
-        ("Park rate was 5–9× too low", "parks led the ranking", DIM),
-        ("Cool-roof rate was 33% too high", "trees led the ranking", DIM),
-        ("Both corrected", "cool roof leads by 4%", ACCENT),
+    rows = [
+        ("Compare, not guess",
+         "Draw a box over any ward and get its cell count, mean temperature, "
+         "eligible measures and cost — in seconds, not a procurement cycle."),
+        ("Defend the shortlist",
+         "Every funded cell carries its temperature, land cover, measure and price. "
+         "The ranking is reproducible from the repository."),
+        ("Re-run when the data moves",
+         "A scheduled Earth Engine refresh regenerates the grid; the release "
+         "manifest ties the dashboard to an exact dataset."),
     ]
-    w = Inches(3.76)
-    for i, (cause, effect, colour) in enumerate(steps):
-        x = MARGIN + (w + Inches(0.31)) * i
-        card(s, x, y, w, Inches(1.62), fill=SURFACE,
-             line=ACCENT if colour == ACCENT else None, line_w=1.25)
-        text(s, x + Inches(0.34), y + Inches(0.3), w - Inches(0.68), Inches(0.6),
-             [(cause, 13, MUTED, False, UI)], line_spacing=1.3)
-        text(s, x + Inches(0.34), y + Inches(0.94), w - Inches(0.68), Inches(0.5),
-             [(effect, 14.5, colour if colour == ACCENT else FG, True, UI)])
+    y = Inches(2.5)
+    for title, body in rows:
+        text(s, MARGIN, y, Inches(3.5), Inches(0.4), [(title, 18, ACCENT, True, UI)])
+        text(s, MARGIN + Inches(3.8), y + Inches(0.02), Inches(8.1), Inches(0.8),
+             [(body, 14, FG, False, UI)], line_spacing=1.4)
+        y += Inches(1.16)
 
-    text(s, MARGIN, Inches(5.86), Inches(11.9), Inches(0.6),
-         [("A 4% lead sits inside the error of a rate nobody has validated. Treat "
-           "the funded set as approximately right, not decisively right.",
-           13.5, DANGER, False, UI)], line_spacing=1.4)
+    rule(s, MARGIN, Inches(5.92), Inches(11.9))
+    claim(s, Inches(6.08),
+          "The output is a shortlist a committee can argue with — which is what "
+          "makes it usable.")
     footer(s, n, total)
 
 
-def slide_roadmap(prs, f, n, total):
+def slide_limits(prs, f, n, total):
     s = add_slide(prs)
-    eyebrow(s, "08 — roadmap")
-    heading(s, "Three moves, in order of decision value")
+    eyebrow(s, "08 — limitations and next step")
+    heading(s, "What we would validate first")
 
-    items = [
-        ("01", "Put ranges on every rate",
-         "Run the ranking over a scenario grid and report which cells stay funded. "
-         "One uncertain number should not silently determine a ₹10 crore shortlist."),
-        ("02", "Calibrate cooling against our own data",
-         "Guwahati already has parks. Compare their LST against matched built-up "
-         "cells nearby. Turns a placeholder constant into a local estimate."),
-        ("03", "Close the loop, or drop the claim",
-         "Either let the model drive the recommendation and prove it helps on "
-         "held-out ground, or state plainly that it is diagnostic only."),
-    ]
-    y = Inches(2.46)
-    for num, title, body in items:
-        text(s, MARGIN, y, Inches(0.9), Inches(0.5),
-             [(num, 24, ACCENT, True, DATA)])
-        text(s, MARGIN + Inches(1.0), y - Inches(0.02), Inches(10.7), Inches(0.4),
-             [(title, 19, FG, True, UI)])
-        text(s, MARGIN + Inches(1.0), y + Inches(0.44), Inches(10.4), Inches(0.7),
-             [(body, 13.5, MUTED, False, UI)], line_spacing=1.4)
-        y += Inches(1.36)
+    y = Inches(2.44)
+    card(s, MARGIN, y, Inches(5.72), Inches(2.4), fill=SURFACE, line=DANGER, line_w=1.25)
+    text(s, MARGIN + Inches(0.4), y + Inches(0.32), Inches(5), Inches(0.3),
+         [("KNOWN LIMITATION", 10, DANGER, True, DATA)])
+    text(s, MARGIN + Inches(0.4), y + Inches(0.8), Inches(4.94), Inches(1.4),
+         [("Cooling values are planning assumptions, never fitted to Guwahati or "
+           "validated against a field trial. One of three unit rates is still "
+           "unanchored. The analysis is one thermal snapshot.",
+           14, FG, False, UI)], line_spacing=1.4)
 
-    rule(s, MARGIN, Inches(6.5), Inches(11.9))
-    footer(s, n, total)
+    x2 = MARGIN + Inches(6.18)
+    card(s, x2, y, Inches(5.72), Inches(2.4), fill=SURFACE, line=SUCCESS, line_w=1.25)
+    text(s, x2 + Inches(0.4), y + Inches(0.32), Inches(5), Inches(0.3),
+         [("NEXT STEP", 10, SUCCESS, True, DATA)])
+    text(s, x2 + Inches(0.4), y + Inches(0.8), Inches(4.94), Inches(1.4),
+         [("Validate cooling with repeated observations: compare existing parks "
+           "and canopy against matched built-up cells across seasons, then replace "
+           "each constant with a local estimate and a range.",
+           14, FG, False, UI)], line_spacing=1.4)
+
+    text(s, MARGIN, Inches(5.24), Inches(11.9), Inches(0.8),
+         [("We publish the limitations because a planning tool that hides them is "
+           "worse than no tool. The measurement layer is real and tested; the "
+           "intervention layer is a placeholder we can now describe exactly — which "
+           "is the prerequisite for fixing it.", 14, MUTED, False, UI)],
+         line_spacing=1.45)
+
+    footer(s, n, total, link=LINKS["docs"], link_label="every assumption, documented")
 
 
 def slide_close(prs, f, n, total):
     s = add_slide(prs)
 
-    text(s, MARGIN, Inches(2.32), Inches(11), Inches(2.2),
-         [[("Measure honestly.", 46, FG, True, UI)],
-          [("Calibrate locally.", 46, MUTED, False, UI)],
-          [("Then optimise.", 46, DIM, False, UI)]], line_spacing=1.14)
+    text(s, MARGIN, Inches(1.96), Inches(11.4), Inches(1.6),
+         [("From satellite pixels to a", 40, MUTED, False, UI)])
+    text(s, MARGIN, Inches(2.66), Inches(11.4), Inches(1.6),
+         [("defensible urban cooling shortlist.", 40, FG, True, UI)])
 
-    rule(s, MARGIN, Inches(5.2), Inches(11.9))
+    rule(s, MARGIN, Inches(3.92), Inches(11.9))
 
-    text(s, MARGIN, Inches(5.5), Inches(7.6), Inches(0.7),
-         [("The measurement layer is real, corrected and tested. The intervention "
-           "layer is a placeholder we can now describe exactly — which is the "
-           "prerequisite for fixing it.", 14, MUTED, False, UI)], line_spacing=1.4)
+    cols = [
+        ("Live site", LINKS["site"], "urban-heat-island-mitigation-simula.vercel.app"),
+        ("Dashboard", LINKS["dashboard"], ".../frontend"),
+        ("Source", LINKS["repo"], "github.com/ankamteja/…-simulation"),
+        ("Docs", LINKS["docs"], ".../tree/main/docs"),
+    ]
+    y = Inches(4.26)
+    for i, (label, url, shown) in enumerate(cols):
+        x = MARGIN + Inches(3.0) * i
+        text(s, x, y, Inches(2.85), Inches(0.3),
+             [(label.upper(), 9.5, DIM, False, DATA)])
+        text(s, x, y + Inches(0.32), Inches(2.85), Inches(0.7),
+             [("↗ ", 11, ACCENT, False, DATA, url),
+              (shown, 11, ACCENT, False, DATA, url)], line_spacing=1.3)
 
-    text(s, Inches(8.7), Inches(5.5), Inches(3.95), Inches(0.6),
-         [[(FIGURES["deploy_url"], 12, ACCENT, False, DATA)],
-          [(f"data release {f['release_id']}", 11, DIM, False, DATA)]],
-         align=PP_ALIGN.RIGHT, line_spacing=1.5)
+    text(s, MARGIN, Inches(5.72), Inches(11.9), Inches(0.6),
+         [("Guwahati, Assam · Landsat 8 · 100 m grid · "
+           f"{f['cells']:,} cells · data release {f['release_id']} · MIT licensed",
+           12, DIM, False, DATA)])
 
-    footer(s, n, total)
+    text(s, Inches(10.6), Inches(6.86), Inches(2.05), Inches(0.3),
+         [(f"{n} / {total}", 9, DIM, False, DATA)], align=PP_ALIGN.RIGHT)
 
 
 # -------------------------------------------------------------------- main ---
 BUILDERS = [
     slide_title,
-    slide_positioning,
-    slide_data,
+    slide_problem,
+    slide_solution,
     slide_architecture,
-    slide_model,
-    slide_recommendation,
-    slide_real,
-    slide_gap,
-    slide_roadmap,
+    slide_result,
+    slide_demo,
+    slide_safety,
+    slide_impact,
+    slide_limits,
     slide_close,
 ]
 
@@ -544,8 +584,8 @@ def main():
         build(prs, figures, i, total)
 
     prs.save(OUT)
-    size_mb = OUT.stat().st_size / 1e6
-    print(f"wrote {OUT.relative_to(ROOT)} — {total} slides, {size_mb:.2f} MB")
+    print(f"wrote {OUT.relative_to(ROOT)} — {total} slides, "
+          f"{OUT.stat().st_size / 1e6:.2f} MB")
 
 
 if __name__ == "__main__":
