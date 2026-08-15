@@ -1,23 +1,21 @@
 """Builds UHI-Presentation.pptx.
 
-Thirteen slides in the order a technical panel reads: problem, solution,
-novelty, approach, algorithm, validation, dashboard, impact, limitations,
-future work, links, citations.
+Thirteen slides in the section order a technical panel expects: problem
+understanding, literature review, methodology, architecture, data sources,
+algorithm, validation, interface, outcomes, limitations, team, references.
 
-Written as bullets and tables rather than prose. Two constraints the content
-holds to, because both are credibility risks in front of judges:
-
-  1. Cooling values are planning assumptions used to compare scenarios, never
-     measured guarantees. The slide that shows them says where they came from.
-  2. The model is not the decision-maker. The recommendation comes from an
-     auditable rule and cost engine.
+Section titles state what the slide contains rather than making a claim. The
+evidence carries the argument; a headline that fills a third of the slide only
+crowds it out.
 
 Every headline figure is either read from the pipeline's own output at build
 time or listed in FIGURES with the document it came from. The validation table
-is computed from frontend/data/grid.geojson - see presentation/README.md.
+is computed from the committed grid - see presentation/README.md.
 
-Palette and type follow frontend/style.css so the deck and the dashboard read
-as one product.
+Layout follows the reference deck: content column 0.65 to 12.65 in, eyebrow at
+0.38, title at 0.95, standfirst at 1.73, body from 2.20, footer rule at 6.88.
+Palette and type follow frontend/style.css so the deck and the dashboard read as
+one product.
 
     python presentation/build_deck.py
 """
@@ -245,52 +243,94 @@ def rule(slide, x, y, w, colour=SURFACE_3):
     return ln
 
 
-def bullets(slide, x, y, w, items, *, size=14, gap=0.34, colour=FG, lead=None):
-    """A bulleted block. Each item is a string, or (lead, rest) to bold the lead.
-
-    Bullets rather than prose because a judge reads a slide in seconds and a
-    paragraph makes them hunt for the claim.
-    """
-    cur = y
-    for item in items:
-        dot = slide.shapes.add_shape(MSO_SHAPE.OVAL, x, cur + Inches(0.075), Inches(0.055), Inches(0.055))
-        dot.fill.solid()
-        dot.fill.fore_color.rgb = lead or ACCENT
-        dot.line.fill.background()
-        dot.shadow.inherit = False
-
-        if isinstance(item, tuple):
-            runs = [(item[0], size, FG, True, UI), (item[1], size, colour, False, UI)]
-        else:
-            runs = [(item, size, colour, False, UI)]
-        box = text(slide, x + Inches(0.2), cur, w - Inches(0.2), Inches(0.4),
-                   runs, line_spacing=1.32)
-        cur += Inches(gap) + Inches(0.055) * max(0, len(str(item)) // 95)
-    return cur
+# ------------------------------------------------------------- primitives ---
+# Geometry follows the layout reference: content column 0.65 → 12.65, eyebrow at
+# 0.38, section title at 0.95, standfirst at 1.73, body from 2.20, footer rule
+# at 6.88. Titles are 30pt, not 40 — a headline that fills a third of the slide
+# leaves no room for the evidence underneath it.
+MARGIN = Inches(0.65)
+COL_W = Inches(12.0)
 
 
-def table(slide, x, y, w, headers, rows, *, widths=None, size=12.5,
-          row_h=0.34, highlight=None):
-    """A compact data table. `highlight` bolds one row index in the accent."""
+def section(slide, index_label, title, standfirst=None):
+    """Eyebrow, functional section title, optional one-line standfirst."""
+    text(slide, MARGIN, Inches(0.38), Inches(6.0), Inches(0.25),
+         [(index_label.upper(), 10, ACCENT, True, DATA)])
+    text(slide, MARGIN, Inches(0.95), COL_W, Inches(0.65),
+         [(title, 30, FG, True, UI)])
+    if standfirst:
+        text(slide, Inches(0.67), Inches(1.73), Inches(11.4), Inches(0.55),
+             [(standfirst, 13.5, MUTED, False, UI)], line_spacing=1.3)
+
+
+def page(slide, n, *, link=None, link_label=None):
+    ln = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, MARGIN, Inches(6.88), COL_W, Emu(9525))
+    ln.fill.solid()
+    ln.fill.fore_color.rgb = SURFACE_3
+    ln.line.fill.background()
+    ln.shadow.inherit = False
+
+    if link:
+        text(slide, MARGIN, Inches(7.02), Inches(9.0), Inches(0.22),
+             [("↗ ", 9, ACCENT, False, DATA),
+              (link_label or link, 9, ACCENT, False, DATA, link)])
+    text(slide, Inches(11.9), Inches(7.02), Inches(0.75), Inches(0.22),
+         [(f"{n:02d}", 9, DIM, False, DATA)], align=PP_ALIGN.RIGHT)
+
+
+def wrapped_lines(body, w_inches, size):
+    """Rough line count for a text box. PowerPoint reflows at render time, so
+    stacked blocks need an estimate here or a three-line paragraph silently
+    overlaps the heading beneath it."""
+    chars_per_line = max(20, int((w_inches * 96) / (size * 0.50)))
+    return max(1, -(-len(body) // chars_per_line))
+
+
+def para(slide, x, y, w, lead, body, *, size=12.5, lead_colour=None, gap=0.22):
+    """A labelled paragraph: bold lead-in, then the substance. Returns the y the
+    next block should start at, so a column of these cannot collide."""
+    text(slide, x, y, w, Inches(0.24),
+         [(lead, size, lead_colour or FG, True, UI)])
+    text(slide, x, y + Inches(0.26), w, Inches(0.6),
+         [(body, size, MUTED, False, UI)], line_spacing=1.32)
+    lines = wrapped_lines(body, w / 914400, size)
+    return y + Inches(0.26) + Inches(0.22 * lines) + Inches(gap)
+
+
+def panel(slide, x, y, w, h, title, *, tint=None):
+    card(slide, x, y, w, h, fill=SURFACE)
+    tab = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, x, y, Inches(0.05), h)
+    tab.fill.solid()
+    tab.fill.fore_color.rgb = tint or ACCENT
+    tab.line.fill.background()
+    tab.shadow.inherit = False
+    text(slide, x + Inches(0.26), y + Inches(0.16), w - Inches(0.52), Inches(0.24),
+         [(title.upper(), 10, tint or ACCENT, True, DATA)])
+
+
+def table(slide, x, y, w, headers, rows, *, widths=None, size=12,
+          row_h=0.33, highlight=None):
     n = len(headers)
     widths = widths or [1 / n] * n
     cols = [int(w * f) for f in widths]
 
     hx = x
     for i, h in enumerate(headers):
-        text(slide, hx, y, cols[i], Inches(0.28),
-             [(h.upper(), 9.5, DIM, False, DATA)],
+        text(slide, hx, y, cols[i], Inches(0.26),
+             [(h.upper(), 9, DIM, False, DATA)],
              align=PP_ALIGN.RIGHT if i else PP_ALIGN.LEFT)
         hx += cols[i]
 
-    rule(slide, x, y + Inches(0.28), w, SURFACE_3)
+    ln = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, x, y + Inches(0.26), w, Emu(9525))
+    ln.fill.solid(); ln.fill.fore_color.rgb = SURFACE_3
+    ln.line.fill.background(); ln.shadow.inherit = False
 
-    cy = y + Inches(0.38)
+    cy = y + Inches(0.36)
     for r_i, row in enumerate(rows):
         on = highlight is not None and r_i == highlight
         cx = x
         for i, cell in enumerate(row):
-            text(slide, cx, cy, cols[i], Inches(0.3),
+            text(slide, cx, cy, cols[i], Inches(0.28),
                  [(str(cell), size, ACCENT if on else (FG if i == 0 else MUTED),
                    on, UI if i == 0 else DATA)],
                  align=PP_ALIGN.RIGHT if i else PP_ALIGN.LEFT)
@@ -305,453 +345,538 @@ def slide_title(prs, f, n, total):
 
     seg = W / len(RAMP)
     for i, c in enumerate(RAMP):
-        bar = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, int(seg * i), 0, int(seg) + 1, Inches(0.08))
-        bar.fill.solid()
-        bar.fill.fore_color.rgb = c
-        bar.line.fill.background()
-        bar.shadow.inherit = False
+        bar = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, int(seg * i), 0, int(seg) + 1, Inches(0.12))
+        bar.fill.solid(); bar.fill.fore_color.rgb = c
+        bar.line.fill.background(); bar.shadow.inherit = False
 
-    text(s, MARGIN, Inches(1.16), Inches(10), Inches(0.3),
-         [("URBAN HEAT ISLAND MITIGATION · GUWAHATI, ASSAM", 11, ACCENT, True, DATA)])
-    text(s, MARGIN, Inches(1.7), Inches(11.4), Inches(1.5),
-         [[("Heatwise", 54, FG, True, UI)],
-          [("Budget-constrained urban heat mitigation planning", 26, MUTED, False, UI)]],
-         line_spacing=1.06)
+    text(s, MARGIN, Inches(0.72), Inches(8.0), Inches(0.25),
+         [("SUSTAINABILITY HACKATHON  ·  URBAN CLIMATE", 10, ACCENT, True, DATA)])
 
-    text(s, MARGIN, Inches(3.7), Inches(11.2), Inches(0.6),
-         [("A satellite-derived 100 m heat grid, land-cover safety rules and a "
-           "cost model, combined into a ranked mitigation shortlist that fits a "
-           "stated municipal budget.", 15, MUTED, False, UI)], line_spacing=1.4)
+    text(s, MARGIN, Inches(1.28), Inches(11.5), Inches(0.9),
+         [("Heatwise", 46, FG, True, UI)])
+    text(s, MARGIN, Inches(2.06), Inches(11.5), Inches(0.5),
+         [("Urban Heat Island Mitigation Simulation", 22, MUTED, False, UI)])
 
-    rule(s, MARGIN, Inches(4.66), Inches(11.9))
+    card(s, MARGIN, Inches(2.78), Inches(11.9), Inches(1.15), fill=SURFACE)
+    text(s, MARGIN + Inches(0.3), Inches(2.98), Inches(11.3), Inches(0.24),
+         [("PROBLEM STATEMENT", 10, ACCENT, True, DATA)])
+    text(s, MARGIN + Inches(0.3), Inches(3.26), Inches(11.3), Inches(0.5),
+         [("Identify where urban surface heat is most severe in Guwahati, and "
+           "decide which mitigation measures to fund first under a fixed "
+           "municipal budget.", 14.5, FG, False, UI)], line_spacing=1.3)
 
-    text(s, MARGIN, Inches(4.92), Inches(6.4), Inches(0.3),
-         [("TEAM", 9.5, DIM, False, DATA)])
-    for i, (name, role) in enumerate(TEAM):
-        text(s, MARGIN, Inches(5.2) + Inches(0.29) * i, Inches(6.6), Inches(0.3),
-             [(name, 12.5, FG, False, UI), ("  ·  ", 12.5, DIM, False, UI),
-              (role, 12.5, MUTED, False, UI)])
+    rule(s, MARGIN, Inches(4.24), COL_W)
 
-    text(s, Inches(8.0), Inches(4.92), Inches(4.6), Inches(0.3),
-         [("PROJECT", 9.5, DIM, False, DATA)])
-    text(s, Inches(8.0), Inches(5.2), Inches(4.6), Inches(1.3),
-         [[("↗ Live dashboard", 12, ACCENT, False, DATA, LINKS["dashboard"])],
-          [("↗ Source repository", 12, ACCENT, False, DATA, LINKS["repo"])],
-          [("↗ Technical documentation", 12, ACCENT, False, DATA, LINKS["docs"])]],
-         line_spacing=1.5)
+    text(s, MARGIN, Inches(4.5), Inches(6.5), Inches(0.24),
+         [("TEAM  ·  " + TEAM_NAME.upper().replace("TEAM ", ""), 10, DIM, False, DATA)])
+    text(s, MARGIN, Inches(4.8), Inches(7.2), Inches(0.9),
+         [(", ".join(name for name, _ in TEAM), 13, MUTED, False, UI)],
+         line_spacing=1.35)
 
-    text(s, Inches(10.6), Inches(6.86), Inches(2.05), Inches(0.3),
-         [(f"{n} / {total}", 9, DIM, False, DATA)], align=PP_ALIGN.RIGHT)
+    text(s, Inches(8.4), Inches(4.5), Inches(4.2), Inches(0.24),
+         [("PROJECT", 10, DIM, False, DATA)])
+    text(s, Inches(8.4), Inches(4.8), Inches(4.25), Inches(1.0),
+         [[("↗ Live dashboard", 11.5, ACCENT, False, DATA, LINKS["dashboard"])],
+          [("↗ Source repository", 11.5, ACCENT, False, DATA, LINKS["repo"])],
+          [("↗ Documentation", 11.5, ACCENT, False, DATA, LINKS["docs"])]],
+         line_spacing=1.45)
+
+    cols = [
+        (f"{f['cells']:,}", "cells mapped at 100 m"),
+        (f"{f['treatable']:,}", "eligible after land-cover rules"),
+        (f"₹{FIGURES['funded_cr']} Cr", "committed at ₹10 Cr budget"),
+        (FIGURES["funded_cells"], "sites in the shortlist"),
+    ]
+    for i, (v, l) in enumerate(cols):
+        stat(s, MARGIN + Inches(3.0) * i, Inches(5.9), Inches(2.9), v, l, value_pt=21)
+
+    text(s, Inches(11.9), Inches(7.02), Inches(0.75), Inches(0.22),
+         [("01", 9, DIM, False, DATA)], align=PP_ALIGN.RIGHT)
 
 
 def slide_problem(prs, f, n, total):
     s = add_slide(prs)
-    eyebrow(s, "01 — problem")
-    heading(s, "Heat is unevenly distributed; budgets are not")
+    section(s, "02 — problem understanding & motivation",
+            "Urban heat is a health and energy burden with an uneven footprint",
+            "Guwahati, Assam — 8,144 cells of Landsat-derived surface temperature.")
 
     png = ASSETS / "dash-overview.jpg"
     if png.exists():
-        s.shapes.add_picture(str(png), Inches(6.5), Inches(2.0), width=Inches(6.12))
+        s.shapes.add_picture(str(png), Inches(6.5), Inches(2.24), width=Inches(6.15))
 
-    bullets(s, MARGIN, Inches(2.1), Inches(5.5), [
-        ("Surface temperature spans 21.1–33.2 °C ", "across the study area — a 12 °C "
-         "range inside one city."),
-        ("Ward-level averages hide it. ", "Adjacent 100 m cells differ by several "
-         "degrees, so the decision scale is the block, not the district."),
-        ("530 cells sit in the top decile ", "of the observed range and drive "
-         "heat-related health and energy load."),
-        ("Mitigation budgets are finite. ", "Treating every eligible cell would cost "
-         "₹167.5 Cr against a typical annual allocation of ₹10 Cr."),
-        ("No ranking exists. ", "Standard practice produces a heat map and stops "
-         "short of which sites to fund first."),
-    ], gap=0.72)
-
-    footer(s, n, total)
-
-
-def slide_solution(prs, f, n, total):
-    s = add_slide(prs)
-    eyebrow(s, "02 — solution")
-    heading(s, "A ranked, costed, budget-capped shortlist")
-
-    bullets(s, MARGIN, Inches(2.16), Inches(11.6), [
-        ("End-to-end pipeline. ", "Landsat 8 thermal imagery → 100 m heat grid → "
-         "land-cover eligibility → cost model → budget-constrained selection → dashboard."),
-        ("Safety rules first. ", "8,144 cells reduce to 4,157 eligible; water, wetland "
-         "and existing tree cover are excluded in code before any ranking occurs."),
-        ("Explicit cost model. ", "Each measure is priced as rate × coverage fraction × "
-         "cell area, from published municipal rates rather than assumed figures."),
-        ("Greedy selection under constraint. ", "Cells are ordered by cooling per rupee, "
-         "ties broken by surface temperature, and funded until the budget is exhausted."),
-        ("Operational dashboard. ", "Budget scenarios, per-cell inspection with the "
-         "reason for each recommendation, current-versus-mitigation comparison, and an "
-         "exportable report."),
-    ], gap=0.62)
-
-    rule(s, MARGIN, Inches(5.78), Inches(11.9))
-    cols = [
-        (f"{f['cells']:,}", "cells mapped"),
-        (f"{f['treatable']:,}", "eligible after safety rules"),
-        (f"₹{FIGURES['funded_cr']} Cr", "committed at ₹10 Cr budget"),
-        (FIGURES["funded_cells"], "sites funded"),
+    blocks = [
+        ("Cities run hotter than their surroundings.",
+         "Concrete, asphalt and roofing absorb and re-radiate more heat than the "
+         "vegetation they replaced."),
+        ("The cost is health and energy.",
+         "Surface heat drives heat stress in exposed populations and raises cooling "
+         "demand when the grid is already at peak."),
+        ("The footprint is uneven at street scale.",
+         "Across the study area temperature spans 21.1–33.2 °C, and neighbouring "
+         "100 m cells differ by several degrees."),
+        ("Mitigation budgets are finite.",
+         "Treating every eligible cell would cost ₹167.5 Cr against an annual "
+         "allocation nearer ₹10 Cr, so placement determines the return."),
     ]
-    for i, (v, l) in enumerate(cols):
-        stat(s, MARGIN + Inches(3.0) * i, Inches(6.0), Inches(2.9), v, l, value_pt=22)
+    y = Inches(2.34)
+    for lead, body in blocks:
+        y = para(s, MARGIN, y, Inches(5.5), lead, body, size=12, gap=0.3)
 
-    footer(s, n, total)
+    page(s, n)
 
 
-def slide_novelty(prs, f, n, total):
+def slide_literature(prs, f, n, total):
     s = add_slide(prs)
-    eyebrow(s, "03 — novelty")
-    heading(s, "What is new here")
+    section(s, "03 — literature review & existing approaches",
+            "Where prior work stops",
+            "Four established strands, and the gap this project addresses.")
 
-    items = [
-        ("Selection, not just detection",
-         "Published UHI mapping work stops at a risk surface. This system carries the "
-         "surface through eligibility, cost and a budget constraint to a specific, "
-         "orderable list of sites."),
-        ("Safety encoded as a gate, not guidance",
-         "Land-cover exclusions run before ranking and are asserted by tests, so no "
-         "recommendation can reach the interface proposing work on water, wetland or "
-         "existing canopy."),
-        ("Cost-efficiency as the objective",
-         "Ranking on cooling per rupee rather than temperature alone funds 249 sites "
-         "where hottest-first funds 229 for the same money — the cheaper measure fits "
-         "more sites into the same budget."),
-        ("Auditable by construction",
-         "Every funded cell resolves to a rule, a rate and a rank. The dashboard re-runs "
-         "the pipeline's own ordering client-side, so an interactive change of budget or "
-         "area cannot diverge from the committed plan."),
-        ("Model kept in its lane",
-         "The RandomForest is reported as a diagnostic. The visible recommendation comes "
-         "from the rule and cost engine, which is what makes it explainable to a planner."),
+    rows = [
+        ("Thermal remote sensing of urban climate",
+         "Voogt & Oke 2003; Weng 2009",
+         "Establishes satellite LST as the standard measure of urban heat. Produces "
+         "a risk surface; does not select interventions."),
+        ("Measured cooling from surfaces and canopy",
+         "Akbari et al. 2001; Santamouris 2014",
+         "Field and review evidence that cool roofs and vegetation reduce temperature. "
+         "Site-specific, not a city-wide allocation method."),
+        ("Microclimate simulation",
+         "Bruse & Fleer 1998 (ENVI-met)",
+         "Physically detailed simulation of a street or block. Computationally heavy; "
+         "impractical across thousands of cells."),
+        ("Green-infrastructure prioritisation",
+         "Norton et al. 2015",
+         "Closest prior work — a framework ranking green infrastructure by cooling "
+         "need. Does not carry a unit-cost model or a budget constraint."),
     ]
+    y = Inches(2.3)
+    for title, cite, body in rows:
+        text(s, MARGIN, y, Inches(3.6), Inches(0.24), [(title, 12.5, FG, True, UI)])
+        text(s, MARGIN, y + Inches(0.26), Inches(3.6), Inches(0.24),
+             [(cite, 10.5, DIM, False, DATA)])
+        text(s, Inches(4.5), y, Inches(8.15), Inches(0.6),
+             [(body, 12.5, MUTED, False, UI)], line_spacing=1.32)
+        y += Inches(0.96)
 
-    y = Inches(2.16)
-    for title, body in items:
-        text(s, MARGIN, y, Inches(3.9), Inches(0.4), [(title, 14.5, ACCENT, True, UI)])
-        text(s, MARGIN + Inches(4.1), y, Inches(7.8), Inches(0.8),
-             [(body, 13, MUTED, False, UI)], line_spacing=1.35)
-        y += Inches(0.92)
+    panel(s, MARGIN, Inches(6.02), COL_W, Inches(0.76), "Identified gap", tint=SUCCESS)
+    text(s, MARGIN + Inches(0.26), Inches(6.44), Inches(11.4), Inches(0.28),
+         [("No existing method combines city-wide satellite screening, land-cover "
+           "suitability rules and unit costs into a shortlist that respects a stated "
+           "budget ceiling.", 12.5, FG, False, UI)])
 
-    footer(s, n, total)
+    page(s, n)
 
 
-def slide_approach(prs, f, n, total):
+def slide_method(prs, f, n, total):
     s = add_slide(prs)
-    eyebrow(s, "04 — approach")
-    heading(s, "Processing pipeline", size=34)
+    section(s, "04 — proposed methodology & technical approach",
+            "From thermal imagery to a budget-constrained shortlist",
+            "Five stages, each producing an artefact the next stage consumes.")
+
+    steps = [
+        ("01", "Screen", "Composite Landsat 8 thermal and optical bands in Earth "
+         "Engine; derive LST, NDVI and NDBI onto a 100 m grid of 8,144 cells."),
+        ("02", "Gate", "Classify each cell against ESA WorldCover and remove "
+         "never-touch classes. 8,144 cells reduce to 4,157 eligible."),
+        ("03", "Price", "Assign a measure per eligible cell and cost it as "
+         "rate × coverage fraction × cell area, using published municipal rates."),
+        ("04", "Rank", "Order by cooling per rupee, breaking ties on surface "
+         "temperature so the hottest eligible sites are funded first."),
+        ("05", "Cap", "Accumulate cost down the ranking and stop at the budget. "
+         "At ₹10 Cr this yields 249 sites."),
+    ]
+    y = Inches(2.3)
+    for num, name, body in steps:
+        text(s, MARGIN, y, Inches(0.6), Inches(0.3), [(num, 14, ACCENT, True, DATA)])
+        text(s, Inches(1.25), y, Inches(1.6), Inches(0.3), [(name, 13.5, FG, True, UI)])
+        text(s, Inches(3.0), y, Inches(9.65), Inches(0.5),
+             [(body, 12.5, MUTED, False, UI)], line_spacing=1.3)
+        y += Inches(0.7)
+
+    rule(s, MARGIN, Inches(5.9), COL_W)
+    text(s, MARGIN, Inches(6.1), Inches(2.4), Inches(0.24),
+         [("DISTINGUISHING CHOICES", 10, DIM, False, DATA)])
+    text(s, Inches(3.0), Inches(6.06), Inches(9.65), Inches(0.7),
+         [("Suitability is a gate applied before ranking, not advice attached after it. "
+           "Cost enters the objective rather than a footnote. The machine-learning model "
+           "is reported as a screening diagnostic and is deliberately kept out of the "
+           "selection path.", 12, MUTED, False, UI)], line_spacing=1.32)
+
+    page(s, n)
+
+
+def slide_architecture(prs, f, n, total):
+    s = add_slide(prs)
+    section(s, "05 — system architecture & processing pipeline",
+            "Module boundaries and the artefacts that cross them")
 
     png = ASSETS / "architecture.png"
     if png.exists():
-        s.shapes.add_picture(str(png), MARGIN, Inches(1.86), width=Inches(11.9))
-    footer(s, n, total, link=LINKS["docs"], link_label="docs/01-architecture.md")
+        s.shapes.add_picture(str(png), MARGIN, Inches(1.9), width=COL_W)
+    page(s, n, link=LINKS["docs"], link_label="docs/01-architecture.md")
+
+
+def slide_data(prs, f, n, total):
+    s = add_slide(prs)
+    section(s, "06 — data sources & preprocessing",
+            "Inputs, resolution and the steps applied before analysis")
+
+    text(s, MARGIN, Inches(2.24), Inches(5.9), Inches(0.24),
+         [("1.  SOURCE DATASETS", 10, DIM, False, DATA)])
+    table(s, MARGIN, Inches(2.56), Inches(5.9),
+          ["Dataset", "Res.", "Role"],
+          [["Landsat 8 C2 L2", "30 m", "Thermal + optical"],
+           ["ESA WorldCover 2021", "10 m", "Land-cover class"],
+           ["Municipal rate schedules", "—", "Unit costs"]],
+          widths=[.45, .17, .38], row_h=0.34)
+
+    text(s, MARGIN, Inches(4.16), Inches(5.9), Inches(0.24),
+         [("2.  PREPROCESSING STEPS", 10, DIM, False, DATA)])
+    steps = [
+        "Cloud and shadow masking from the QA_PIXEL band",
+        "Multi-scene median composite to remove transient artefacts",
+        "LST from the thermal band; NDVI and NDBI from surface reflectance",
+        "Zonal aggregation onto a 100 m QGIS fishnet — 8,144 cells",
+        "Majority land-cover class assigned per cell from WorldCover",
+    ]
+    y = Inches(4.5)
+    for st in steps:
+        text(s, MARGIN, y, Inches(0.2), Inches(0.24), [("·", 12.5, ACCENT, True, UI)])
+        text(s, MARGIN + Inches(0.2), y, Inches(5.7), Inches(0.3),
+             [(st, 12, MUTED, False, UI)], line_spacing=1.3)
+        y += Inches(0.36)
+
+    x2 = Inches(7.05)
+    text(s, x2, Inches(2.24), Inches(5.6), Inches(0.24),
+         [("3.  DERIVED FIELDS PER CELL", 10, DIM, False, DATA)])
+    table(s, x2, Inches(2.56), Inches(5.6),
+          ["Field", "Range", "Use"],
+          [["LST", "21.1 – 33.2 °C", "Heat measure"],
+           ["NDVI", "−0.14 – 0.78", "Vegetation"],
+           ["NDBI", "−0.68 – 0.18", "Built-up"],
+           ["Land cover", "7 classes", "Eligibility"],
+           ["Priority", "3 tiers", "Filtering"]],
+          widths=[.30, .38, .32], row_h=0.32)
+
+    text(s, x2, Inches(4.66), Inches(5.6), Inches(0.24),
+         [("4.  QUALITY CONTROL", 10, DIM, False, DATA)])
+    text(s, x2, Inches(4.98), Inches(5.6), Inches(1.4),
+         [("Every artefact is regenerated by CI and compared against its committed "
+           "copy; a mismatch fails the build. A release manifest binds the dashboard "
+           "to one dataset hash, so the interface cannot serve a grid that no longer "
+           "matches the analysis.", 12, MUTED, False, UI)], line_spacing=1.32)
+
+    page(s, n, link=LINKS["docs"], link_label="docs/07-data-contracts.md")
 
 
 def slide_algorithm(prs, f, n, total):
     s = add_slide(prs)
-    eyebrow(s, "05 — algorithm and worked example")
-    heading(s, "How one cell is selected", size=34)
+    section(s, "07 — selection algorithm & worked example",
+            "The cost model, the ordering rule, and one cell traced through it")
 
-    # left: the model
-    text(s, MARGIN, Inches(1.94), Inches(6.0), Inches(0.3),
-         [("COST AND COOLING MODEL", 9.5, DIM, False, DATA)])
-    table(s, MARGIN, Inches(2.3), Inches(6.0),
+    text(s, MARGIN, Inches(2.24), Inches(5.9), Inches(0.24),
+         [("COST AND COOLING MODEL", 10, DIM, False, DATA)])
+    table(s, MARGIN, Inches(2.56), Inches(5.9),
           ["Measure", "₹/m²", "Cover", "ΔT °C", "₹/cell"],
           [["Cool roof", "300", "15%", "1.0", "4.01 L"],
            ["Tree canopy", "150", "25%", "0.8", "3.75 L"],
            ["Pocket park", "1,150", "10%", "2.0", "11.5 L"]],
-          widths=[.30, .16, .16, .16, .22], highlight=0)
+          widths=[.30, .16, .16, .16, .22], highlight=0, row_h=0.33)
 
-    text(s, MARGIN, Inches(3.72), Inches(6.0), Inches(0.62),
+    text(s, MARGIN, Inches(3.92), Inches(5.9), Inches(0.5),
          [("Cost = rate × coverage fraction × cell area. Rates are published "
-           "municipal figures; ΔT values are planning assumptions, not measurements.",
-           11.5, DIM, False, UI)], line_spacing=1.35)
+           "municipal figures. ΔT values are planning assumptions.",
+           11, DIM, False, UI)], line_spacing=1.3)
 
-    text(s, MARGIN, Inches(4.46), Inches(6.0), Inches(0.3),
-         [("SELECTION RULE", 9.5, DIM, False, DATA)])
-    card(s, MARGIN, Inches(4.76), Inches(6.0), Inches(1.24), fill=SURFACE)
-    text(s, MARGIN + Inches(0.26), Inches(4.98), Inches(5.5), Inches(0.4),
-         [("sort by ΔT / cost  desc", 13.5, ACCENT, False, DATA)])
-    text(s, MARGIN + Inches(0.26), Inches(5.28), Inches(5.5), Inches(0.4),
-         [("then LST desc, then grid_id asc", 13.5, FG, False, DATA)])
-    text(s, MARGIN + Inches(0.26), Inches(5.58), Inches(5.5), Inches(0.4),
-         [("fill while cumulative cost ≤ budget", 12, MUTED, False, UI)])
+    text(s, MARGIN, Inches(4.6), Inches(5.9), Inches(0.24),
+         [("ORDERING RULE", 10, DIM, False, DATA)])
+    card(s, MARGIN, Inches(4.9), Inches(5.9), Inches(1.4), fill=SURFACE)
+    text(s, MARGIN + Inches(0.26), Inches(5.1), Inches(5.4), Inches(0.3),
+         [("sort by  ΔT / cost  desc", 13, ACCENT, False, DATA)])
+    text(s, MARGIN + Inches(0.26), Inches(5.42), Inches(5.4), Inches(0.3),
+         [("then LST desc, then grid_id asc", 13, FG, False, DATA)])
+    text(s, MARGIN + Inches(0.26), Inches(5.76), Inches(5.4), Inches(0.4),
+         [("accumulate cost down the list; stop at the budget ceiling",
+           11.5, MUTED, False, UI)], line_spacing=1.25)
 
-    # right: the worked cell
-    x2 = Inches(7.1)
-    text(s, x2, Inches(1.94), Inches(5.5), Inches(0.3),
-         [("WORKED EXAMPLE — RANK #1 OF 4,157", 9.5, DIM, False, DATA)])
-    card(s, x2, Inches(2.3), Inches(5.52), Inches(3.7), fill=SURFACE, line=ACCENT, line_w=1.1)
+    x2 = Inches(7.05)
+    text(s, x2, Inches(2.24), Inches(5.6), Inches(0.24),
+         [("WORKED EXAMPLE — RANK 1 OF 4,157", 10, DIM, False, DATA)])
+    card(s, x2, Inches(2.56), Inches(5.6), Inches(3.74), fill=SURFACE, line=ACCENT, line_w=1.0)
+    text(s, x2 + Inches(0.26), Inches(2.78), Inches(5.1), Inches(0.28),
+         [("+102070+29080", 14, FG, True, DATA)])
+    text(s, x2 + Inches(0.26), Inches(3.08), Inches(5.1), Inches(0.26),
+         [("Railway Colony, Maligaon  ·  26.1235, 91.6915", 11, MUTED, False, UI)])
+    table(s, x2 + Inches(0.26), Inches(3.5), Inches(5.08),
+          ["Attribute", "Value", "Basis"],
+          [["Surface temperature", "33.2 °C", "measured"],
+           ["Built-up intensity", "0.121", "measured"],
+           ["Vegetation index", "0.210", "measured"],
+           ["Land cover", "Built-up", "classified"],
+           ["Assigned measure", "Cool roof", "rule"],
+           ["Estimated cost", "₹4.01 L", "rate table"],
+           ["Expected cooling", "−1.00 °C", "assumption"]],
+          widths=[.46, .28, .26], size=11.5, row_h=0.3)
 
-    text(s, x2 + Inches(0.28), Inches(2.54), Inches(5.0), Inches(0.3),
-         [("+102070+29080", 15, FG, True, DATA)])
-    text(s, x2 + Inches(0.28), Inches(2.86), Inches(5.0), Inches(0.3),
-         [("Railway Colony, Maligaon · 26.1235, 91.6915", 11.5, MUTED, False, UI)])
-
-    rows = [
-        ["Surface temperature", "33.2 °C", "top 10%"],
-        ["Built-up intensity (NDBI)", "0.121", "top 10%"],
-        ["Vegetation (NDVI)", "0.210", "bottom 10%"],
-        ["Land cover", "Built-up", "eligible"],
-        ["Measure", "Cool roof", "gated"],
-        ["Estimated cost", "₹4.01 L", "priced"],
-        ["Expected cooling", "−1.00 °C", "assumed"],
-    ]
-    table(s, x2 + Inches(0.28), Inches(3.3), Inches(4.96),
-          ["Attribute", "Value", "Basis"], rows,
-          widths=[.48, .28, .24], size=12, row_h=0.31)
-
-    footer(s, n, total)
+    page(s, n)
 
 
 def slide_validation(prs, f, n, total):
     s = add_slide(prs)
-    eyebrow(s, "06 — validation")
-    heading(s, "Compared against the obvious alternatives")
+    section(s, "08 — validation & comparative evaluation",
+            "The ordering rule tested against two alternatives",
+            "Identical budget, eligible pool and cooling assumptions. Only the ordering differs.")
 
-    text(s, MARGIN, Inches(1.96), Inches(11.6), Inches(0.5),
-         [("Same ₹10 Cr budget, same eligible pool, same cooling assumptions. "
-           "Only the selection rule changes.", 14, MUTED, False, UI)])
-
-    table(s, MARGIN, Inches(2.66), Inches(11.9),
-          ["Selection strategy", "Sites", "Spend", "Total ΔT", "Mean °C", "Hotspots cut"],
+    table(s, MARGIN, Inches(2.4), COL_W,
+          ["Ordering strategy", "Sites", "Spend", "Total ΔT", "Mean °C", "Hotspots cut"],
           [["Random among eligible", "248", "₹9.99 Cr", "245", "27.94", "25"],
            ["Hottest eligible first", "229", "₹9.98 Cr", "240", "30.28", "154"],
            ["Cooling per rupee, then hottest", "249", "₹9.99 Cr", "249", "30.16", "180"]],
-          widths=[.34, .12, .14, .13, .13, .14], highlight=2, row_h=0.42)
+          widths=[.34, .12, .14, .13, .13, .14], highlight=2, row_h=0.4)
 
-    rule(s, MARGIN, Inches(4.5), Inches(11.9))
+    rule(s, MARGIN, Inches(4.12), COL_W)
 
-    bullets(s, MARGIN, Inches(4.74), Inches(11.6), [
-        ("Against hottest-first: ", "20 more sites and 26 more hotspot cells removed for "
-         "the same spend, because the cheapest measure per degree fits more sites in."),
-        ("Against random: ", "180 hotspot cells removed versus 25 — the ranking, not the "
-         "budget, is doing the work."),
-        ("Against no safety gate: ", "taking the hottest 249 cells outright places 14 of "
-         "them (6%) on existing tree cover, where planting is already redundant."),
-    ], gap=0.62)
+    findings = [
+        ("Against hottest-first",
+         "20 additional sites and 26 further hotspot cells removed for the same "
+         "outlay, because the lower cost per degree admits more sites under the cap."),
+        ("Against random ordering",
+         "180 hotspot cells removed versus 25, confirming the gain comes from the "
+         "ordering rather than the budget."),
+        ("Against no suitability gate",
+         "Taking the hottest 249 cells without land-cover filtering places 14 of them "
+         "on existing tree cover, where planting adds nothing."),
+    ]
+    y = Inches(4.36)
+    for lead, body in findings:
+        text(s, MARGIN, y, Inches(3.3), Inches(0.24), [(lead, 12.5, FG, True, UI)])
+        text(s, Inches(4.2), y, Inches(8.45), Inches(0.5),
+             [(body, 12.5, MUTED, False, UI)], line_spacing=1.3)
+        y += Inches(0.78)
 
-    footer(s, n, total)
+    page(s, n)
 
 
-def slide_demo(prs, f, n, total):
+def slide_dashboard(prs, f, n, total):
     s = add_slide(prs)
-    eyebrow(s, "07 — dashboard")
-    heading(s, "Every recommendation is inspectable", size=34)
+    section(s, "09 — dashboard & decision interface",
+            "Per-cell inspection, budget scenarios and scenario comparison")
 
     png = ASSETS / "dash-compare.jpg"
     if png.exists():
-        pic_h = Inches(4.26)
-        pic_w = Inches(4.26 * 1680 / 892)
-        s.shapes.add_picture(str(png), int((W - pic_w) / 2), Inches(1.9),
+        pic_h = Inches(4.1)
+        pic_w = Inches(4.1 * 1680 / 892)
+        s.shapes.add_picture(str(png), int((W - pic_w) / 2), Inches(2.16),
                              width=int(pic_w), height=int(pic_h))
 
-    text(s, MARGIN, Inches(6.34), Inches(11.9), Inches(0.4),
-         [("Click any cell for why it ranks where it does, what the rule engine "
-           "proposes, what it costs, whether the budget reaches it, and a Street View "
-           "link to inspect the site.", 12.5, MUTED, False, UI)], align=PP_ALIGN.CENTER)
-    footer(s, n, total, link=LINKS["dashboard"], link_label="live dashboard")
-
-
-def slide_impact(prs, f, n, total):
-    s = add_slide(prs)
-    eyebrow(s, "08 — impact and benefits")
-    heading(s, "What the plan delivers, and where it goes next")
-
     items = [
-        (f"{FIGURES['hotspots_before']} → {FIGURES['hotspots_after']}",
-         "hotspot cells", "Top-decile cells removed at ₹10 Cr — a 34% reduction "
-         "in the population most exposed to extreme surface heat."),
-        (f"₹{FIGURES['funded_cr']} Cr", "committed, not ₹167.5 Cr",
-         "The plan fits a realistic municipal allocation instead of an "
-         "unfundable whole-city figure."),
-        ("249", "sites, each defensible",
-         "Every site carries its temperature, land cover, measure, price and rank, "
-         "so the shortlist survives procurement scrutiny."),
+        "Cell inspection: rank, land cover, indices, measure, cost",
+        "Budget scenarios from ₹10 Cr to ₹100 Cr, recomputed live",
+        "Current versus post-plan surface on a draggable divider",
+        "Street View link at each cell's coordinates",
     ]
     x = MARGIN
-    w = Inches(3.76)
-    for v, k, body in items:
-        card(s, x, Inches(2.16), w, Inches(2.1), fill=SURFACE)
-        text(s, x + Inches(0.3), Inches(2.4), w - Inches(0.6), Inches(0.5),
-             [(v, 26, ACCENT, True, UI)])
-        text(s, x + Inches(0.3), Inches(2.88), w - Inches(0.6), Inches(0.3),
-             [(k, 11, DIM, False, DATA)])
-        text(s, x + Inches(0.3), Inches(3.2), w - Inches(0.6), Inches(0.9),
-             [(body, 12, MUTED, False, UI)], line_spacing=1.35)
-        x += w + Inches(0.31)
+    for it in items:
+        text(s, x, Inches(6.42), Inches(2.85), Inches(0.44),
+             [("· ", 11.5, ACCENT, True, UI), (it, 11.5, MUTED, False, UI)],
+             line_spacing=1.28)
+        x += Inches(3.0)
 
-    text(s, MARGIN, Inches(4.6), Inches(11.9), Inches(0.3),
-         [("SCALABILITY AND PRACTICALITY", 9.5, DIM, False, DATA)])
-    bullets(s, MARGIN, Inches(4.94), Inches(11.6), [
-        ("Inputs are global. ", "Landsat 8 and ESA WorldCover cover any city on Earth "
-         "at no cost; porting the pipeline is a boundary file and a rate table."),
-        ("Rates are configuration, not code. ", "Unit costs and cooling assumptions live "
-         "in one JSON file read by every module, so a new city changes data, not logic."),
-        ("Reproducible. ", "133 tests and CI that regenerates every artefact and fails if "
-         "a committed copy differs. MIT licensed with data attribution."),
-    ], gap=0.56)
+    page(s, n, link=LINKS["dashboard"], link_label="live dashboard")
 
-    footer(s, n, total)
+
+def slide_outcomes(prs, f, n, total):
+    s = add_slide(prs)
+    section(s, "10 — expected outcomes & impact",
+            "What the shortlist achieves, and how the method transfers")
+
+    panel(s, MARGIN, Inches(2.24), Inches(5.85), Inches(2.5), "Measured outcomes at ₹10 Cr")
+    outs = [
+        ("Hotspot cells", f"{FIGURES['hotspots_before']} → {FIGURES['hotspots_after']}",
+         "a 34% reduction in top-decile cells"),
+        ("Sites funded", "249", "of 4,157 eligible"),
+        ("Committed cost", f"₹{FIGURES['funded_cr']} Cr", "against a ₹167.5 Cr upper bound"),
+        ("Cooling, funded cells", "−1.00 °C", "modelled, per treated cell"),
+    ]
+    y = Inches(2.68)
+    for k, v, note in outs:
+        text(s, MARGIN + Inches(0.26), y, Inches(2.5), Inches(0.26),
+             [(k, 12, MUTED, False, UI)])
+        text(s, MARGIN + Inches(2.8), y, Inches(1.5), Inches(0.26),
+             [(v, 12.5, FG, True, DATA)], align=PP_ALIGN.RIGHT)
+        text(s, MARGIN + Inches(4.4), y, Inches(1.3), Inches(0.26),
+             [(note, 10, DIM, False, UI)])
+        y += Inches(0.48)
+
+    panel(s, Inches(7.05), Inches(2.24), Inches(5.6), Inches(2.5),
+          "Scalability", tint=SUCCESS)
+    scal = [
+        "Landsat 8 and ESA WorldCover are global and free — the method ports to any "
+        "city with a boundary file.",
+        "Unit rates and cooling values are configuration, not code; a new city edits "
+        "one JSON file.",
+        "Runtime is minutes on a laptop for a city of 8,144 cells.",
+    ]
+    y = Inches(2.7)
+    for sc in scal:
+        text(s, Inches(7.31), y, Inches(5.1), Inches(0.5),
+             [("· ", 11.5, SUCCESS, True, UI), (sc, 11.5, MUTED, False, UI)],
+             line_spacing=1.3)
+        y += Inches(0.66)
+
+    text(s, MARGIN, Inches(5.06), COL_W, Inches(0.24),
+         [("SUSTAINABILITY RELEVANCE", 10, DIM, False, DATA)])
+    text(s, MARGIN, Inches(5.36), COL_W, Inches(1.2),
+         [("Targeted surface cooling reduces heat exposure for the population living "
+           "in the hottest blocks and lowers peak cooling demand, which is where urban "
+           "electricity emissions concentrate. Directing a fixed budget to the highest "
+           "cooling per rupee means the same public money removes 180 hotspot cells "
+           "rather than 25.", 12.5, MUTED, False, UI)], line_spacing=1.35)
+
+    page(s, n)
 
 
 def slide_limits(prs, f, n, total):
     s = add_slide(prs)
-    eyebrow(s, "09 — limitations")
-    heading(s, "What this does not yet establish")
+    section(s, "11 — limitations & future work",
+            "Known constraints, and the work that would resolve them")
 
-    bullets(s, MARGIN, Inches(2.16), Inches(11.6), [
-        ("Cooling values are assumptions. ", "0.8 / 1.0 / 2.0 °C per measure originate in "
-         "a planning catalogue. They were never fitted to Guwahati or validated against a "
-         "field trial, and they determine the ranking."),
-        ("One unit rate is unanchored. ", "Cool roof and pocket park rates come from the "
-         "Telangana Cool Roof Policy and Gujarat AMRUT 2.0. The tree-canopy rate has no "
-         "published municipal equivalent."),
-        ("Cool roof leads by 4%. ", "That margin sits inside the error of an unvalidated "
-         "rate, so the measure mix should be read as approximate, not settled."),
-        ("Surface, not air temperature. ", "Landsat measures skin temperature. The health "
-         "and comfort outcomes a city cares about depend on air temperature."),
-        ("One thermal snapshot. ", "A single scene describes one moment, not a seasonal "
-         "or diurnal pattern."),
-        ("Model is not in the decision path. ", "Spatial-block R² is 0.513 against 0.895 "
-         "on a random split; the honest figure is the lower one, and nothing downstream "
-         "consumes either."),
-    ], gap=0.63)
-
-    footer(s, n, total, link=LINKS["docs"], link_label="docs/08-limitations.md")
-
-
-def slide_future(prs, f, n, total):
-    s = add_slide(prs)
-    eyebrow(s, "10 — future work")
-    heading(s, "Ordered by effect on decision quality")
-
-    items = [
-        ("01", "Calibrate cooling against observation",
-         "Compare existing parks and canopy against matched built-up cells across "
-         "seasons, replacing each assumed constant with a local estimate and a range."),
-        ("02", "Propagate uncertainty into the ranking",
-         "Run the selection over a scenario grid of rates and cooling values, and report "
-         "which cells stay funded across them."),
-        ("03", "Add temporal coverage",
-         "Multi-date and seasonal composites, so the plan responds to a pattern rather "
-         "than a single scene."),
-        ("04", "Surface-to-air temperature transfer",
-         "Add the step that converts skin temperature to the air temperature that governs "
-         "health outcomes."),
-        ("05", "Population weighting",
-         "Optimise people-degrees rather than cell-degrees, weighting schools, hospitals "
-         "and dense settlement."),
+    panel(s, MARGIN, Inches(2.24), Inches(5.85), Inches(3.5), "Current limitations", tint=DANGER)
+    lims = [
+        ("Cooling values are assumptions.", "0.8 / 1.0 / 2.0 °C per measure come from "
+         "a planning catalogue, not local measurement, and they set the ranking."),
+        ("One rate is unanchored.", "Cool-roof and park rates cite published schedules; "
+         "the tree-canopy rate has no municipal equivalent."),
+        ("Surface, not air temperature.", "Landsat measures skin temperature; comfort "
+         "and health depend on air temperature."),
+        ("A single observation window.", "One thermal composite describes one period, "
+         "not a seasonal or diurnal cycle."),
     ]
-    y = Inches(2.16)
-    for num, title, body in items:
-        text(s, MARGIN, y, Inches(0.7), Inches(0.4), [(num, 17, ACCENT, True, DATA)])
-        text(s, MARGIN + Inches(0.86), y - Inches(0.02), Inches(10.9), Inches(0.36),
-             [(title, 15, FG, True, UI)])
-        text(s, MARGIN + Inches(0.86), y + Inches(0.3), Inches(10.6), Inches(0.5),
-             [(body, 12.5, MUTED, False, UI)], line_spacing=1.32)
-        y += Inches(0.88)
+    y = Inches(2.7)
+    for lead, body in lims:
+        text(s, MARGIN + Inches(0.26), y, Inches(5.3), Inches(0.24),
+             [(lead, 12, FG, True, UI)])
+        text(s, MARGIN + Inches(0.26), y + Inches(0.24), Inches(5.3), Inches(0.44),
+             [(body, 11.5, MUTED, False, UI)], line_spacing=1.28)
+        y += Inches(0.8)
 
-    footer(s, n, total)
-
-
-def slide_links(prs, f, n, total):
-    s = add_slide(prs)
-    eyebrow(s, "11 — links and documentation")
-    heading(s, "Everything is public and reproducible", size=34)
-
-    rows = [
-        ["Live dashboard", "Interactive planning console", LINKS["dashboard"]],
-        ["Landing page", "Project overview and figures", LINKS["site"]],
-        ["Source repository", "Full pipeline, tests and CI", LINKS["repo"]],
-        ["Documentation", "Architecture, data contracts, limitations", LINKS["docs"]],
+    panel(s, Inches(7.05), Inches(2.24), Inches(5.6), Inches(3.5), "Planned work", tint=SUCCESS)
+    future = [
+        ("Calibrate cooling locally.", "Compare existing parks and canopy against "
+         "matched built-up cells across seasons; replace each constant with a fitted "
+         "estimate and a range."),
+        ("Propagate uncertainty.", "Re-run selection across a scenario grid of rates "
+         "and report which cells remain funded throughout."),
+        ("Extend temporal coverage.", "Multi-date composites so the plan reflects a "
+         "pattern rather than one scene."),
+        ("Weight by population.", "Optimise people-degrees, prioritising schools, "
+         "hospitals and dense settlement."),
     ]
+    y = Inches(2.7)
+    for lead, body in future:
+        text(s, Inches(7.31), y, Inches(5.1), Inches(0.24),
+             [(lead, 12, FG, True, UI)])
+        text(s, Inches(7.31), y + Inches(0.24), Inches(5.1), Inches(0.44),
+             [(body, 11.5, MUTED, False, UI)], line_spacing=1.28)
+        y += Inches(0.8)
 
-    text(s, MARGIN, Inches(2.0), Inches(3.0), Inches(0.28), [("RESOURCE", 9.5, DIM, False, DATA)])
-    text(s, Inches(3.9), Inches(2.0), Inches(4.2), Inches(0.28), [("CONTENTS", 9.5, DIM, False, DATA)])
-    text(s, Inches(8.2), Inches(2.0), Inches(4.4), Inches(0.28), [("LINK", 9.5, DIM, False, DATA)])
-    rule(s, MARGIN, Inches(2.28), Inches(11.9))
+    text(s, MARGIN, Inches(6.0), COL_W, Inches(0.5),
+         [("All assumptions and their provenance are recorded in the repository under "
+           "docs/08-limitations.md and STATUS.md.", 11.5, DIM, False, UI)])
 
-    y = Inches(2.44)
-    for label, desc, url in rows:
-        text(s, MARGIN, y, Inches(3.1), Inches(0.3), [(label, 13.5, FG, False, UI)])
-        text(s, Inches(3.9), y, Inches(4.2), Inches(0.3), [(desc, 12.5, MUTED, False, UI)])
-        text(s, Inches(8.2), y, Inches(4.4), Inches(0.3),
-             [("↗ ", 11.5, ACCENT, False, DATA), (url.replace("https://", ""), 11.5, ACCENT, False, DATA, url)])
-        y += Inches(0.52)
-
-    rule(s, MARGIN, y + Inches(0.08), Inches(11.9))
-
-    text(s, MARGIN, y + Inches(0.32), Inches(11.9), Inches(0.28),
-         [("KEY DOCUMENTS IN THE REPOSITORY", 9.5, DIM, False, DATA)])
-    docs = [
-        ["docs/01-architecture.md", "Module boundaries and the data contract between them"],
-        ["docs/07-data-contracts.md", "Column-by-column reference for every file crossing a module"],
-        ["docs/08-limitations.md", "Every assumption, with the reason it is still an assumption"],
-        ["STATUS.md", "What is true now, verified against the committed data"],
-    ]
-    dy = y + Inches(0.62)
-    for path, desc in docs:
-        text(s, MARGIN, dy, Inches(3.1), Inches(0.28), [(path, 12, ACCENT, False, DATA)])
-        text(s, Inches(3.9), dy, Inches(8.7), Inches(0.28), [(desc, 12, MUTED, False, UI)])
-        dy += Inches(0.34)
-
-    footer(s, n, total)
+    page(s, n, link=LINKS["docs"], link_label="docs/08-limitations.md")
 
 
-def slide_citations(prs, f, n, total):
+def slide_team(prs, f, n, total):
     s = add_slide(prs)
-    eyebrow(s, "12 — data sources and citations")
-    heading(s, "Sources", size=34)
+    section(s, "12 — team composition & contributions",
+            "Five contributors",
+            "Roles reflect each member's commit history in the repository.")
 
-    y = Inches(1.96)
-    for group, entries in CITATIONS:
-        text(s, MARGIN, y, Inches(11.9), Inches(0.28),
-             [(group.upper(), 9.5, DIM, False, DATA)])
-        y += Inches(0.3)
-        for e in entries:
-            text(s, MARGIN, y, Inches(11.6), Inches(0.32),
-                 [(e, 12, MUTED, False, UI)], line_spacing=1.3)
-            y += Inches(0.34)
-        y += Inches(0.12)
+    y = Inches(2.5)
+    for name, role in TEAM:
+        text(s, MARGIN, y, Inches(0.2), Inches(0.28), [("·", 14, ACCENT, True, UI)])
+        text(s, MARGIN + Inches(0.24), y, Inches(4.0), Inches(0.28),
+             [(name, 14, FG, True, UI)])
+        text(s, Inches(5.2), y, Inches(7.45), Inches(0.28),
+             [(role, 13, MUTED, False, UI)])
+        y += Inches(0.62)
 
-    text(s, MARGIN, Inches(6.5), Inches(11.9), Inches(0.3),
-         [("Landsat and ESA WorldCover are open data. Full attribution is in "
-           "NOTICE.md; the project is MIT licensed.", 11.5, DIM, False, UI)])
+    rule(s, MARGIN, Inches(5.9), COL_W)
+    text(s, MARGIN, Inches(6.12), COL_W, Inches(0.5),
+         [("The repository records 79 commits across five contributors, with CI running "
+           "the full test suite on every push.", 12, DIM, False, UI)])
 
-    footer(s, n, total)
+    page(s, n, link=LINKS["repo"], link_label="commit history")
+
+
+def slide_references(prs, f, n, total):
+    s = add_slide(prs)
+    section(s, "13 — appendix: links & references",
+            "Project resources and cited work")
+
+    text(s, MARGIN, Inches(2.2), Inches(5.9), Inches(0.24),
+         [("PROJECT LINKS", 10, DIM, False, DATA)])
+    y = Inches(2.52)
+    for label, url in [("Live dashboard", LINKS["dashboard"]),
+                       ("Landing page", LINKS["site"]),
+                       ("Source repository", LINKS["repo"]),
+                       ("Documentation", LINKS["docs"])]:
+        text(s, MARGIN, y, Inches(1.9), Inches(0.26), [(label, 11.5, FG, False, UI)])
+        text(s, Inches(2.65), y, Inches(3.9), Inches(0.26),
+             [("↗ ", 10.5, ACCENT, False, DATA),
+              (url.replace("https://", "")[:44], 10.5, ACCENT, False, DATA, url)])
+        y += Inches(0.36)
+
+    text(s, MARGIN, Inches(4.16), Inches(5.9), Inches(0.24),
+         [("DATA SOURCES", 10, DIM, False, DATA)])
+    y = Inches(4.48)
+    for src in ["USGS Landsat 8–9 Collection 2 Level-2",
+                "ESA WorldCover 10 m 2021 v200",
+                "Telangana Cool Roof Policy 2023–28",
+                "Gujarat AMRUT 2.0 garden schedule"]:
+        text(s, MARGIN, y, Inches(5.9), Inches(0.26), [(src, 11.5, MUTED, False, UI)])
+        y += Inches(0.32)
+
+    x2 = Inches(7.05)
+    text(s, x2, Inches(2.2), Inches(5.6), Inches(0.24),
+         [("CITED WORK", 10, DIM, False, DATA)])
+    y = Inches(2.52)
+    for ref in REFERENCES:
+        text(s, x2, y, Inches(5.6), Inches(0.5), [(ref, 10.5, MUTED, False, UI)],
+             line_spacing=1.25)
+        y += Inches(0.62)
+
+    page(s, n)
 
 
 # ------------------------------------------------------------- static copy ---
-# Roles are taken from each contributor's actual commit history rather than
-# assigned, so the slide is accurate rather than flattering.
+TEAM_NAME = "Team Heatwise"
+
+# Roles are taken from each contributor's commit history rather than assigned.
 TEAM = [
     ("Ankam Charan Teja", "ML pipeline, decision engine, documentation"),
     ("Yogeshwar S", "Dashboard, presentation, ML integration"),
-    ("Sriya Sudakshina", "Decision-support module"),
+    ("Sriya Sudakshina", "Decision-support module, cost catalogue"),
     ("Nikhil Cheepati", "Remote sensing, Earth Engine export"),
-    ("Dandu Uddeep Sri Shourya", "Frontend"),
+    ("Dandu Uddeep Sri Shourya", "Frontend, literature research"),
 ]
 
-CITATIONS = [
-    ("Satellite and geospatial data", [
-        "USGS. Landsat 8–9 Collection 2 Level-2 Science Products. U.S. Geological Survey, 2024.",
-        "Zanaga, D. et al. ESA WorldCover 10 m 2021 v200. European Space Agency, 2022. doi:10.5281/zenodo.7254221",
-        "Gorelick, N. et al. Google Earth Engine: Planetary-scale geospatial analysis for everyone. Remote Sensing of Environment, 2017.",
-    ]),
-    ("Unit rates", [
-        "Government of Telangana. Telangana Cool Roof Policy 2023–28 — ₹300/m² for cool-roof coating or tiles.",
-        "Government of Gujarat. AMRUT 2.0 municipal garden development schedule — ₹1,152–2,250/m².",
-    ]),
-    ("Methods and tooling", [
-        "Pedregosa, F. et al. Scikit-learn: Machine Learning in Python. JMLR 12, 2011 — RandomForestRegressor.",
-        "Roberts, D. R. et al. Cross-validation strategies for data with spatial, temporal, phylogenetic or "
-        "spatial-temporal structure. Ecography 40, 2017 — spatial-block validation.",
-        "QGIS Development Team. QGIS Geographic Information System. Open Source Geospatial Foundation, 2024.",
-        "Agafonkin, V. Leaflet — an open-source JavaScript library for interactive maps, 2024.",
-    ]),
+REFERENCES = [
+    "Voogt, J. A. & Oke, T. R. Thermal remote sensing of urban climates. "
+    "Remote Sensing of Environment 86(3), 2003.",
+    "Weng, Q. Thermal infrared remote sensing for urban climate and environmental "
+    "studies. ISPRS Journal of Photogrammetry and Remote Sensing 64(4), 2009.",
+    "Akbari, H., Pomerantz, M. & Taha, H. Cool surfaces and shade trees to reduce "
+    "energy use and improve air quality in urban areas. Solar Energy 70(3), 2001.",
+    "Santamouris, M. Cooling the cities — a review of reflective and green roof "
+    "mitigation technologies. Solar Energy 103, 2014.",
+    "Norton, B. A. et al. Planning for cooler cities: a framework to prioritise green "
+    "infrastructure. Landscape and Urban Planning 134, 2015.",
+    "Gorelick, N. et al. Google Earth Engine: planetary-scale geospatial analysis for "
+    "everyone. Remote Sensing of Environment 202, 2017.",
+    "Roberts, D. R. et al. Cross-validation strategies for data with spatial structure. "
+    "Ecography 40, 2017.",
 ]
 
 
@@ -759,17 +884,17 @@ CITATIONS = [
 BUILDERS = [
     slide_title,
     slide_problem,
-    slide_solution,
-    slide_novelty,
-    slide_approach,
+    slide_literature,
+    slide_method,
+    slide_architecture,
+    slide_data,
     slide_algorithm,
     slide_validation,
-    slide_demo,
-    slide_impact,
+    slide_dashboard,
+    slide_outcomes,
     slide_limits,
-    slide_future,
-    slide_links,
-    slide_citations,
+    slide_team,
+    slide_references,
 ]
 
 

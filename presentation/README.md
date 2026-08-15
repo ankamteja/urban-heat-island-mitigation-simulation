@@ -17,32 +17,35 @@ python presentation/build_deck.py
 
 ## Structure
 
-Thirteen slides in the order a technical panel reads them:
+Thirteen slides, in the section order a technical panel reads. Section titles
+state what the slide contains; the evidence carries the argument.
 
-| # | Slide | Carries |
+| # | Section | Carries |
 |---|---|---|
-| 1 | Title | Project, team and roles, the three project links |
-| 2 | Problem | Why block-scale ranking is needed at all |
-| 3 | Solution | The pipeline in five bullets, then the headline figures |
-| 4 | Novelty | Five specific claims, each falsifiable |
-| 5 | Approach | The eight-stage pipeline diagram |
-| 6 | Algorithm | Cost/cooling table, the selection rule, one worked cell |
-| 7 | Validation | Random vs hottest-first vs ours, at the same budget |
-| 8 | Dashboard | Screenshot of the cell inspector |
-| 9 | Impact | Hotspot reduction, then scalability and reproducibility |
-| 10 | Limitations | Six, each naming what would settle it |
-| 11 | Future work | Five, ordered by effect on decision quality |
-| 12 | Links | Resource table plus the four key repository documents |
-| 13 | Citations | Data sources, unit rates, methods |
+| 1 | Title | Problem statement, team, project links, headline figures |
+| 2 | Problem understanding & motivation | Why urban heat matters, stated generally |
+| 3 | Literature review & existing approaches | Four prior strands and the identified gap |
+| 4 | Proposed methodology & technical approach | Five stages, then the distinguishing choices |
+| 5 | System architecture & processing pipeline | The eight-stage diagram |
+| 6 | Data sources & preprocessing | Datasets, preprocessing steps, derived fields, QC |
+| 7 | Selection algorithm & worked example | Cost model, ordering rule, one cell traced |
+| 8 | Validation & comparative evaluation | Three ordering strategies at one budget |
+| 9 | Dashboard & decision interface | Interface screenshot and capabilities |
+| 10 | Expected outcomes & impact | Outcomes, scalability, sustainability relevance |
+| 11 | Limitations & future work | Four each, side by side |
+| 12 | Team composition & contributions | Roles from commit history |
+| 13 | Appendix: links & references | Project links, data sources, cited work |
 
-Written as bullets and tables. Two positions the content holds deliberately,
-because both are credibility risks in front of judges:
+Layout follows the reference deck: content column 0.65–12.65 in, eyebrow 0.38,
+title 0.95 at 30pt, standfirst 1.73, body from 2.20, footer rule 6.88, page
+number at 12.10.
 
-- **Cooling values are planning assumptions, not measured guarantees.** Slide 6
-  shows where each one came from; slide 10 leads with the fact that they
-  determine the ranking and were never validated locally.
-- **The model is not the decision-maker.** The recommendation comes from the
-  rule and cost engine. Slide 4 says so as a design claim rather than a caveat.
+Two positions the content holds deliberately:
+
+- **Cooling values are planning assumptions, not measured guarantees.** Slide 7
+  labels the basis of every figure in the worked example; slide 11 leads with it.
+- **The model is not the decision-maker.** The recommendation comes from the rule
+  and cost engine. Slide 4 states it as a design choice.
 
 ## Regenerating the validation table
 
