@@ -96,9 +96,11 @@ The web layer is fully static. [`vercel.json`](./vercel.json) and
 [`.vercelignore`](./.vercelignore) configure a Vercel deployment that ships only
 the landing page and `frontend/` (~2.7 MB); no build step is required.
 
-The Vercel project is connected to this repository. Pushing to `main` triggers
-the production deployment; the dashboard fetches a content-hashed grid manifest
-so each deployment loads its matching data release.
+Vercel deploys this repository through its Git integration. After a production
+deploy, verify `frontend/data/release.json`: it identifies the exact dashboard
+grid by SHA-256 and currently reports ₹1,674,616,910 (₹167.46 Cr) across all
+eligible cells. If the public site shows another total, its production alias is
+serving a different deployment or branch.
 
 ## Licence
 
