@@ -287,7 +287,10 @@ def wrapped_lines(body, w_inches, size):
     """Rough line count for a text box. PowerPoint reflows at render time, so
     stacked blocks need an estimate here or a three-line paragraph silently
     overlaps the heading beneath it."""
-    chars_per_line = max(20, int((w_inches * 96) / (size * 0.50)))
+    # 0.58 em per character, measured against Aptos at these sizes. The earlier
+    # 0.50 was optimistic: in a 3-inch column it reported one line where two
+    # rendered, and stacked bullets overlapped.
+    chars_per_line = max(16, int((w_inches * 96) / (size * 0.58)))
     return max(1, -(-len(body) // chars_per_line))
 
 
@@ -299,7 +302,7 @@ def para(slide, x, y, w, lead, body, *, size=12.5, lead_colour=None, gap=0.22):
     text(slide, x, y + Inches(0.26), w, Inches(0.6),
          [(body, size, MUTED, False, UI)], line_spacing=1.32)
     lines = wrapped_lines(body, w / 914400, size)
-    return y + Inches(0.26) + Inches(0.22 * lines) + Inches(gap)
+    return y + Inches(0.26) + Inches(0.205 * lines) + Inches(gap)
 
 
 def panel(slide, x, y, w, h, title, *, tint=None):
@@ -620,38 +623,78 @@ def slide_algorithm(prs, f, n, total):
     page(s, n)
 
 
+def feature_group(slide, x, y, w, heading, items, *, size=10.5, tint=None):
+    """A titled bullet group that reports the y it finished at, so columns of
+    them pack without collision regardless of how each line wraps."""
+    text(slide, x, y, w, Inches(0.2),
+         [(heading.upper(), 8.5, tint or ACCENT, True, DATA)])
+    cy = y + Inches(0.24)
+    for it in items:
+        text(slide, x, cy, Inches(0.14), Inches(0.2), [("·", size, tint or ACCENT, True, UI)])
+        text(slide, x + Inches(0.15), cy, w - Inches(0.15), Inches(0.36),
+             [(it, size, MUTED, False, UI)], line_spacing=1.22)
+        cy += Inches(0.19) * wrapped_lines(it, (w - Inches(0.15)) / 914400, size)
+        cy += Inches(0.05)
+    return cy + Inches(0.2)
+
+
 def slide_dashboard(prs, f, n, total):
     s = add_slide(prs)
     section(s, n, "dashboard & decision interface",
-            "Per-cell inspection, budget scenarios and scenario comparison")
+            "What the interface exposes to a planner")
 
     png = ASSETS / "dash-compare.jpg"
     if png.exists():
-        pic_h = Inches(3.86)
-        pic_w = Inches(3.86 * 1680 / 892)
-        px = int((W - pic_w) / 2)
-        # Hairline frame: the screenshot is dark and would otherwise float on the
-        # white page with no edge.
-        frame = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, px - Inches(0.03), Inches(2.09),
-                                   int(pic_w) + Inches(0.06), pic_h + Inches(0.06))
+        pic_w = Inches(5.3)
+        pic_h = Inches(5.3 * 892 / 1680)
+        frame = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, MARGIN - Inches(0.03), Inches(2.07),
+                                   pic_w + Inches(0.06), pic_h + Inches(0.06))
         frame.fill.background()
         frame.line.color.rgb = SURFACE_3
         frame.line.width = Pt(0.75)
         frame.shadow.inherit = False
-        s.shapes.add_picture(str(png), px, Inches(2.12), width=int(pic_w), height=int(pic_h))
+        s.shapes.add_picture(str(png), MARGIN, Inches(2.1), width=int(pic_w), height=int(pic_h))
 
-    # One line each, so the row cannot run into the footer rule.
-    items = [
-        "Per-cell inspection with rank and cost",
-        "Budget scenarios, ₹10 Cr to ₹100 Cr",
-        "Current vs post-plan on a divider",
-        "Street View at each coordinate",
-    ]
-    x = MARGIN
-    for it in items:
-        text(s, x, Inches(6.26), Inches(2.9), Inches(0.26),
-             [("· ", 11, ACCENT, True, UI), (it, 11, MUTED, False, UI)])
-        x += Inches(3.0)
+    # left column, under the screenshot
+    feature_group(s, MARGIN, Inches(5.06), Inches(5.3),
+                  "Scenario comparison", [
+                      "Draggable Current → Mitigation divider over a single map, "
+                      "operable from the keyboard",
+                      "Decision summary: current and projected mean, cells treated, "
+                      "hotspot change, committed investment",
+                  ])
+
+    # middle column
+    y = Inches(2.1)
+    y = feature_group(s, Inches(6.25), y, Inches(3.15), "Map and layers", [
+        "Interpolated thermal field or the raw 100 m cells",
+        "Layer toggles for temperature, funded sites and place labels",
+        "Priority filter and drag-box area selection",
+        "Sequential temperature ramp with a scale legend",
+    ])
+    feature_group(s, Inches(6.25), y, Inches(3.15), "Planning and optimisation", [
+        "Budget slider with ₹10, 25, 50 and 100 Cr presets",
+        "Per-measure toggles showing funded count, cost and cooling",
+        "Greedy budget fill in the pipeline's own rank order",
+        "Measures the rules never propose are shown as unavailable, with the reason",
+    ])
+
+    # right column
+    y = Inches(2.1)
+    y = feature_group(s, Inches(9.6), y, Inches(3.05), "Cell inspection", [
+        "Grid ID, reverse-geocoded place name, coordinates and priority tier",
+        "Why this cell: temperature, built-up intensity and vegetation ranked "
+        "against the study area",
+        "Recommended measure with cooling, cost, plan rank and funded state",
+        "Street View and Google Maps links; cell extent drawn on the map",
+    ])
+    feature_group(s, Inches(9.6), y, Inches(3.05), "Analysis and output", [
+        "Temperature distribution, current against plan",
+        "Vegetation against temperature with a least-squares fit",
+        "Cooling efficiency per crore by measure",
+        "Methodology drawer and a printable report export",
+        "Release manifest binds the interface to one dataset hash",
+    ])
 
     page(s, n, link=LINKS["dashboard"], link_label="live dashboard")
 
