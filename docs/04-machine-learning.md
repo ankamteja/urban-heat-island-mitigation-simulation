@@ -154,7 +154,7 @@ Both come from `shared/constants.json`.
 | Action | INR/m² | Coverage | Effective INR/m² | Assumed cooling |
 |---|---|---|---|---|
 | Tree cover | 150 | 25% | 37.5 | 0.8 °C |
-| Cool roof | 400 | 15% | 60.0 | 1.0 °C |
+| Cool roof | 300 | 15% | 45.0 | 1.0 °C |
 | Green park | 1,150 | 10% | 115.0 | 2.0 °C |
 | None | 0 | 0% | 0 | 0 °C |
 

@@ -53,7 +53,7 @@ Actionable cells, one row each.
 
 | Intervention | Cells | Rate (INR/m²) | Cooling (°C) |
 |---|---:|---:|---:|
-| Cool roof | 3,494 | 60.0 | 1.0 |
+| Cool roof | 3,494 | 45.0 | 1.0 |
 | Tree cover | 589 | 37.5 | 0.8 |
 | Green park | 74 | 115.0 | 2.0 |
 
