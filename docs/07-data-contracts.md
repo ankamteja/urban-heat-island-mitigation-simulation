@@ -204,6 +204,75 @@ hand-maintained contract between Python and JavaScript, and
 
 ---
 
+## Contract 7 — `cities.json` and `city.json` (the multi-city contract)
+
+**Written by** `update_manifest()` and `write_outputs()` in
+`backend/build_city.py`. **Read by** `frontend/js/cityPicker.js`.
+
+See [12 — Any city](./12-multi-city.md) for what produces these.
+
+### `frontend/data/cities/<slug>/city.json`
+
+One per built city. Provenance and headline figures for a single grid.
+
+| Key | Type | Meaning |
+|---|---|---|
+| `slug`, `name`, `region` | string | Identity. `slug` is the URL and directory name. |
+| `bbox` | `[w, s, e, n]` | The requested extent, before snapping to the lattice. |
+| `cells`, `actionable_cells` | int | Cell counts. |
+| `mean_lst_c`, `max_lst_c`, `mean_ndvi` | float | Headline measurements. |
+| `mean_drop_treated_c`, `mean_drop_grid_c` | float | The two cooling averages, both named by denominator. |
+| `cost_all_actionable_inr`, `budget_inr` | int | Upper bound and the programme cap. |
+| `funded_cells`, `funded_cost_inr`, `funded_action_mix` | | What the budget buys. |
+| `action_mix`, `land_cover_mix` | object | Composition of the grid. |
+| `heat_risk_lst_scale` | `[lo, hi]` | **Per city.** The bounds `Heat_Risk` was scaled with. |
+| `heat_risk_lst_scale_basis` | string | How those bounds were chosen. |
+| `tier_cut_high`, `tier_cut_low` | float | The quantile cuts, for audit. |
+| `cell_area_m2` | float | Cell area at this latitude — costs are per m². |
+| `composite_window` | `[start, end]` | **The window actually used.** The default is relative to today. |
+| `composite_season`, `scenes_used`, `max_cloud_cover_pct` | | What went into the median. |
+| `source`, `built_by` | string | Provenance. |
+| `cost_basis_applies` | **bool** | Whether the INR rate card is valid here. |
+| `cost_basis_note` | string | Why, in a sentence the dashboard can show. |
+| `grid_sha256`, `release_id` | string | Digest of this city's `grid.geojson`. |
+
+`cost_basis_applies` is the one field that must never be wrong. `false` puts a
+red banner over the plan panel saying the rupee figures do not apply. Marking a
+non-Indian city `true` silently presents the Indian rate card as that city's
+budget.
+
+`grid_sha256` mirrors the `release.json` integrity pattern and doubles as the
+cache-busting key, so a rebuilt city cannot be served from a stale browser
+cache. `tests/test_multi_city.py` checks it against the file.
+
+### `frontend/data/cities.json`
+
+The manifest. **Derived, never hand-edited** — `update_manifest()` rebuilds it
+from whatever `city.json` files exist on every build, so it cannot list a city
+the repository does not have.
+
+Each entry is that city's `city.json` plus:
+
+| Key | Type | Meaning |
+|---|---|---|
+| `path` | string | Grid path relative to `frontend/`. |
+| `builtin` | bool | True only for the committed Earth Engine Guwahati grid. |
+
+The Guwahati entry is synthesised rather than read from a `city.json`, and takes
+its `grid_sha256` and `cells` from `release.json` so that every entry carries the
+same integrity token and the dashboard has one code path for all cities.
+
+### What breaks this contract
+
+- **A city directory without a `city.json`.** It is not listed, and it is
+  invisible in the dashboard.
+- **A hand-edited manifest.** The next build overwrites it.
+- **A stale `grid_sha256`.** A rebuilt city is served from the browser cache —
+  the failure that once presented as "the dashboard is not updating" against a
+  server that had been serving the new file all along.
+
+---
+
 ## Rules of thumb
 
 1. **Never hand-edit a generated file.** Regenerate and commit. CI diffs them.

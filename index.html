@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Urban Heat Island Mitigation — Guwahati</title>
-<meta name="description" content="Turning Landsat thermal imagery into a ranked, costed cooling plan for Guwahati, Assam." />
+<title>Urban Heat Island Mitigation — Guwahati and five more cities</title>
+<meta name="description" content="Turning Landsat thermal imagery into a ranked, costed cooling plan — for Guwahati, and for any city you point it at." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='%23FB923C'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23EF4444'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -108,10 +108,11 @@ footer a { color: var(--muted); }
 
 <main>
   <p class="eyebrow">Remote sensing · Machine learning · Urban planning</p>
-  <h1>Urban Heat Island<br/>Mitigation — Guwahati</h1>
+  <h1>Urban Heat Island<br/>Mitigation</h1>
   <div class="rule"></div>
-  <p class="lead">A decision-support pipeline that turns Landsat&nbsp;8 thermal imagery into a ranked, costed plan for where to plant, shade and re-surface the city.</p>
+  <p class="lead">A decision-support pipeline that turns Landsat&nbsp;8 thermal imagery into a ranked, costed plan for where to plant, shade and re-surface a city. Built and validated on Guwahati; it now builds any city from open satellite data, with no account and no credentials.</p>
 
+  <p class="eyebrow" style="margin-top:34px">Guwahati, Assam — the validated case</p>
   <div class="stats">
     <div><span>Grid cells</span><b>8,144</b></div>
     <div><span>Resolution</span><b>100 m</b></div>
@@ -129,6 +130,13 @@ footer a { color: var(--muted); }
       <h2>Heat dashboard</h2>
       <p>The grid as a continuous thermal surface. Select an area to view the post-mitigation planning scenario and ecology pointers.</p>
       <span class="go">Open dashboard →</span>
+    </a>
+
+    <a class="card" href="/frontend/?city=nagpur">
+      <span class="tag">Five more cities</span>
+      <h2>Any city</h2>
+      <p>Nagpur, Ahmedabad, Delhi, Chennai and Phoenix, built from Microsoft Planetary Computer with no Earth Engine account. Switch cities in the dashboard, or drop in a grid you built yourself.</p>
+      <span class="go">Open Nagpur →</span>
     </a>
 
     <a class="card b" href="https://github.com/ankamteja/urban-heat-island-mitigation-simulation">
@@ -152,10 +160,12 @@ footer a { color: var(--muted); }
   </section>
 
   <p class="note"><b>Read the caveats:</b> interventions are gated on real ESA WorldCover land cover, so nothing is proposed on water, wetland or existing tree cover. But the costs and the cooling figures are planning assumptions, not measurements, and the model’s honest score is R² 0.51 under a spatial-block split — not the 0.90 a random split reports. <a href="https://github.com/ankamteja/urban-heat-island-mitigation-simulation/blob/main/docs/08-limitations.md">Full limitations →</a></p>
+
+  <p class="note"><b>On the other cities:</b> their temperatures are measured the same way, but they are hot-season composites while Guwahati is an annual median, so the figures are not comparable city to city. Heat-risk bounds are per city, so priority tiers are not comparable either. And the rupee rates are Indian municipal rates — Phoenix is included as the worked example of a cost figure that computes cleanly and means nothing. <a href="https://github.com/ankamteja/urban-heat-island-mitigation-simulation/blob/main/docs/12-multi-city.md">How the multi-city build works →</a></p>
 </main>
 
 <footer>
-  Guwahati, Assam · Landsat 8 · 100 m grid ·
+  Guwahati, Assam · and five more cities · Landsat 8 · 100 m grid ·
   <a href="https://github.com/ankamteja/urban-heat-island-mitigation-simulation">source on GitHub</a>
 </footer>
 </body>

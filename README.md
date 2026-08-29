@@ -1,6 +1,8 @@
-# Urban Heat Island Mitigation Simulation — Guwahati
+# Urban Heat Island Mitigation Simulation
 
-Analysis of the Urban Heat Island effect in Guwahati, Assam using Landsat 8 remote sensing, Google Earth Engine, and grid-based spatial analysis. The city is divided into ~8,100 hundred-metre cells; each cell gets a land surface temperature, a vegetation index, a priority tier, a recommended mitigation action and a costed estimate, and the result is explorable in a browser dashboard.
+Analysis of the Urban Heat Island effect using Landsat 8 remote sensing and grid-based spatial analysis. A city is divided into hundred-metre cells; each cell gets a land surface temperature, a vegetation index, a priority tier, a recommended mitigation action and a costed estimate, and the result is explorable in a browser dashboard.
+
+Built and validated on **Guwahati, Assam** via Google Earth Engine. It now builds **any city** from Microsoft Planetary Computer with no account and no credentials — five more are in the repository, and the dashboard switches between them. See [12 — Any city](./docs/12-multi-city.md).
 
 **New here? Start with [`docs/`](./docs/README.md)** — it covers architecture, a clean-clone build, and a walkthrough of every script.
 
@@ -45,7 +47,36 @@ Machine Learning & Prediction    Decision-Support
 
 Full detail, including every column of every file crossing a module boundary, is in [`docs/07-data-contracts.md`](./docs/07-data-contracts.md).
 
+## Other cities
+
+```bash
+python backend/build_city.py --list
+python backend/build_city.py --preset nagpur
+python backend/build_city.py --bbox 78.42 17.36 78.54 17.46 --name Hyderabad --slug hyderabad
+```
+
+No Earth Engine account is needed. `backend/build_city.py` reads Landsat C2 L2
+and ESA WorldCover from Microsoft Planetary Computer anonymously, applies the
+same decision rules out of `shared/uhi_shared.py`, and writes a dashboard grid, a
+dataset CSV, a ranking CSV and a provenance file per city.
+
+Nagpur, Ahmedabad, Delhi, Chennai and Phoenix are committed under
+`frontend/data/cities/`, so they can be downloaded and checked independently. The
+dashboard's city selector switches between them, `?city=<slug>` deep-links one,
+and dropping a `grid.geojson` on the page loads a grid you built yourself — read
+in the browser, never uploaded.
+
+**Three things not to do with them**, all documented in
+[08 — Limitations](./docs/08-limitations.md): do not compare temperatures
+between cities (different composite windows), do not compare priority tiers
+(heat-risk bounds are per city), and do not read the rupee figures outside India
+(the rate card is Indian municipal). Phoenix is in the list precisely as the
+worked example of that last one.
+
 ## Headline numbers
+
+Guwahati, the validated case. Every other city's figures are in its own
+`city.json`.
 
 | | |
 |---|---|

@@ -1,5 +1,7 @@
 # 3. Remote Sensing & Data Engineering
 
+> **There are two ingest paths now.** This page documents the original one: the Earth Engine script that produced the committed Guwahati dataset. It needs a Google account and runs in a browser. The second path, `backend/build_city.py`, reads the same Landsat C2 L2 scenes and the same ESA WorldCover tiles from Microsoft Planetary Computer with no credentials, applies the same scaling arithmetic and the same cloud mask, and works for any city — see [12 — Any city](./12-multi-city.md). Read this page first regardless: it explains what every number in that arithmetic means.
+
 This module is the head of the pipeline: it turns raw satellite imagery of Guwahati into a table of 8,144 grid cells, each carrying a temperature, a vegetation index, a built-up index, a land-cover class and a heat-risk score. It is one file — `Remote Sensing & Data Engineering/GEE/urban_heat_analysis.js` — and that file does not run on your computer. It runs on Google's servers, inside a hosted service called Google Earth Engine, which you drive from a browser. This page walks that script line by line, defines every remote-sensing term it uses, works out the arithmetic behind every magic number in it, and then tells you exactly how to run it yourself. It assumes you can program and assumes you have never touched satellite data.
 
 ## Contents

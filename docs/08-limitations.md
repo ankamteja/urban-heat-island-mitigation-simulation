@@ -234,6 +234,63 @@ faithful rendering of 8,144 discrete measurements. Colour between cell centres
 is inferred. Zoom far enough in and you are looking at an interpolation, not
 data.
 
+## 13. Temperatures are not comparable between cities
+
+The repository now ships several cities. **Do not rank them against each other.**
+
+Guwahati is a single annual median from one Earth Engine composite and reads
+27.0 °C mean. Ahmedabad, built by `backend/build_city.py`, reads 47.9 °C. Some of
+that 21 °C gap is a real difference between a monsoon-climate city in Assam and
+a semi-arid one in Gujarat. Some of it is that the two numbers were computed
+over different windows: an annual median including the monsoon against a
+hot-season median over eight scenes.
+
+This project cannot tell you the split, and no figure in it separates the two.
+
+Within one city, every cell was measured the same way and comparison is exactly
+what the data supports. Across cities it is not, unless both were built with the
+same pinned `--start`/`--end` and the same `--season`.
+
+See [12 — Any city](./12-multi-city.md).
+
+## 14. `Heat_Risk` bounds are per city, so tiers do not compare either
+
+This follows from §6 and compounds it.
+
+The Earth Engine script scaled heat risk with `unitScale(LST, 20, 34)` — bounds
+taken from Guwahati. They cannot be reused: Nagpur's 2nd/98th percentiles are
+40–48 °C, entirely above the 34 °C ceiling, so every Nagpur cell would saturate
+at `Heat_Risk = 1.0` and the quantile tiers would be cut from a constant.
+
+Each city therefore derives its own bounds from its own distribution, recorded in
+`city.json` as `heat_risk_lst_scale`. The consequence is that **`High` priority
+means "hot relative to this city" and nothing more.** A `High` cell in Delhi and
+a `High` cell in Chennai are not claims about the same temperature, and the same
+physical surface would tier differently in two cities.
+
+The alternative — one global scale — would be worse: it would put whole cities
+at one end of the ramp and rank nothing within them.
+
+## 15. The rupee figures do not leave India
+
+`shared/constants.json` prices interventions at Indian municipal rates in INR/m².
+Those rates are sourced and real, and they are real *for India*.
+
+Applied to a city outside India the arithmetic completes, the totals format
+correctly, and the result means nothing. Phoenix is in the preset list as the
+worked example: its temperatures, vegetation and land cover are measured and
+correct, and its ₹-denominated plan is the Indian rate card applied to Arizona,
+wrong by an unknown factor.
+
+Every city carries `cost_basis_applies` in its `city.json`, and the dashboard
+shows a red banner where it is `false`. A grid opened from a local file has no
+`city.json` vouching for it at all and gets an amber "costs unverified".
+
+For a non-Indian city, read the plan as a **ranking** — which cells to treat
+first, which measure per cell — and ignore the totals. The ranking depends on
+the *ratio* of cooling to cost between measures, which survives a change of
+currency far better than the absolute figures do.
+
 ---
 
 ## What is *not* a limitation any more

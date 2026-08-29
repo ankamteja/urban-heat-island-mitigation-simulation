@@ -5,7 +5,9 @@ Everything needed to understand, build, run and modify this project.
 ## The shortest possible orientation
 
 Guwahati is divided into 8,144 cells of roughly 100 m. Google Earth Engine
-measures each cell's surface temperature, vegetation and land cover. A Python
+measures each cell's surface temperature, vegetation and land cover. (Any other
+city can be built the same way without an Earth Engine account — see
+[12 — Any city](./12-multi-city.md).) A Python
 rule engine ranks each cell by heat risk and assigns it a costed mitigation
 action, refusing to place work on water, wetland or already-forested land. A
 Leaflet page draws the result twice — as measured, and as a clearly labelled
@@ -32,6 +34,7 @@ planning assumptions, not measurements. See [08 — Limitations](./08-limitation
 | [09 — Automated refresh](./09-automated-refresh.md) | How the satellite data keeps itself current, and the one-time setup to enable it. |
 | [10 — Tree-cover temperature check](./10-tree-cover-check.md) | The reproducible nearby-cell contrast check, and why it is not a causal intervention estimate. |
 | [11 — Roadmap to 9/10](./11-roadmap-to-9.md) | Prioritized, testable improvements for scientific validity, product quality and operational readiness. |
+| [12 — Any city](./12-multi-city.md) | Building any city without Earth Engine, the lattice that made it possible, and what does not transfer between cities. |
 
 ## Reading order
 
@@ -47,6 +50,8 @@ It is the page that would have prevented this project's two worst defects.
 
 **Changing the dashboard:** [06 — Frontend](./06-frontend.md), then the contract
 section of [07](./07-data-contracts.md#contract-4--gridgeojson-the-frontend-contract).
+
+**Adding a city:** [12 — Any city](./12-multi-city.md).
 
 ---
 
