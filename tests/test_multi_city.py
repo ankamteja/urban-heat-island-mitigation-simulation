@@ -277,6 +277,80 @@ def test_every_action_is_one_the_pipeline_recognises(city_dir):
 
 
 # --------------------------------------------------------------------------
+# 3b. The study area
+# --------------------------------------------------------------------------
+
+@pytest.mark.parametrize("city_dir", _city_params())
+def test_city_records_which_outline_it_was_clipped_to(city_dir):
+    """A reader has to be able to tell a city from a crop of one.
+
+    Built cities used to be raw bounding boxes, so every one of them was a
+    rectangle while Guwahati -- clipped to a geoBoundaries polygon by the Earth
+    Engine script -- was city-shaped. Cities are now clipped to their
+    administrative boundary, but not all of them can be: an outline too large
+    to tile at 100 m leaves the preset window in place.
+
+    Both outcomes are legitimate. Silently confusing them is not, because the
+    cell count, the total cost and the mean temperature all mean something
+    different for a whole city than for a window inside one.
+    """
+    meta = _load(city_dir / "city.json")
+    assert meta["boundary_mode"] in {"full", "window", "none"}, meta["boundary_mode"]
+    if meta["boundary_mode"] == "none":
+        assert meta["boundary"] is None
+    else:
+        assert meta["boundary"], "a clipped city must name the outline it used"
+
+
+@pytest.mark.parametrize("city_dir", _city_params())
+def test_a_full_boundary_city_is_not_a_rectangle(city_dir):
+    """boundary_mode "full" is a claim about shape, so check the shape.
+
+    A city clipped to its own outline cannot fill its bounding box -- no
+    administrative boundary is a perfect rectangle on a lattice. If it does
+    fill it, the clip did not happen and the metadata is lying about it, which
+    is worse than the rectangle.
+
+    95% is generous. The three cities clipped to a full boundary fill 47%, 56%
+    and 61% of theirs.
+    """
+    meta = _load(city_dir / "city.json")
+    if meta["boundary_mode"] != "full":
+        pytest.skip(f"{meta['slug']} is a {meta['boundary_mode']}")
+
+    ids = [f["properties"]["grid_id"]
+           for f in _load(city_dir / "grid.geojson")["features"]]
+    parsed = [_parse_grid_id(g) for g in ids]
+    cols = {c for c, _ in parsed}
+    rows = {r for _, r in parsed}
+    bbox_cells = (max(cols) - min(cols) + 1) * (max(rows) - min(rows) + 1)
+    fill = len(ids) / bbox_cells
+    assert fill < 0.95, (
+        f"{meta['slug']} claims boundary_mode 'full' but fills {fill:.0%} of its "
+        f"bounding box -- it is still a rectangle")
+
+
+@pytest.mark.parametrize("city_dir", _city_params())
+def test_cells_are_contiguous_enough_to_be_one_place(city_dir):
+    """A clipped city is still one city, not scattered fragments.
+
+    A bad boundary match -- a point geocode, a building footprint, the wrong
+    administrative unit -- can leave a handful of disconnected specks that
+    still satisfy every other assertion here. Requiring most cells to have a
+    lattice neighbour catches that without hard-coding any city's shape.
+    """
+    ids = {f["properties"]["grid_id"]
+           for f in _load(city_dir / "grid.geojson")["features"]}
+    cells = {_parse_grid_id(g) for g in ids}
+    with_neighbour = sum(
+        1 for c, r in cells
+        if (c + 1, r) in cells or (c - 1, r) in cells
+        or (c, r + 1) in cells or (c, r - 1) in cells
+    )
+    assert with_neighbour / len(cells) > 0.98
+
+
+# --------------------------------------------------------------------------
 # 4. The manifest
 # --------------------------------------------------------------------------
 

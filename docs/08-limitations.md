@@ -253,6 +253,21 @@ same pinned `--start`/`--end` and the same `--season`.
 
 See [12 — Any city](./12-multi-city.md).
 
+## 13b. Study areas are not the same kind of thing
+
+Some cities are clipped to their whole administrative outline; others are a
+rectangular window inside a city too large to tile at 100 m. `city.json`
+records which, as `boundary_mode`.
+
+This matters for every total. "Cost if every actionable cell were treated" is a
+figure for a whole city in Delhi, Nagpur and Hyderabad, and a figure for part of
+one in Ahmedabad, Chennai and Phoenix. Cell counts are not comparable between
+the two, and neither are the crore totals derived from them.
+
+Per-cell and per-area figures — mean temperature, mean NDVI, cooling per rupee,
+the funding order — are unaffected, because they do not depend on how much of
+the city is in frame.
+
 ## 14. `Heat_Risk` bounds are per city, so tiers do not compare either
 
 This follows from §6 and compounds it.

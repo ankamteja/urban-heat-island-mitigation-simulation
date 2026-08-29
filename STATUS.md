@@ -1,7 +1,7 @@
 # Status
 
-**Last verified:** 2026-08-14, by running the pipeline and querying the
-committed data.
+**Last verified:** 2026-08-29, by running the pipeline, rebuilding every city
+and querying the committed data.
 
 The single document describing where this project actually stands. It replaces
 `IMPROVEMENTS.md` and `INTEGRATION_AUDIT.md`, which described a repository state
@@ -30,8 +30,17 @@ that no longer existed.
   water, wetland, or already-forested land.
 - **Both recommendation engines agree on every cell**, because they call one
   shared rule.
-- **133 tests pass**, and CI regenerates every artefact and fails if the
+- **210 tests pass**, and CI regenerates every artefact and fails if the
   committed copies differ.
+- **The pipeline builds any city, with no credentials.**
+  `backend/build_city.py` reads Landsat C2 L2 and ESA WorldCover from Microsoft
+  Planetary Computer anonymously. Six cities besides Guwahati are committed and
+  downloadable, and the dashboard switches between them or opens a
+  `grid.geojson` from your own machine.
+- **Nothing in this repository requires an account or an API key.** The
+  scheduled refresh used to need an Earth Engine service-account key, which was
+  never set, so it had never run. `backend/refresh_grid.py` does the same job
+  through Planetary Computer.
 
 Current recommendation set, 8,144 cells:
 
@@ -123,7 +132,43 @@ all cool roof.** See the caveat on costs below.
 | 9 | **Both `SPEC_AUDIT.md` files still describe the pre-fix state.** They now carry a superseded banner pointing here, but were left in place rather than deleted — they are other contributors' module documentation and may hold detail worth folding in first. | hour |
 | 13 | **Three top-level directories contain spaces and an ampersand** (`Machine Learning & Prediction`, `Remote Sensing & Data Engineering`). Every cross-reference is URL-encoded (`%20%26%20`), scripts quote paths defensively, and CI needs quoted `working-directory` keys. Renaming to `ml/`, `remote-sensing/` would be cleaner but touches ~40 files, the CI workflows, `.vercelignore` and `shared/uhi_shared.py` for a cosmetic payoff. **Deliberately not done** — it needs a decision, not a drive-by. | decision |
 | 10 | **No linting or formatting config anywhere**, and no `package.json` for the frontend. All eleven JS files share global scope via `<script>` tags — `view`, `charts` and `INTERVENTIONS` are globals. ES modules plus ESLint would fix it without introducing a build step; `ruff` would cover the Python side. | hours |
+| 14 | **Two cities are still rectangles.** Ahmedabad has no city-level polygon in OpenStreetMap and Phoenix's city limits are too large to tile at 100 m, so both keep a preset window. Fixing Ahmedabad properly means a curated boundary source (geoBoundaries ADM3, as the Earth Engine script used) rather than a geocoder. | hours |
+| 15 | **Cross-city comparison is unsupported but not prevented.** The dashboard will happily show Guwahati at 27 °C and Ahmedabad at 47.9 °C on the same colour ramp on consecutive clicks. The limitation is documented in three places; nothing in the UI stops a reader drawing the wrong conclusion. | decision |
 | 12 | **46% of the study area now receives no action by design.** The `already_green` rule excludes all 3,752 cells ESA WorldCover classifies as tree cover, including hot ones. This is the single largest behavioural change from the land-cover fix and is defensible for *planting*, but arguably wrong for a hot, sparsely-canopied cell that WorldCover still labels tree cover. Worth a deliberate decision rather than inheriting it. | decision |
+
+---
+
+## Multi-city, as of 2026-08-29
+
+| City | Cells | Study area | Mean LST °C | INR rates apply |
+|---|---:|:---:|---:|:---:|
+| Guwahati | 8,144 | full outline (Earth Engine) | 27.0 | yes |
+| New Delhi | 4,968 | full outline | 39.0 | yes |
+| Chennai | 7,718 | window | 41.9 | yes |
+| Ahmedabad | 8,282 | window | 47.9 | yes |
+| Phoenix | 8,242 | window | 48.6 | **no** |
+| Hyderabad | 19,220 | full outline | 39.3 | yes |
+| Nagpur | 22,714 | full outline | 46.4 | yes |
+
+**These figures are not comparable across cities**, and the reasons are
+documented rather than hidden:
+
+- Guwahati is a single annual Earth Engine median; the rest are hot-season
+  medians over several scenes. Part of every gap is real and part is
+  compositing, and this project cannot separate them.
+- `Heat_Risk` bounds are derived per city, so priority tiers mean "hot for this
+  city" and nothing more.
+- A full outline covers a whole city; a window covers part of one. Cell counts
+  and crore totals are not comparable between the two. Per-cell and per-area
+  figures are unaffected.
+- The rupee rates are Indian municipal. Phoenix is in the list deliberately as
+  the worked example of a cost figure that computes cleanly and means nothing;
+  its `cost_basis_applies` is `false` and the dashboard bands the money off.
+
+Two cities that should have outlines do not. Ahmedabad has no city-level
+polygon in OpenStreetMap — only a 775,000-cell district — and Phoenix's city
+limits are 1,340 km², four times Chennai. Both keep a rectangular window and
+record `boundary_mode: "window"` rather than claiming a shape they do not have.
 
 ---
 

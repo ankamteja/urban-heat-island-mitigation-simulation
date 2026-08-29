@@ -60,18 +60,25 @@ and ESA WorldCover from Microsoft Planetary Computer anonymously, applies the
 same decision rules out of `shared/uhi_shared.py`, and writes a dashboard grid, a
 dataset CSV, a ranking CSV and a provenance file per city.
 
-Nagpur, Ahmedabad, Delhi, Chennai and Phoenix are committed under
-`frontend/data/cities/`, so they can be downloaded and checked independently. The
-dashboard's city selector switches between them, `?city=<slug>` deep-links one,
-and dropping a `grid.geojson` on the page loads a grid you built yourself — read
-in the browser, never uploaded.
+Nagpur, Ahmedabad, Delhi, Chennai, Hyderabad and Phoenix are committed under
+`frontend/data/cities/`, so they can be downloaded and checked independently —
+the dashboard's **Data** menu links straight to each city's four files. The city
+selector switches between them, `?city=<slug>` deep-links one, and dropping a
+`grid.geojson` on the page loads a grid you built yourself — read in the
+browser, never uploaded.
 
-**Three things not to do with them**, all documented in
+Cities are clipped to their administrative outline where one small enough to
+tile exists, so Delhi, Nagpur and Hyderabad render as real city shapes rather
+than boxes. Where the outline is too large — Phoenix's city limits are 1,340 km²
+— the study area stays a rectangular window and `city.json` says so.
+
+**Four things not to do with them**, all documented in
 [08 — Limitations](./docs/08-limitations.md): do not compare temperatures
 between cities (different composite windows), do not compare priority tiers
-(heat-risk bounds are per city), and do not read the rupee figures outside India
-(the rate card is Indian municipal). Phoenix is in the list precisely as the
-worked example of that last one.
+(heat-risk bounds are per city), do not compare totals between a full-outline
+city and a windowed one (different fractions of a city), and do not read the
+rupee figures outside India (the rate card is Indian municipal). Phoenix is in
+the list precisely as the worked example of that last one.
 
 ## Headline numbers
 

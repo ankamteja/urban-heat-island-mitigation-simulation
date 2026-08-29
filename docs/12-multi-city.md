@@ -149,20 +149,22 @@ window and the scene count that produced the file in front of you.
 
 ## The cities in the repository
 
-| City | Region | Cells | Mean LST °C | Peak °C | Heat_Risk bounds | Scenes | Actionable | Funded at ₹10 Cr | INR rates apply |
-|---|---|---:|---:|---:|:---:|---:|---:|---:|:---:|
-| Ahmedabad | Gujarat, India | 8,282 | 47.91 | 57.48 | 40–53 | 8 | 6,062 | 242 | yes |
-| Chennai | Tamil Nadu, India | 8,282 | 41.25 | 50.43 | 29–46 | 8 | 5,961 | 229 | yes |
-| New Delhi | Delhi, India | 8,282 | 39.59 | 49.36 | 33–45 | 8 | 4,521 | 254 | yes |
-| Nagpur | Maharashtra, India | 8,282 | 44.19 | 50.82 | 40–48 | 8 | 5,947 | 239 | yes |
-| Phoenix | Arizona, USA | 8,282 | 48.58 | 53.10 | 42–52 | 8 | 6,189 | 267 | **no** |
+| City | Region | Cells | Study area | Mean LST °C | Peak °C | Heat_Risk bounds | Actionable | Funded at ₹10 Cr | INR rates apply |
+|---|---|---:|:---:|---:|---:|:---:|---:|---:|:---:|
+| Ahmedabad | Gujarat, India | 8,282 | window | 47.91 | 57.48 | 40–53 | 6,062 | 242 | yes |
+| Chennai | Tamil Nadu, India | 7,718 | window | 41.92 | 50.43 | 29–46 | 5,626 | 229 | yes |
+| New Delhi | Delhi, India | 4,968 | **full outline** | 38.98 | 47.0 | 36–43 | 2,003 | 254 | yes |
+| Hyderabad | Telangana, India | 19,220 | **full outline** | 39.3 | 48.66 | 33–44 | 13,540 | 234 | yes |
+| Nagpur | Maharashtra, India | 22,714 | **full outline** | 46.39 | 56.49 | 41–54 | 16,159 | 239 | yes |
+| Phoenix | Arizona, USA | 8,242 | window | 48.63 | 53.1 | 42–52 | 6,159 | 267 | **no** |
 
 Guwahati, for comparison, is 8,144 cells with a mean of 27.0 °C.
 
-**Do not read that table as a ranking of Indian cities by heat.** Guwahati is a
-single Earth Engine annual median; these are hot-season medians over eight
-Landsat scenes each. Part of the gap is real and part is compositing, and this
-project cannot tell you the split. See
+**Do not read that table as a ranking of cities by heat.** Guwahati is a single
+Earth Engine annual median; these are hot-season medians over several Landsat
+scenes each. Part of the gap is real and part is compositing, and this project
+cannot tell you the split. Nor are the cell counts comparable: a full outline
+covers a whole city, a window covers part of one. See
 [08 — Limitations](./08-limitations.md).
 
 ### Phoenix is in the list on purpose
@@ -176,6 +178,54 @@ That is the case the dashboard's cost-basis banner exists for, and the reason
 that is fully computed, plausibly formatted, and not true.
 
 ---
+
+## City shape, and why some cities are rectangles
+
+A raw bounding box makes every city a rectangle. Guwahati is not one, because
+the Earth Engine script clipped it to a geoBoundaries polygon; `build_city.py`
+originally had no equivalent step and every city it built was a plain box.
+
+Cities are now looked up in **OpenStreetMap's Nominatim** — no account, no key,
+one request per build — and cells whose **centre** falls outside the boundary
+are dropped. The centre, not any overlap: a cell is in the city or it is not,
+and an overlap test keeps a rim of cells that are mostly outside it and whose
+temperature is mostly not the city's.
+
+Clipping happens **before tiering**. Priority tiers are quantiles over the study
+area, so cutting them from cells that are then discarded would tier the city
+against land outside it.
+
+### Picking the right outline is most of the problem
+
+The geocoder's first hit is often the wrong administrative level, and it is
+wrong in both directions:
+
+- **Ahmedabad** — the district polygon is 775,000 cells around a city core of a
+  few thousand. Its city-level entry has no polygon at all.
+- **Hyderabad** — the city-level relation sprawls to 129,000 cells, while
+  Hyderabad *district*, one of India's smallest and entirely urban, is 41,700
+  and is what anyone means by the name.
+
+So neither rank wins on its own. The rule is: **city-level if it fits the cell
+cap, otherwise the largest administrative area that does.** That gets Hyderabad
+its district and leaves Nagpur and Delhi on their city outlines.
+
+### Cities too large to tile keep their window
+
+Above `MAX_BOUNDARY_CELLS`, the boundary is not adopted. Phoenix's city limits
+are 1,340 km² — 162,000 cells at 100 m, four times Chennai, for a city that is
+in the preset list only as a cost-model example.
+
+Those cities keep their preset window and record `boundary_mode: "window"`,
+because a centred crop of a much larger city is a rectangle whatever it is
+called. Claiming a shape it does not have would be worse than the rectangle.
+
+`city.json` always records both `boundary` — the entity actually matched — and
+`boundary_mode`. `tests/test_multi_city.py` asserts that a city claiming a full
+outline really does fail to fill its bounding box, so the metadata cannot drift
+from the geometry.
+
+`--no-clip` tiles the raw bbox, for offline builds or a bad geocoder match.
 
 ## Using it in the dashboard
 
