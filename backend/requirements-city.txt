@@ -1,0 +1,15 @@
+# Dependencies for backend/build_city.py, the credential-free multi-city ingest.
+#
+# Deliberately separate from backend/requirements.txt: that file pulls in
+# earthengine-api, which needs a Google Cloud service account registered with
+# Earth Engine. Nothing here needs an account of any kind.
+#
+# rasterio must be built against GDAL 3.5 or newer. build_city.py checks this at
+# startup and refuses to run otherwise -- older builds do not reliably skip NaN
+# nodata under `average` and `mode` resampling, and when they get it wrong they
+# get it wrong silently, folding cloud-masked pixels into the cell value.
+rasterio>=1.3
+pystac-client>=0.7
+planetary-computer>=1.0
+numpy>=1.24
+pandas>=2.0

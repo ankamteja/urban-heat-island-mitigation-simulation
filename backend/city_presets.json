@@ -1,0 +1,118 @@
+{
+  "_comment": [
+    "Bounding boxes for cities the builder ships as presets, in",
+    "[west, south, east, north] degrees (EPSG:4326).",
+    "",
+    "These are hand-chosen urban-core boxes, not administrative boundaries.",
+    "The point is a study area of roughly the size of the original Guwahati",
+    "extent (~0.09 x 0.07 degrees, ~72 km2) so the cell counts, the runtime",
+    "and the dashboard payload all stay in the same range.",
+    "",
+    "Anything not listed here still works: pass --bbox W S E N --name/--slug.",
+    "",
+    "Phoenix is deliberately included and deliberately outside India. The cost",
+    "model in shared/constants.json is Indian municipal rupees per square",
+    "metre; it does not transfer. The builder marks any city whose",
+    "cost_basis_applies is false, and the dashboard shows the warning. It is a",
+    "worked example of the assumption breaking, not an oversight."
+  ],
+  "guwahati": {
+    "name": "Guwahati",
+    "region": "Assam, India",
+    "bbox": [
+      91.6876,
+      26.1136,
+      91.7774,
+      26.1863
+    ],
+    "cost_basis_applies": true
+  },
+  "nagpur": {
+    "name": "Nagpur",
+    "region": "Maharashtra, India",
+    "bbox": [
+      79.0551,
+      21.1037,
+      79.1449,
+      21.1763
+    ],
+    "cost_basis_applies": true
+  },
+  "ahmedabad": {
+    "name": "Ahmedabad",
+    "region": "Gujarat, India",
+    "bbox": [
+      72.5451,
+      22.9937,
+      72.6349,
+      23.0663
+    ],
+    "cost_basis_applies": true
+  },
+  "jaipur": {
+    "name": "Jaipur",
+    "region": "Rajasthan, India",
+    "bbox": [
+      75.7651,
+      26.8636,
+      75.8549,
+      26.9363
+    ],
+    "cost_basis_applies": true
+  },
+  "chennai": {
+    "name": "Chennai",
+    "region": "Tamil Nadu, India",
+    "bbox": [
+      80.2051,
+      13.0336,
+      80.2949,
+      13.1064
+    ],
+    "cost_basis_applies": true
+  },
+  "delhi": {
+    "name": "New Delhi",
+    "region": "Delhi, India",
+    "bbox": [
+      77.1951,
+      28.5837,
+      77.2849,
+      28.6563
+    ],
+    "cost_basis_applies": true
+  },
+  "hyderabad": {
+    "name": "Hyderabad",
+    "region": "Telangana, India",
+    "bbox": [
+      78.4351,
+      17.3737,
+      78.5249,
+      17.4463
+    ],
+    "cost_basis_applies": true
+  },
+  "kolkata": {
+    "name": "Kolkata",
+    "region": "West Bengal, India",
+    "bbox": [
+      88.3251,
+      22.5337,
+      88.4149,
+      22.6063
+    ],
+    "cost_basis_applies": true
+  },
+  "phoenix": {
+    "name": "Phoenix",
+    "region": "Arizona, USA",
+    "bbox": [
+      -112.1049,
+      33.4337,
+      -112.0151,
+      33.5063
+    ],
+    "cost_basis_applies": false
+  }
+}
