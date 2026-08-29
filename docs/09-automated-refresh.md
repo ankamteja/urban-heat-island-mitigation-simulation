@@ -82,9 +82,17 @@ Cloud account and handling a private key, which is yours to hold.
 
 ### 1. Create a service account and register it with Earth Engine
 
-1. In the [Google Cloud console](https://console.cloud.google.com/), select the
-   project that owns the Earth Engine assets (the boundary asset the original
-   script references lives under `projects/urban-heat-guwahati`).
+> **Any Google Cloud project will do.** An earlier version of this page said to
+> use the project that owns the Earth Engine assets, and to share the boundary
+> asset with the service account. Neither is needed, and the instruction sent
+> people looking for access to `projects/urban-heat-guwahati` that they did not
+> need. `refresh_dataset.py` reads each cell's polygon out of the `.geo` column
+> of the committed `dataset.csv` and builds the `FeatureCollection` in memory —
+> see `measure()`. The only Earth Engine data it reads is the public Landsat and
+> WorldCover collections. No private asset is involved at any point.
+
+1. In the [Google Cloud console](https://console.cloud.google.com/), create or
+   select any project. A fresh empty one is fine.
 2. Enable the **Earth Engine API** for that project.
 3. **IAM & Admin → Service Accounts → Create service account.** Name it
    something like `uhi-refresh`. It needs no project IAM roles.
@@ -93,8 +101,6 @@ Cloud account and handling a private key, which is yours to hold.
 5. Register the service account with Earth Engine at
    [signup.earthengine.google.com/#!/service_accounts](https://signup.earthengine.google.com/#!/service_accounts),
    using the account's email (`uhi-refresh@<project>.iam.gserviceaccount.com`).
-6. Grant that email **read access to the boundary asset** in the Earth Engine
-   Code Editor (Assets → the asset → Share), or the job cannot see it.
 
 ### 2. Add the key as a repository secret
 
