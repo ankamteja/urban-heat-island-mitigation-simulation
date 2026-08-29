@@ -7,15 +7,18 @@ name: refresh-data
 # the freshest scene available". That is what this does.
 #
 # Monthly, or on demand:
-#   1. re-measure every committed grid cell from Earth Engine
+#   1. re-measure every committed grid cell from Microsoft Planetary Computer
 #   2. re-run the ML pipeline and Decision-Support over the new dataset
 #   3. run the tests, so a bad refresh cannot be committed
 #   4. commit and push -- Vercel redeploys automatically on the push
 #
-# The grid itself is never regenerated; see backend/refresh_dataset.py for why
+# The grid itself is never regenerated; see backend/refresh_grid.py for why
 # that matters (grid_id is the join key for every downstream file).
 #
-# Requires one repository secret: EE_SERVICE_ACCOUNT_JSON.
+# No credentials. This used to need an Earth Engine service-account key
+# (EE_SERVICE_ACCOUNT_JSON), which was the only secret in the repository and
+# meant a fork could not run its own refresh. Planetary Computer serves the
+# same Landsat C2 L2 scenes anonymously, so the secret is gone.
 # Setup: docs/09-automated-refresh.md
 
 on:
@@ -57,13 +60,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r "Machine Learning & Prediction/requirements.txt"
           pip install -r backend/requirements.txt
+          pip install -r backend/requirements-city.txt
           pip install pytest
 
-      - name: Refresh the dataset from Earth Engine
-        env:
-          EE_SERVICE_ACCOUNT_JSON: ${{ secrets.EE_SERVICE_ACCOUNT_JSON }}
+      - name: Refresh the dataset from Planetary Computer
         run: |
-          python backend/refresh_dataset.py \
+          python backend/refresh_grid.py \
             --days "${{ github.event.inputs.days || '365' }}" \
             ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
 
@@ -98,7 +100,7 @@ jobs:
           git add -A
           git commit -m "Refresh satellite data $(date -u +%Y-%m-%d)
 
-          Automated run of backend/refresh_dataset.py followed by the full
+          Automated run of backend/refresh_grid.py followed by the full
           pipeline. Grid geometry and cell ids are unchanged by construction;
           only the measured bands and everything derived from them moved.
 

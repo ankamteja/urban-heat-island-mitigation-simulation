@@ -75,7 +75,78 @@ formula drift fails loudly.
 
 ---
 
-## One-time setup
+## No credentials are needed
+
+The refresh runs on **Microsoft Planetary Computer**, which serves the same
+Landsat Collection 2 Level 2 scenes anonymously. `backend/refresh_grid.py`
+needs no account, no API key and no repository secret, and a fork can run its
+own refresh the day it is forked.
+
+It re-measures the committed cells and writes their measured columns back.
+Geometry and `grid_id` come from the committed `dataset.csv` unchanged — the
+grid is never regenerated, because `grid_id` is the join key for every
+downstream file.
+
+A cross-check worth recording: run against the committed Earth Engine dataset,
+the Planetary Computer path returns a mean surface temperature of 26.75 °C
+against the committed 27.00 °C, a shift of −0.25 °C over 8,144 cells, with NDVI
+spanning the same range. Two independent pipelines, the same published USGS
+coefficients, the same answer.
+
+**Nothing below this line is required.** It documents the original Earth Engine
+path, which still works and is kept for anyone who wants it.
+
+---
+
+## Optional: the Earth Engine path
+
+`backend/refresh_dataset.py` does the same job through Google Earth Engine.
+It is no longer what the workflow runs, and you only need this if you
+specifically want Earth Engine's own compositing.
+
+### Getting the key
+
+Five steps. Only you can do these — they involve your Google account and a
+private key, which is yours to hold.
+
+1. In the [Google Cloud console](https://console.cloud.google.com/), create or
+   select any project. A fresh empty one is fine.
+2. Enable the **Earth Engine API** for that project.
+3. **IAM & Admin → Service Accounts → Create service account.** Name it
+   something like `uhi-refresh`. It needs no project IAM roles.
+4. On the new account, **Keys → Add key → Create new key → JSON**. A `.json`
+   file downloads. **This is a credential — treat it like a password.**
+5. Register the service account with Earth Engine at
+   [signup.earthengine.google.com/#!/service_accounts](https://signup.earthengine.google.com/#!/service_accounts),
+   using the account's email (`uhi-refresh@<project>.iam.gserviceaccount.com`).
+
+Then either export it locally:
+
+```bash
+pip install earthengine-api
+export EE_SERVICE_ACCOUNT_JSON="$(cat ~/Downloads/uhi-refresh-key.json)"
+python backend/refresh_dataset.py --dry-run
+```
+
+or, to use it in CI, add it as a repository secret named
+`EE_SERVICE_ACCOUNT_JSON` under **Settings → Secrets and variables → Actions**
+and point the workflow's refresh step back at `refresh_dataset.py`.
+
+Paste the key yourself. It must never be committed, pasted into an issue, or
+sent through chat — a service-account key grants API access under your Google
+Cloud project until it is revoked. If it leaks, delete it in the Cloud console
+(**Service Accounts → Keys → Delete**) and create a new one; deletion is
+instant and total.
+
+The slowest part is Earth Engine registration itself, which can wait on
+approval. Nothing else blocks.
+
+---
+
+## Historical: the original setup instructions
+
+Kept because the steps below were what this page said before the refresh moved
+off Earth Engine.
 
 Three steps. Only you can do the first two — they involve creating a Google
 Cloud account and handling a private key, which is yours to hold.
