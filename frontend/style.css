@@ -556,6 +556,14 @@ body.is-loading-city .map-region { opacity: .45; transition: opacity var(--dur) 
   background: rgba(12, 16, 23, .82);
   backdrop-filter: blur(2px);
 }
+/* Required, and not optional the way it looks.
+   The browser's own [hidden] { display: none } lives in the user-agent
+   stylesheet, which every author rule outranks -- so the `display: grid`
+   above silently defeated the hidden attribute and left this overlay painted
+   over the whole dashboard from first load. Any element given a display value
+   unconditionally needs this line; the other panels here default to
+   display:none and opt in via a class, which is why only this one broke. */
+.drop-overlay[hidden] { display: none; }
 .drop-card {
   padding: 26px 32px;
   border: 1px dashed var(--accent-line);
