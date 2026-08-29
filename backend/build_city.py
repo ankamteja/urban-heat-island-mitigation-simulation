@@ -88,6 +88,7 @@ Run:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import sys
@@ -572,14 +573,45 @@ def apply_rules(df):
     return df
 
 
+def add_plan_rank(df):
+    """The pipeline's funding order, carried into the grid.
+
+    The dashboard re-runs the budget client-side over whatever subset the user
+    has filtered to, so it needs the priority order in the file. It must not
+    re-derive it: `temperature` ships at 1 dp and cooling_per_rupee has only
+    three distinct values, so thousands of cells tie at a precision the pipeline
+    never saw, and the browser funds a different set of the same size and cost.
+
+    Same keys and the same reasoning as add_plan_rank() in
+    export_grid_geojson.py. Cooling per rupee is an attribute of the MEASURE,
+    not of the cell, so it is computed from the median cost per action: pricing
+    each cell from its own polygon makes cost vary by a few rupees between
+    identical actions, which turns geometric noise into thousands of distinct
+    scores in the sixth decimal and leaves LST unused as a tie-break.
+
+    Non-actionable cells get 0 -- never funded at any budget.
+    """
+    actionable = df["recommended_action"] != "None"
+    ranked = df[actionable].copy()
+
+    unit_cost = ranked.groupby("recommended_action")["cost_estimate"].transform("median")
+    ranked["_cpr"] = ranked["cooling_c"] / unit_cost
+    ranked = ranked.sort_values(
+        ["_cpr", "LST", "grid_id"],
+        ascending=[False, False, True],
+        kind="mergesort",
+    )
+
+    df["plan_rank"] = 0
+    df.loc[ranked.index, "plan_rank"] = range(1, len(ranked) + 1)
+    return df
+
+
 def rank(df, budget):
+    """ranking.csv, in the same order the dashboard funds cells in."""
     actionable = df[df["recommended_action"] != "None"].copy()
-    # kind='mergesort' is stable, and grid_id breaks ties, so the funding order
-    # is reproducible. A non-deterministic sort here was a real defect once.
-    actionable = actionable.sort_values(
-        ["cooling_per_rupee", "grid_id"], ascending=[False, True], kind="mergesort"
-    ).reset_index(drop=True)
-    actionable["rank"] = np.arange(1, len(actionable) + 1)
+    actionable = actionable.sort_values("plan_rank", kind="mergesort").reset_index(drop=True)
+    actionable["rank"] = actionable["plan_rank"]
     actionable["cumulative_cost"] = actionable["cost_estimate"].cumsum()
     actionable["within_budget"] = actionable["cumulative_cost"] <= budget
     return actionable
@@ -610,15 +642,29 @@ def write_outputs(slug, meta, df, ranked, out_dir):
                 "grid_id": r.grid_id,
                 "temperature": round(float(r.LST), 1),
                 "ndvi": round(float(r.NDVI), 3),
+                "ndbi": round(float(r.NDBI), 3),
+                "land_cover": str(r.land_cover),
                 "priority": str(r.priority),
                 "recommended_action": str(r.recommended_action),
+                "exclusion_reason": str(r.exclusion_reason or ""),
                 "cost_estimate": int(round(r.cost_estimate)),
                 "cooling_c": round(float(r.cooling_c), 1),
+                # The pipeline's funding order. 0 = never funded at any budget.
+                # int, because the browser sorts on it.
+                "plan_rank": int(r.plan_rank),
             },
         })
     validate_features(features)
-    (out_dir / "grid.geojson").write_text(
-        json.dumps({"type": "FeatureCollection", "features": features}), encoding="utf-8")
+    payload = json.dumps({"type": "FeatureCollection", "features": features})
+    (out_dir / "grid.geojson").write_text(payload, encoding="utf-8")
+
+    # The committed Guwahati grid ships with a sha256 in data/release.json and
+    # the dashboard refuses to load it unchecked. A built city gets the same
+    # treatment rather than a weaker guarantee: the digest goes in city.json and
+    # doubles as the cache-busting key, so a rebuilt city cannot be served from
+    # a stale browser cache.
+    meta["grid_sha256"] = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+    meta["release_id"] = meta["grid_sha256"][:12]
 
     # 2. dataset.csv -- same column set and order as the committed Guwahati file,
     #    so anything that reads one reads the other.
@@ -662,8 +708,9 @@ def validate_features(features):
     """Same contract check export_grid_geojson.py applies. A city built here
     must be indistinguishable to the frontend from the committed Guwahati
     file."""
-    expected = {"grid_id", "temperature", "ndvi", "priority",
-                "recommended_action", "cost_estimate", "cooling_c"}
+    expected = {"grid_id", "temperature", "ndvi", "ndbi", "land_cover",
+                "priority", "recommended_action", "exclusion_reason",
+                "cost_estimate", "cooling_c", "plan_rank"}
     if not features:
         raise ValueError("No features produced")
     for i, f in enumerate(features):
@@ -676,6 +723,9 @@ def validate_features(features):
             raise ValueError(f"Feature {i} geometry is not a Polygon")
         if not isinstance(f["properties"]["cost_estimate"], int):
             raise ValueError(f"Feature {i} cost_estimate must be int")
+        if not isinstance(f["properties"]["plan_rank"], int):
+            raise ValueError(
+                f"Feature {i} plan_rank must be int - the browser sorts on it")
         if f["properties"]["recommended_action"] not in shared.VALID_ACTIONS:
             raise ValueError(
                 f"Feature {i} action {f['properties']['recommended_action']!r} "
@@ -832,6 +882,7 @@ def main() -> None:
     df = build_dataframe(cols, rows_desc, data, lst_scale)
     df["priority"], hi_cut, lo_cut = tier(df)
     df = apply_rules(df)
+    df = add_plan_rank(df)
     budget = shared.CONSTANTS["budget_rupees"]
     ranked = rank(df, budget)
 
