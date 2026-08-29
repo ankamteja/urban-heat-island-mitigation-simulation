@@ -9,17 +9,19 @@ const RELEASE_MANIFEST = 'data/release.json';
 
 initChartDefaults();
 
-loadCurrentGrid()
-  .then(data => {
+boot()
+  .then(({ data, city, cities }) => {
     App.allCells = data.cells;
     App.bounds = data.bounds;
     App.center = data.center;
+    App.city = city;
 
     initMap('map', data.center);
     mapView.map.fitBounds(L.latLngBounds(data.bounds), { padding: [24, 24] });
     initSurfaces(data.cells);
     addGeocoder(mapView.map);
 
+    setupCityPicker(cities);
     setupScopeControls();
     setupSelector();
     setupDrawers();
@@ -42,7 +44,33 @@ loadCurrentGrid()
     sub.classList.add('is-error');
   });
 
-async function loadCurrentGrid() {
+/* Decide which city to open, then open it.
+
+   cities.json is derived from what is actually on disk, but it is optional and
+   it does not carry the committed city's checksum -- release.json does, and
+   the integrity gate that file exists for is not negotiable. So the manifest
+   supplies the list and release.json still supplies the guarantee for the
+   built-in grid. */
+async function boot() {
+  const cities = await loadCityManifest();
+  const city = { ...resolveInitialCity(cities) };
+
+  if (city.builtin) {
+    const release = await loadRelease();
+    App.release = release;
+    city.grid_sha256 = release.grid_sha256;
+    city.release_id = release.release_id || release.grid_sha256.slice(0, 12);
+    if (release.cell_count) city.cells = release.cell_count;
+    document.body.dataset.gridRelease = city.release_id;
+  } else if (city.release_id) {
+    document.body.dataset.gridRelease = city.release_id;
+  }
+
+  const data = await loadCityGrid(city);
+  return { data, city, cities };
+}
+
+async function loadRelease() {
   const manifestResponse = await fetch(RELEASE_MANIFEST, { cache: 'no-store' });
   if (!manifestResponse.ok) {
     throw new Error(`Could not load release manifest (${manifestResponse.status})`);
@@ -51,10 +79,7 @@ async function loadCurrentGrid() {
   if (!release.grid_sha256 || !/^[a-f0-9]{64}$/.test(release.grid_sha256)) {
     throw new Error('Release manifest has no valid grid checksum');
   }
-  const data = await loadGrid(`data/grid.geojson?release=${release.grid_sha256}`);
-  App.release = release;
-  document.body.dataset.gridRelease = release.release_id || release.grid_sha256.slice(0, 12);
-  return data;
+  return release;
 }
 
 function dismissBoot() {

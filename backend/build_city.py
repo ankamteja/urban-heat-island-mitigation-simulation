@@ -742,7 +742,7 @@ def update_manifest():
 
     legacy = REPO_DIR / "frontend" / "data" / "grid.geojson"
     if legacy.exists():
-        entries.append({
+        entry = {
             "slug": "guwahati",
             "name": "Guwahati",
             "region": "Assam, India",
@@ -750,7 +750,21 @@ def update_manifest():
             "source": "Google Earth Engine (Landsat 8 C2 L2 + ESA WorldCover v200)",
             "cost_basis_applies": True,
             "builtin": True,
-        })
+        }
+        # The committed city's checksum lives in release.json, not in a
+        # city.json. Copy it in so every manifest entry carries the same
+        # integrity token and the dashboard has one code path for all cities.
+        release = REPO_DIR / "frontend" / "data" / "release.json"
+        if release.exists():
+            r = json.loads(release.read_text(encoding="utf-8"))
+            if r.get("grid_sha256"):
+                entry["grid_sha256"] = r["grid_sha256"]
+                entry["release_id"] = r.get("release_id", r["grid_sha256"][:12])
+            if r.get("cell_count"):
+                entry["cells"] = r["cell_count"]
+            if r.get("total_cost_inr"):
+                entry["cost_all_actionable_inr"] = r["total_cost_inr"]
+        entries.append(entry)
 
     for city_json in sorted(OUT_ROOT.glob("*/city.json")):
         meta = json.loads(city_json.read_text(encoding="utf-8"))

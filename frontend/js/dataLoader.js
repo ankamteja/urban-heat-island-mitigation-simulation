@@ -3,7 +3,77 @@
 async function loadGrid(path) {
   const res = await fetch(path, { cache: 'no-store' });
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-  return normalize(await res.json(), path);
+  const geojson = await res.json();
+  validateGrid(geojson);
+  return normalize(geojson, path);
+}
+
+/* The grid contract, checked before anything is drawn.
+
+   Since the dashboard can open a file the user chose, the interesting failure
+   is no longer "the fetch broke" but "that is the wrong file". Without this,
+   a plausible-but-wrong GeoJSON — a ward boundary layer, an older 7-property
+   grid, someone's unrelated export — renders an empty map and a panel of
+   zeroes, which reads as a broken dashboard rather than a wrong input. Every
+   throw here has to name what is actually wrong with the file.
+
+   The 11 properties are export_grid_geojson.py's FRONTEND_PROPERTIES. Three
+   of them are load-bearing enough to be fatal:
+     grid_id            — identity; the funded set is a set of these
+     temperature        — the measurement the whole app is about
+     plan_rank          — the pipeline's funding order. A grid without it
+                          parses, draws and then funds nothing at any budget,
+                          because optimisePlan() only considers rank > 0.
+   The rest degrade honestly, so they are reported as a warning, not a throw. */
+const REQUIRED_PROPERTIES = ['grid_id', 'temperature', 'plan_rank'];
+const CONTRACT_PROPERTIES = [
+  'grid_id', 'temperature', 'ndvi', 'ndbi', 'land_cover', 'priority',
+  'recommended_action', 'exclusion_reason', 'cost_estimate', 'cooling_c',
+  'plan_rank'
+];
+
+function validateGrid(geojson) {
+  if (!geojson || typeof geojson !== 'object') {
+    throw new Error('the file did not parse to a JSON object');
+  }
+  if (geojson.type !== 'FeatureCollection') {
+    throw new Error(
+      `expected a GeoJSON FeatureCollection, found ${geojson.type ? `"${geojson.type}"` : 'no "type" field'}`);
+  }
+  if (!Array.isArray(geojson.features) || !geojson.features.length) {
+    throw new Error('the FeatureCollection has no features');
+  }
+
+  const sample = geojson.features[0];
+  const geom = sample && sample.geometry;
+  if (!geom || geom.type !== 'Polygon') {
+    throw new Error(
+      `grid cells must be Polygons, the first feature is ${geom && geom.type ? `a ${geom.type}` : 'missing its geometry'}`);
+  }
+
+  const props = (sample && sample.properties) || {};
+  const missing = REQUIRED_PROPERTIES.filter(k => props[k] === undefined);
+  if (missing.length) {
+    throw new Error(
+      `its cells have no ${missing.join(', ')}. ` +
+      `A grid from this pipeline carries ${CONTRACT_PROPERTIES.length} properties ` +
+      `(${CONTRACT_PROPERTIES.join(', ')}); this file has ` +
+      `${Object.keys(props).length} (${Object.keys(props).join(', ') || 'none'})`);
+  }
+  if (typeof props.temperature !== 'number' || !isFinite(props.temperature)) {
+    throw new Error(`temperature must be a number, found ${JSON.stringify(props.temperature)}`);
+  }
+  if (typeof props.plan_rank !== 'number') {
+    throw new Error(
+      `plan_rank must be a number — the budget is allocated by sorting on it — found ${JSON.stringify(props.plan_rank)}`);
+  }
+
+  const absent = CONTRACT_PROPERTIES.filter(k => props[k] === undefined);
+  if (absent.length) {
+    console.warn(`Grid is missing optional properties: ${absent.join(', ')}. ` +
+                 'Panels that read them will show blanks.');
+  }
+  return true;
 }
 
 function normalize(geojson, source) {

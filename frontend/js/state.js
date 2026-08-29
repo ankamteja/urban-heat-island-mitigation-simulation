@@ -15,6 +15,14 @@ const App = {
   bounds: null,
   center: null,
 
+  /* which city is on screen, and what else is available.
+     `city` is the manifest entry -- name, region, source, the composite window
+     and cost_basis_applies. Every panel that names the study area or qualifies
+     a rupee figure reads it from here, so they cannot disagree about which
+     city they are describing. */
+  city: null,
+  cities: [],
+
   /* scope */
   priority: 'All',
   selection: null,          // L.LatLngBounds, or null for the whole study area
