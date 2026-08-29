@@ -280,35 +280,63 @@ function setupCityPicker(cities) {
    progress. */
 function setupDropZone() {
   const overlay = document.getElementById('drop-overlay');
-  let depth = 0;   // dragenter/dragleave fire per element, so count them
+  if (!overlay) return;
 
-  const show = on => { if (overlay) overlay.hidden = !on; };
+  /* The overlay hides on a timer that `dragover` keeps resetting, rather than
+     on a dragenter/dragleave counter.
+
+     Counting was tried and it strands the overlay over the whole dashboard.
+     dragenter and dragleave fire per element, so the obvious implementation
+     counts them and hides at zero -- but a drag can end with no dragleave at
+     all: cancelled with Escape, released outside the window, or dragged back
+     out over a region the browser reports inconsistently. The count never
+     returns to zero, the overlay never hides, and the only way out is a
+     reload.
+
+     A drag in progress fires dragover continuously, several times a second.
+     So "no dragover for 200 ms" means the drag is over, whatever ended it and
+     whether or not any event announced it. This cannot get stuck: the timer is
+     always already scheduled by the time the overlay is visible. */
+  let hideTimer = null;
+
+  const show = () => {
+    overlay.hidden = false;
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(hide, 200);
+  };
+  const hide = () => {
+    clearTimeout(hideTimer);
+    hideTimer = null;
+    overlay.hidden = true;
+  };
 
   window.addEventListener('dragenter', e => {
     if (!hasFiles(e)) return;
     e.preventDefault();
-    depth++;
-    show(true);
+    show();
   });
   window.addEventListener('dragover', e => {
     if (!hasFiles(e)) return;
+    /* Both preventDefaults are required. Without them the browser refuses the
+       drop and falls back to navigating to the file. */
     e.preventDefault();
     e.dataTransfer.dropEffect = 'copy';
-  });
-  window.addEventListener('dragleave', e => {
-    if (!hasFiles(e)) return;
-    depth = Math.max(0, depth - 1);
-    if (!depth) show(false);
+    show();
   });
   window.addEventListener('drop', e => {
     if (!hasFiles(e)) return;
     /* Without this the browser navigates away from the dashboard to render the
        dropped JSON, which loses the whole session. */
     e.preventDefault();
-    depth = 0;
-    show(false);
+    hide();
     readCityFile(e.dataTransfer.files && e.dataTransfer.files[0]);
   });
+
+  /* Belt and braces for the cases that strand a drag: Escape cancels it, and
+     a drag released outside the window ends it without a drop. */
+  window.addEventListener('dragend', hide);
+  window.addEventListener('blur', hide);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') hide(); });
 }
 
 function hasFiles(e) {
