@@ -1,0 +1,331 @@
+{
+  "cities": [
+    {
+      "slug": "guwahati",
+      "name": "Guwahati",
+      "region": "Assam, India",
+      "path": "data/grid.geojson",
+      "source": "Google Earth Engine (Landsat 8 C2 L2 + ESA WorldCover v200)",
+      "cost_basis_applies": true,
+      "builtin": true,
+      "grid_sha256": "aa26b5c9dc55fd650727f294eaaecf9d90cc2541fef4bbdff42ec450838b1450",
+      "release_id": "aa26b5c9dc55",
+      "cells": 8144,
+      "cost_all_actionable_inr": 1674616910
+    },
+    {
+      "slug": "ahmedabad",
+      "name": "Ahmedabad",
+      "region": "Gujarat, India",
+      "bbox": [
+        72.5451,
+        22.9937,
+        72.6349,
+        23.0663
+      ],
+      "cells": 8282,
+      "actionable_cells": 6062,
+      "mean_lst_c": 47.91,
+      "max_lst_c": 57.48,
+      "mean_ndvi": 0.203,
+      "mean_drop_treated_c": 1.01,
+      "mean_drop_grid_c": 0.74,
+      "cost_all_actionable_inr": 2555856996,
+      "budget_inr": 100000000,
+      "funded_cells": 242,
+      "funded_cost_inr": 99754273,
+      "funded_action_mix": {
+        "Cool roof": 242
+      },
+      "action_mix": {
+        "Cool roof": 5859,
+        "None": 2220,
+        "Tree cover": 103,
+        "Green park": 100
+      },
+      "land_cover_mix": {
+        "built_up": 7185,
+        "tree_cover": 485,
+        "water": 322,
+        "cropland": 165,
+        "shrubland": 48,
+        "bare_sparse": 46,
+        "grassland": 31
+      },
+      "heat_risk_lst_scale": [
+        40.0,
+        53.0
+      ],
+      "heat_risk_lst_scale_basis": "this city's own 2nd/98th LST percentiles, rounded outward",
+      "tier_cut_high": 0.3456,
+      "tier_cut_low": 0.095,
+      "cell_area_m2": 9160.1,
+      "composite_window": [
+        "2024-08-29",
+        "2026-08-29"
+      ],
+      "composite_season": "Mar-Jun (northern hot season)",
+      "scenes_used": 8,
+      "max_cloud_cover_pct": 20.0,
+      "source": "Microsoft Planetary Computer STAC (Landsat 8/9 C2 L2 + ESA WorldCover v200)",
+      "built_by": "backend/build_city.py",
+      "cost_basis_applies": true,
+      "cost_basis_note": "Unit rates in shared/constants.json are Indian municipal INR/m2. They are applied here unchanged.",
+      "grid_sha256": "4070085add86e7791165d6bf4c938e6501edc5c2040b98a03a5ac42b0de9d676",
+      "release_id": "4070085add86",
+      "path": "data/cities/ahmedabad/grid.geojson",
+      "builtin": false
+    },
+    {
+      "slug": "chennai",
+      "name": "Chennai",
+      "region": "Tamil Nadu, India",
+      "bbox": [
+        80.2051,
+        13.0336,
+        80.2949,
+        13.1064
+      ],
+      "cells": 8282,
+      "actionable_cells": 5961,
+      "mean_lst_c": 41.25,
+      "max_lst_c": 50.43,
+      "mean_ndvi": 0.287,
+      "mean_drop_treated_c": 1.02,
+      "mean_drop_grid_c": 0.73,
+      "cost_all_actionable_inr": 2678413484,
+      "budget_inr": 100000000,
+      "funded_cells": 229,
+      "funded_cost_inr": 99773551,
+      "funded_action_mix": {
+        "Cool roof": 229
+      },
+      "action_mix": {
+        "Cool roof": 5756,
+        "None": 2321,
+        "Green park": 128,
+        "Tree cover": 77
+      },
+      "land_cover_mix": {
+        "built_up": 6418,
+        "tree_cover": 1053,
+        "water": 560,
+        "bare_sparse": 136,
+        "grassland": 106,
+        "cropland": 9
+      },
+      "heat_risk_lst_scale": [
+        29.0,
+        46.0
+      ],
+      "heat_risk_lst_scale_basis": "this city's own 2nd/98th LST percentiles, rounded outward",
+      "tier_cut_high": 0.3745,
+      "tier_cut_low": 0.1226,
+      "cell_area_m2": 9682.4,
+      "composite_window": [
+        "2024-08-29",
+        "2026-08-29"
+      ],
+      "composite_season": "Mar-Jun (northern hot season)",
+      "scenes_used": 8,
+      "max_cloud_cover_pct": 20.0,
+      "source": "Microsoft Planetary Computer STAC (Landsat 8/9 C2 L2 + ESA WorldCover v200)",
+      "built_by": "backend/build_city.py",
+      "cost_basis_applies": true,
+      "cost_basis_note": "Unit rates in shared/constants.json are Indian municipal INR/m2. They are applied here unchanged.",
+      "grid_sha256": "d2d7703a332cf7e07077283976f80f34d63c04d9b7461b80dcaa0d7fee39152d",
+      "release_id": "d2d7703a332c",
+      "path": "data/cities/chennai/grid.geojson",
+      "builtin": false
+    },
+    {
+      "slug": "delhi",
+      "name": "New Delhi",
+      "region": "Delhi, India",
+      "bbox": [
+        77.1951,
+        28.5837,
+        77.2849,
+        28.6563
+      ],
+      "cells": 8282,
+      "actionable_cells": 4521,
+      "mean_lst_c": 39.59,
+      "max_lst_c": 49.36,
+      "mean_ndvi": 0.363,
+      "mean_drop_treated_c": 1.01,
+      "mean_drop_grid_c": 0.55,
+      "cost_all_actionable_inr": 1823086860,
+      "budget_inr": 100000000,
+      "funded_cells": 254,
+      "funded_cost_inr": 99969944,
+      "funded_action_mix": {
+        "Cool roof": 254
+      },
+      "action_mix": {
+        "Cool roof": 3959,
+        "None": 3761,
+        "Tree cover": 443,
+        "Green park": 119
+      },
+      "land_cover_mix": {
+        "built_up": 3995,
+        "tree_cover": 3145,
+        "cropland": 661,
+        "water": 275,
+        "grassland": 179,
+        "bare_sparse": 25,
+        "shrubland": 2
+      },
+      "heat_risk_lst_scale": [
+        33.0,
+        45.0
+      ],
+      "heat_risk_lst_scale_basis": "this city's own 2nd/98th LST percentiles, rounded outward",
+      "tier_cut_high": 0.208,
+      "tier_cut_low": -0.2343,
+      "cell_area_m2": 8746.2,
+      "composite_window": [
+        "2024-08-29",
+        "2026-08-29"
+      ],
+      "composite_season": "Mar-Jun (northern hot season)",
+      "scenes_used": 8,
+      "max_cloud_cover_pct": 20.0,
+      "source": "Microsoft Planetary Computer STAC (Landsat 8/9 C2 L2 + ESA WorldCover v200)",
+      "built_by": "backend/build_city.py",
+      "cost_basis_applies": true,
+      "cost_basis_note": "Unit rates in shared/constants.json are Indian municipal INR/m2. They are applied here unchanged.",
+      "grid_sha256": "a51213e82023fedfe04c000315b4490fb840a1bfc5515188f8f4f5a9b60f1526",
+      "release_id": "a51213e82023",
+      "path": "data/cities/delhi/grid.geojson",
+      "builtin": false
+    },
+    {
+      "slug": "nagpur",
+      "name": "Nagpur",
+      "region": "Maharashtra, India",
+      "bbox": [
+        79.0551,
+        21.1037,
+        79.1449,
+        21.1763
+      ],
+      "cells": 8282,
+      "actionable_cells": 5947,
+      "mean_lst_c": 44.19,
+      "max_lst_c": 50.82,
+      "mean_ndvi": 0.281,
+      "mean_drop_treated_c": 1.04,
+      "mean_drop_grid_c": 0.74,
+      "cost_all_actionable_inr": 2627208620,
+      "budget_inr": 100000000,
+      "funded_cells": 239,
+      "funded_cost_inr": 99808152,
+      "funded_action_mix": {
+        "Cool roof": 239
+      },
+      "action_mix": {
+        "Cool roof": 5622,
+        "None": 2335,
+        "Green park": 231,
+        "Tree cover": 94
+      },
+      "land_cover_mix": {
+        "built_up": 6702,
+        "tree_cover": 1196,
+        "cropland": 185,
+        "grassland": 160,
+        "water": 21,
+        "bare_sparse": 14,
+        "shrubland": 4
+      },
+      "heat_risk_lst_scale": [
+        40.0,
+        48.0
+      ],
+      "heat_risk_lst_scale_basis": "this city's own 2nd/98th LST percentiles, rounded outward",
+      "tier_cut_high": 0.2024,
+      "tier_cut_low": -0.1052,
+      "cell_area_m2": 9280.7,
+      "composite_window": [
+        "2024-08-29",
+        "2026-08-29"
+      ],
+      "composite_season": "Mar-Jun (northern hot season)",
+      "scenes_used": 8,
+      "max_cloud_cover_pct": 20.0,
+      "source": "Microsoft Planetary Computer STAC (Landsat 8/9 C2 L2 + ESA WorldCover v200)",
+      "built_by": "backend/build_city.py",
+      "cost_basis_applies": true,
+      "cost_basis_note": "Unit rates in shared/constants.json are Indian municipal INR/m2. They are applied here unchanged.",
+      "grid_sha256": "1259783b2c5b8d9e7abe08713838d1e0ffa5a89e9b3fc3b183c39f0debf9c81b",
+      "release_id": "1259783b2c5b",
+      "path": "data/cities/nagpur/grid.geojson",
+      "builtin": false
+    },
+    {
+      "slug": "phoenix",
+      "name": "Phoenix",
+      "region": "Arizona, USA",
+      "bbox": [
+        -112.1049,
+        33.4337,
+        -112.0151,
+        33.5063
+      ],
+      "cells": 8282,
+      "actionable_cells": 6189,
+      "mean_lst_c": 48.58,
+      "max_lst_c": 53.1,
+      "mean_ndvi": 0.155,
+      "mean_drop_treated_c": 1.03,
+      "mean_drop_grid_c": 0.77,
+      "cost_all_actionable_inr": 2427687599,
+      "budget_inr": 100000000,
+      "funded_cells": 267,
+      "funded_cost_inr": 99981830,
+      "funded_action_mix": {
+        "Cool roof": 267
+      },
+      "action_mix": {
+        "Cool roof": 5862,
+        "None": 2093,
+        "Green park": 203,
+        "Tree cover": 124
+      },
+      "land_cover_mix": {
+        "built_up": 7297,
+        "tree_cover": 440,
+        "bare_sparse": 316,
+        "grassland": 200,
+        "shrubland": 18,
+        "cropland": 6,
+        "water": 5
+      },
+      "heat_risk_lst_scale": [
+        42.0,
+        52.0
+      ],
+      "heat_risk_lst_scale_basis": "this city's own 2nd/98th LST percentiles, rounded outward",
+      "tier_cut_high": 0.4773,
+      "tier_cut_low": 0.1975,
+      "cell_area_m2": 8319.7,
+      "composite_window": [
+        "2024-08-29",
+        "2026-08-29"
+      ],
+      "composite_season": "Mar-Jun (northern hot season)",
+      "scenes_used": 8,
+      "max_cloud_cover_pct": 20.0,
+      "source": "Microsoft Planetary Computer STAC (Landsat 8/9 C2 L2 + ESA WorldCover v200)",
+      "built_by": "backend/build_city.py",
+      "cost_basis_applies": false,
+      "cost_basis_note": "Unit rates in shared/constants.json are INDIAN municipal INR/m2 and do NOT transfer to this city. Every cost figure below is the Indian rate card applied to a non-Indian city, which is wrong by an unknown factor. Treat the geometry and the temperatures as real and every rupee figure as a placeholder.",
+      "grid_sha256": "f04035f68098b7c1157f91aeb5e7260538a33adf51ad0f214fb9fedf6c7ae563",
+      "release_id": "f04035f68098",
+      "path": "data/cities/phoenix/grid.geojson",
+      "builtin": false
+    }
+  ]
+}

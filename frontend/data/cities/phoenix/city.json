@@ -1,0 +1,61 @@
+{
+  "slug": "phoenix",
+  "name": "Phoenix",
+  "region": "Arizona, USA",
+  "bbox": [
+    -112.1049,
+    33.4337,
+    -112.0151,
+    33.5063
+  ],
+  "cells": 8282,
+  "actionable_cells": 6189,
+  "mean_lst_c": 48.58,
+  "max_lst_c": 53.1,
+  "mean_ndvi": 0.155,
+  "mean_drop_treated_c": 1.03,
+  "mean_drop_grid_c": 0.77,
+  "cost_all_actionable_inr": 2427687599,
+  "budget_inr": 100000000,
+  "funded_cells": 267,
+  "funded_cost_inr": 99981830,
+  "funded_action_mix": {
+    "Cool roof": 267
+  },
+  "action_mix": {
+    "Cool roof": 5862,
+    "None": 2093,
+    "Green park": 203,
+    "Tree cover": 124
+  },
+  "land_cover_mix": {
+    "built_up": 7297,
+    "tree_cover": 440,
+    "bare_sparse": 316,
+    "grassland": 200,
+    "shrubland": 18,
+    "cropland": 6,
+    "water": 5
+  },
+  "heat_risk_lst_scale": [
+    42.0,
+    52.0
+  ],
+  "heat_risk_lst_scale_basis": "this city's own 2nd/98th LST percentiles, rounded outward",
+  "tier_cut_high": 0.4773,
+  "tier_cut_low": 0.1975,
+  "cell_area_m2": 8319.7,
+  "composite_window": [
+    "2024-08-29",
+    "2026-08-29"
+  ],
+  "composite_season": "Mar-Jun (northern hot season)",
+  "scenes_used": 8,
+  "max_cloud_cover_pct": 20.0,
+  "source": "Microsoft Planetary Computer STAC (Landsat 8/9 C2 L2 + ESA WorldCover v200)",
+  "built_by": "backend/build_city.py",
+  "cost_basis_applies": false,
+  "cost_basis_note": "Unit rates in shared/constants.json are INDIAN municipal INR/m2 and do NOT transfer to this city. Every cost figure below is the Indian rate card applied to a non-Indian city, which is wrong by an unknown factor. Treat the geometry and the temperatures as real and every rupee figure as a placeholder.",
+  "grid_sha256": "f04035f68098b7c1157f91aeb5e7260538a33adf51ad0f214fb9fedf6c7ae563",
+  "release_id": "f04035f68098"
+}

@@ -1,0 +1,61 @@
+{
+  "slug": "ahmedabad",
+  "name": "Ahmedabad",
+  "region": "Gujarat, India",
+  "bbox": [
+    72.5451,
+    22.9937,
+    72.6349,
+    23.0663
+  ],
+  "cells": 8282,
+  "actionable_cells": 6062,
+  "mean_lst_c": 47.91,
+  "max_lst_c": 57.48,
+  "mean_ndvi": 0.203,
+  "mean_drop_treated_c": 1.01,
+  "mean_drop_grid_c": 0.74,
+  "cost_all_actionable_inr": 2555856996,
+  "budget_inr": 100000000,
+  "funded_cells": 242,
+  "funded_cost_inr": 99754273,
+  "funded_action_mix": {
+    "Cool roof": 242
+  },
+  "action_mix": {
+    "Cool roof": 5859,
+    "None": 2220,
+    "Tree cover": 103,
+    "Green park": 100
+  },
+  "land_cover_mix": {
+    "built_up": 7185,
+    "tree_cover": 485,
+    "water": 322,
+    "cropland": 165,
+    "shrubland": 48,
+    "bare_sparse": 46,
+    "grassland": 31
+  },
+  "heat_risk_lst_scale": [
+    40.0,
+    53.0
+  ],
+  "heat_risk_lst_scale_basis": "this city's own 2nd/98th LST percentiles, rounded outward",
+  "tier_cut_high": 0.3456,
+  "tier_cut_low": 0.095,
+  "cell_area_m2": 9160.1,
+  "composite_window": [
+    "2024-08-29",
+    "2026-08-29"
+  ],
+  "composite_season": "Mar-Jun (northern hot season)",
+  "scenes_used": 8,
+  "max_cloud_cover_pct": 20.0,
+  "source": "Microsoft Planetary Computer STAC (Landsat 8/9 C2 L2 + ESA WorldCover v200)",
+  "built_by": "backend/build_city.py",
+  "cost_basis_applies": true,
+  "cost_basis_note": "Unit rates in shared/constants.json are Indian municipal INR/m2. They are applied here unchanged.",
+  "grid_sha256": "4070085add86e7791165d6bf4c938e6501edc5c2040b98a03a5ac42b0de9d676",
+  "release_id": "4070085add86"
+}
