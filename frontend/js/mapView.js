@@ -5,14 +5,31 @@
    canvas that wipes between current and mitigated states shows the change far
    better than two small maps the eye has to compare by memory. */
 
+/* Basemap: Esri's dark canvas, which serves without a key.
+
+   This was CARTO's dark_nolabels. CARTO now requires an API key for their
+   basemaps and, rather than returning an error, they serve a normal-looking
+   200 with "API KEY REQUIRED / carto.com/basemaps/apikey" watermarked
+   diagonally across every tile. The map still drew, so nothing failed and no
+   request logged an error -- the dashboard just quietly rendered the city
+   under repeated advertising.
+
+   OpenStreetMap's own tile servers are not an option either: their usage
+   policy blocks bulk consumers and returns a 418 "Access blocked" tile.
+
+   Esri's World_Dark_Gray_Base is free, keyless, and tonally close to what the
+   design assumed. Note the {z}/{y}/{x} order -- ArcGIS puts row before
+   column, and swapping them silently serves tiles from the wrong place. */
 const BASEMAP = {
-  url: 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
-  attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-  subdomains: 'abcd',
-  maxZoom: 19
+  url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+  attribution: '&copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+  maxZoom: 16
 };
 
-const LABELS_URL = 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png';
+/* Place names, drawn above the thermal surface so a planner can tell which
+   ward they are looking at. Esri splits labels into a companion layer the
+   same way CARTO did. */
+const LABELS_URL = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}';
 
 const mapView = {
   map: null,
@@ -39,7 +56,7 @@ function initMap(containerId, center) {
   /* Labels ride above the thermal surface so place names stay readable through
      it — the planner has to know which ward they are looking at. */
   mapView.labels = L.tileLayer(LABELS_URL, {
-    subdomains: 'abcd', maxZoom: 19, pane: 'shadowPane', opacity: 0.9
+    maxZoom: 16, pane: 'shadowPane', opacity: 0.9
   }).addTo(map);
 
   mapView.map = map;

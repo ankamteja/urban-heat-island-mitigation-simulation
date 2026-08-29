@@ -268,9 +268,83 @@ function setupCityPicker(cities) {
     });
   }
 
+  setupDownloadMenu();
   setupDropZone();
   renderCityIdentity();
 }
+
+/* ── downloading the current city ────────────────────────────────────────── */
+
+/* What a city ships, and where it actually lives.
+
+   The point of the download is that a reader can check the dashboard's numbers
+   against the file it drew them from. grid.geojson is what the map renders;
+   dataset.csv is the per-cell measurements; ranking.csv is the funding order,
+   which is the one a sceptic wants because it is the plan.
+
+   Only files that are actually on the server are listed. The committed
+   Guwahati build predates the per-city layout and ships only its grid under
+   frontend/data -- its dataset.csv lives outside the web root and linking to
+   it would 404. A dropped file has no server copy at all. */
+function downloadableFiles(city) {
+  if (!city || city.dropped) return [];
+  if (city.builtin) {
+    return [{ name: 'grid.geojson', href: city.path, note: 'the grid the map draws' }];
+  }
+  const dir = `data/cities/${city.slug}`;
+  return [
+    { name: 'grid.geojson', href: `${dir}/grid.geojson`, note: 'the grid the map draws' },
+    { name: 'dataset.csv',  href: `${dir}/dataset.csv`,  note: 'per-cell measurements' },
+    { name: 'ranking.csv',  href: `${dir}/ranking.csv`,  note: 'funding order — the plan' },
+    { name: 'city.json',    href: `${dir}/city.json`,    note: 'provenance and headline figures' }
+  ];
+}
+
+function setupDownloadMenu() {
+  const btn = document.getElementById('btn-download');
+  const menu = document.getElementById('download-menu');
+  if (!btn || !menu) return;
+
+  const close = () => { menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
+
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    if (!menu.hidden) { close(); return; }
+    renderDownloadMenu();
+    menu.hidden = false;
+    btn.setAttribute('aria-expanded', 'true');
+  });
+
+  document.addEventListener('click', e => {
+    if (!menu.hidden && !menu.contains(e.target)) close();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+}
+
+function renderDownloadMenu() {
+  const menu = document.getElementById('download-menu');
+  const city = App.city || BUILTIN_CITY;
+  const files = downloadableFiles(city);
+
+  if (!files.length) {
+    menu.innerHTML = `<p class="dl-empty">${escapeHtml(city.name)} was opened from a
+      file on your own machine, so there is nothing to download — you already
+      have it.</p>`;
+    return;
+  }
+
+  menu.innerHTML = `
+    <p class="dl-head">${escapeHtml(city.name)}</p>
+    <ul>
+      ${files.map(f => `
+        <li><a href="${f.href}" download="${city.slug}-${f.name}">
+          <b>${f.name}</b><i>${f.note}</i>
+        </a></li>`).join('')}
+    </ul>
+    <p class="dl-foot">Served straight from this site — the same files the
+      dashboard reads.</p>`;
+}
+
 
 /* Drop anywhere on the page, not just on a target.
 
@@ -375,6 +449,9 @@ function renderCityIdentity() {
   /* The dropdown has to name what is actually loaded. Leaving it on the last
      manifest city while a dropped file is on screen labels the view with the
      wrong city, which is the one thing this control exists to prevent. */
+  const menu = document.getElementById('download-menu');
+  if (menu && !menu.hidden) renderDownloadMenu();
+
   const select = document.getElementById('city-select');
   if (select) {
     let ghost = select.querySelector('option[value="__file__"]');

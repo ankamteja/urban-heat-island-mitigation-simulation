@@ -638,6 +638,13 @@ NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
 MAX_BOUNDARY_CELLS = 60_000
 
 
+def boundary_cell_count(geometry):
+    """Cells in the geometry's bounding box, at the lattice step."""
+    west, south, east, north = geometry.bounds
+    return ((math.floor(east / CELL_SIZE_DEG) - math.floor(west / CELL_SIZE_DEG) + 1)
+            * (math.floor(north / CELL_SIZE_DEG) - math.floor(south / CELL_SIZE_DEG) + 1))
+
+
 def fetch_boundary(name, region, timeout=30):
     """The city's administrative outline, or None.
 
@@ -680,20 +687,39 @@ def fetch_boundary(name, region, timeout=30):
         print("  no administrative polygon found; using the bbox unclipped")
         return None, None
 
-    cities = [h for h in polygons if h.get("addresstype") == "city"]
-    hit = (cities or polygons)[0]
-    if not cities:
-        print("  no city-level polygon; falling back to the broadest match")
-
     from shapely.geometry import shape as to_shape
-    return to_shape(hit["geojson"]), hit.get("display_name", query)
 
+    sized = [(h, to_shape(h["geojson"])) for h in polygons]
+    sized = [(h, g, boundary_cell_count(g)) for h, g in sized]
 
-def boundary_cell_count(geometry):
-    """Cells in the geometry's bounding box, at the lattice step."""
-    west, south, east, north = geometry.bounds
-    return ((math.floor(east / CELL_SIZE_DEG) - math.floor(west / CELL_SIZE_DEG) + 1)
-            * (math.floor(north / CELL_SIZE_DEG) - math.floor(south / CELL_SIZE_DEG) + 1))
+    # City-level first, but only if it is small enough to tile.
+    #
+    # Preferring addresstype "city" unconditionally is wrong for Hyderabad:
+    # OSM's city-level relation there sprawls to 129,000 cells while the
+    # district -- one of India's smallest and entirely urban -- is 41,700 and
+    # is what anyone means by "Hyderabad". Preferring the district
+    # unconditionally is wrong for Ahmedabad, where it is 775,000 cells around
+    # a city core of a few thousand. Neither rank wins on its own; what
+    # decides is which candidate is both administrative and tileable.
+    fits = [t for t in sized if t[2] <= MAX_BOUNDARY_CELLS]
+    city_fits = [t for t in fits if t[0].get("addresstype") == "city"]
+
+    if city_fits:
+        hit, geometry, _ = city_fits[0]
+    elif fits:
+        # The largest that fits: among a city core and its wider district, the
+        # bigger one is the more complete answer to "where is this city".
+        hit, geometry, _ = max(fits, key=lambda t: t[2])
+        print("  city-level boundary is over the cap; using the largest "
+              "administrative area that fits")
+    else:
+        # Nothing fits. Return the city-level one anyway -- it still trims the
+        # preset window where it crosses it -- and let the caller keep the
+        # window rather than adopt an unusable extent.
+        cities = [t for t in sized if t[0].get("addresstype") == "city"]
+        hit, geometry, _ = (cities or sized)[0]
+
+    return geometry, hit.get("display_name", query)
 
 
 def clip_to_boundary(df, geometry):

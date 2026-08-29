@@ -3,9 +3,12 @@
 This project measured one city. It now measures any city, and the dashboard
 will load them side by side.
 
-The pipeline that produced Guwahati needs a Google Earth Engine account, a
-browser session on Google's servers, and a hand-driven export. That is fine for
-one city and impossible as a habit. `backend/build_city.py` does the same work
+The pipeline that produced Guwahati *used to* need a Google Earth Engine
+account, a browser session on Google's servers, and a hand-driven export. That
+was fine for one city and impossible as a habit — and it is no longer how
+anything here works. Nothing in this repository requires an account or an API
+key: `backend/refresh_grid.py` re-measures the committed Guwahati grid and
+`backend/build_city.py` builds new cities, both anonymously. `backend/build_city.py` does the same work
 against **Microsoft Planetary Computer**, which serves the same Landsat
 Collection 2 Level 2 scenes and the same ESA WorldCover tiles anonymously and
 free, from a local Python process.

@@ -143,37 +143,11 @@ approval. Nothing else blocks.
 
 ---
 
-## Historical: the original setup instructions
+### Using the key in CI
 
-Kept because the steps below were what this page said before the refresh moved
-off Earth Engine.
+Only if you switched the workflow back to `refresh_dataset.py`.
 
-Three steps. Only you can do the first two — they involve creating a Google
-Cloud account and handling a private key, which is yours to hold.
-
-### 1. Create a service account and register it with Earth Engine
-
-> **Any Google Cloud project will do.** An earlier version of this page said to
-> use the project that owns the Earth Engine assets, and to share the boundary
-> asset with the service account. Neither is needed, and the instruction sent
-> people looking for access to `projects/urban-heat-guwahati` that they did not
-> need. `refresh_dataset.py` reads each cell's polygon out of the `.geo` column
-> of the committed `dataset.csv` and builds the `FeatureCollection` in memory —
-> see `measure()`. The only Earth Engine data it reads is the public Landsat and
-> WorldCover collections. No private asset is involved at any point.
-
-1. In the [Google Cloud console](https://console.cloud.google.com/), create or
-   select any project. A fresh empty one is fine.
-2. Enable the **Earth Engine API** for that project.
-3. **IAM & Admin → Service Accounts → Create service account.** Name it
-   something like `uhi-refresh`. It needs no project IAM roles.
-4. On the new account, **Keys → Add key → Create new key → JSON**. A `.json`
-   file downloads. **This is a credential — treat it like a password.**
-5. Register the service account with Earth Engine at
-   [signup.earthengine.google.com/#!/service_accounts](https://signup.earthengine.google.com/#!/service_accounts),
-   using the account's email (`uhi-refresh@<project>.iam.gserviceaccount.com`).
-
-### 2. Add the key as a repository secret
+**Settings → Secrets and variables → Actions → New repository secret**
 
 **Settings → Secrets and variables → Actions → New repository secret**
 

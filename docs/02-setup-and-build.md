@@ -11,7 +11,7 @@ Clean clone to a running dashboard. Every command here has been executed as writ
 - [Step 3 — run the ML pipeline](#step-3--run-the-ml-pipeline)
 - [Step 4 — run Decision-Support](#step-4--run-decision-support)
 - [Step 5 — serve the dashboard](#step-5--serve-the-dashboard)
-- [The part that needs Google Earth Engine](#the-part-that-needs-google-earth-engine)
+- [The optional Earth Engine path](#the-optional-earth-engine-path)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -21,10 +21,17 @@ Clean clone to a running dashboard. Every command here has been executed as writ
 | For | Requirement |
 |---|---|
 | Everything except the satellite step | Python 3.12 or newer, and a browser |
-| Regenerating the satellite data | A Google Earth Engine account — see [below](#the-part-that-needs-google-earth-engine) |
+| Regenerating the satellite data | Nothing. `python backend/refresh_grid.py` re-measures the committed grid from Microsoft Planetary Computer |
+| Building another city | Nothing. `python backend/build_city.py --preset nagpur` |
 | Viewing the dashboard | Any modern browser; an internet connection, because map tiles and the Leaflet library load from CDNs |
 
-**You do not need Earth Engine to run this project.** The satellite export is already committed. Earth Engine is only required if you want to *regenerate* it — which is currently the one outstanding piece of work. Everything else runs offline apart from the dashboard's map tiles.
+**No account or API key is needed anywhere in this project.** The satellite
+export is committed, and both regenerating it and building new cities run
+against Microsoft Planetary Computer, which serves the same Landsat scenes
+anonymously. Everything else runs offline apart from the dashboard's map tiles.
+
+The Earth Engine path still exists and still works, and is described
+[below](#the-optional-earth-engine-path) — but nothing requires it.
 
 There is nothing to install for the frontend. No `npm`, no bundler, no build step.
 
@@ -175,11 +182,15 @@ The dashboard needs `frontend/data/grid.geojson`, which step 4 writes directly. 
 
 ---
 
-## The part that needs Google Earth Engine
+## The optional Earth Engine path
+
+> **You do not need any of this.** `python backend/refresh_grid.py --dry-run`
+> re-measures the committed grid from Planetary Computer with no account. It
+> agrees with the committed Earth Engine data to within 0.25 °C of mean surface
+> temperature across all 8,144 cells. This section is kept for anyone who wants
+> Earth Engine's own compositing.
 
 `Remote Sensing & Data Engineering/GEE/urban_heat_analysis.js` does not run on your machine. Earth Engine is a hosted service: you write JavaScript in a browser IDE, Google runs it on their satellite archive, and results are written to your Google Drive.
-
-You need this only to regenerate `Guwahati_Urban_Heat_Dataset.csv` — and right now, **somebody should**, because the committed copy predates a correctness fix. See [08-limitations.md](./08-limitations.md).
 
 Outline:
 

@@ -48,11 +48,21 @@
       <span class="sr-only">City</span>
       <select id="city-select" class="city-select"></select>
     </label>
-    <button id="btn-city-file" class="btn" type="button"
+    <button id="btn-city-file" class="btn btn-load" type="button"
             title="Open a grid.geojson built by backend/build_city.py. The file is read in this browser and is not uploaded.">
-      Open city file…
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 11V3M5 6l3-3 3 3M3 11v1.5A1.5 1.5 0 004.5 14h7a1.5 1.5 0 001.5-1.5V11" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Load your grid<i>drag a file anywhere, or click</i></span>
     </button>
     <input id="city-file" type="file" accept=".geojson,.json,application/geo+json,application/json" hidden />
+
+    <div class="dl-wrap">
+      <button id="btn-download" class="btn" type="button" aria-expanded="false"
+              title="Download this city's data files">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v8M5 8l3 3 3-3M3 13h10" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Data
+      </button>
+      <div id="download-menu" class="dl-menu" hidden></div>
+    </div>
     <button id="btn-select" class="btn" type="button">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 5.5v-3h3M13.5 5.5v-3h-3M2.5 10.5v3h3M13.5 10.5v3h-3" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
       <span id="btn-select-label">Select area</span>
