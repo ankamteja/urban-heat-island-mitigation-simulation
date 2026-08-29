@@ -1,0 +1,63 @@
+{
+  "slug": "hyderabad",
+  "name": "Hyderabad",
+  "region": "Telangana, India",
+  "bbox": [
+    78.4351,
+    17.3737,
+    78.5249,
+    17.4463
+  ],
+  "boundary": "Hyderabad, Bahadurpura mandal, Hyderabad, Telangana, India",
+  "boundary_mode": "window",
+  "cells": 8129,
+  "actionable_cells": 5819,
+  "mean_lst_c": 38.73,
+  "max_lst_c": 44.62,
+  "mean_ndvi": 0.247,
+  "mean_drop_treated_c": 1.01,
+  "mean_drop_grid_c": 0.72,
+  "cost_all_actionable_inr": 2521572195,
+  "budget_inr": 100000000,
+  "funded_cells": 234,
+  "funded_cost_inr": 99933409,
+  "funded_action_mix": {
+    "Cool roof": 234
+  },
+  "action_mix": {
+    "Cool roof": 5704,
+    "None": 2310,
+    "Green park": 61,
+    "Tree cover": 54
+  },
+  "land_cover_mix": {
+    "built_up": 6662,
+    "tree_cover": 859,
+    "water": 411,
+    "grassland": 118,
+    "cropland": 44,
+    "bare_sparse": 23,
+    "shrubland": 12
+  },
+  "heat_risk_lst_scale": [
+    29.0,
+    42.0
+  ],
+  "heat_risk_lst_scale_basis": "this city's own 2nd/98th LST percentiles, rounded outward",
+  "tier_cut_high": 0.4378,
+  "tier_cut_low": 0.2172,
+  "cell_area_m2": 9489.4,
+  "composite_window": [
+    "2024-08-29",
+    "2026-08-29"
+  ],
+  "composite_season": "Mar-Jun (northern hot season)",
+  "scenes_used": 8,
+  "max_cloud_cover_pct": 20.0,
+  "source": "Microsoft Planetary Computer STAC (Landsat 8/9 C2 L2 + ESA WorldCover v200)",
+  "built_by": "backend/build_city.py",
+  "cost_basis_applies": true,
+  "cost_basis_note": "Unit rates in shared/constants.json are Indian municipal INR/m2. They are applied here unchanged.",
+  "grid_sha256": "f7b1155e2641ff2f64beaf5e4dc96fdafa97848864486af7259fe136787089d4",
+  "release_id": "f7b1155e2641"
+}

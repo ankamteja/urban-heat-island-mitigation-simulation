@@ -621,6 +621,101 @@ def rank(df, budget):
 # outputs
 # --------------------------------------------------------------------------
 
+# --------------------------------------------------------------------------
+# administrative boundary
+# --------------------------------------------------------------------------
+
+# OpenStreetMap's geocoder. No account, no key, no quota beyond a courtesy
+# rate limit of one request a second, which build_city.py honours because it
+# makes exactly one call per build.
+NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
+
+# Above this, a city's own boundary is not worth tiling at 100 m: Phoenix's
+# city limits are 1,340 km2 and would be 162,000 cells, four times Chennai,
+# for a city that is in the preset list only as a cost-model example. Cities
+# over the cap keep their preset window and say so in city.json rather than
+# being given a shape they do not have.
+MAX_BOUNDARY_CELLS = 60_000
+
+
+def fetch_boundary(name, region, timeout=30):
+    """The city's administrative outline, or None.
+
+    Returns (shapely geometry, description) so city.json can record which
+    entity was actually used -- "Nagpur City" and "Nagpur district" are both
+    plausible answers to a search for Nagpur and they differ by a factor of
+    twenty in area.
+
+    Preference order matters. Nominatim ranks a district above a city for
+    several Indian names, and the district polygon for Ahmedabad is 775,000
+    cells against a city core of a few thousand. `addresstype == "city"` is
+    place_rank 16 and a district is rank 10, so the filter is exact rather
+    than heuristic.
+    """
+    import urllib.error
+    import urllib.parse
+    import urllib.request
+
+    query = ", ".join(x for x in (name, region) if x)
+    url = NOMINATIM_URL + "?" + urllib.parse.urlencode({
+        "q": query, "format": "jsonv2", "polygon_geojson": 1, "limit": 8,
+    })
+    request = urllib.request.Request(url, headers={
+        # Nominatim's usage policy requires an identifying User-Agent and
+        # returns 403 without one.
+        "User-Agent": "urban-heat-island-mitigation-simulation/1.0 "
+                      "(https://github.com/ankamteja/urban-heat-island-mitigation-simulation)",
+    })
+
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            hits = json.load(response)
+    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+        print(f"  boundary lookup failed ({exc}); using the bbox unclipped")
+        return None, None
+
+    polygons = [h for h in hits
+                if (h.get("geojson") or {}).get("type") in ("Polygon", "MultiPolygon")]
+    if not polygons:
+        print("  no administrative polygon found; using the bbox unclipped")
+        return None, None
+
+    cities = [h for h in polygons if h.get("addresstype") == "city"]
+    hit = (cities or polygons)[0]
+    if not cities:
+        print("  no city-level polygon; falling back to the broadest match")
+
+    from shapely.geometry import shape as to_shape
+    return to_shape(hit["geojson"]), hit.get("display_name", query)
+
+
+def boundary_cell_count(geometry):
+    """Cells in the geometry's bounding box, at the lattice step."""
+    west, south, east, north = geometry.bounds
+    return ((math.floor(east / CELL_SIZE_DEG) - math.floor(west / CELL_SIZE_DEG) + 1)
+            * (math.floor(north / CELL_SIZE_DEG) - math.floor(south / CELL_SIZE_DEG) + 1))
+
+
+def clip_to_boundary(df, geometry):
+    """Drop cells whose centre falls outside the boundary.
+
+    The centre, not any overlap: a cell is in the city or it is not, and an
+    overlap test would keep a rim of cells that are mostly outside it and
+    whose temperature is mostly not the city's.
+
+    Uses a prepared geometry -- an unprepared `contains` over tens of
+    thousands of points against a 3,500-vertex multipolygon walks every edge
+    every time and turns a two-second step into minutes.
+    """
+    from shapely import points
+    from shapely.prepared import prep
+
+    inside = prep(geometry)
+    centres = points(df["Longitude"].to_numpy(), df["Latitude"].to_numpy())
+    keep = np.fromiter((inside.contains(pt) for pt in centres), dtype=bool, count=len(df))
+    return df[keep].reset_index(drop=True)
+
+
 def cell_polygon(col, row, decimals=6):
     w = round(col * CELL_SIZE_DEG, decimals)
     e = round((col + 1) * CELL_SIZE_DEG, decimals)
@@ -803,6 +898,10 @@ def main() -> None:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--preset", help="a city from backend/city_presets.json")
     ap.add_argument("--bbox", nargs=4, type=float, metavar=("W", "S", "E", "N"))
+    ap.add_argument("--no-clip", action="store_true",
+                    help="Skip the boundary lookup and tile the raw bbox. Use "
+                         "when offline, or when the geocoder returns the wrong "
+                         "entity for a city.")
     ap.add_argument("--name")
     ap.add_argument("--slug")
     ap.add_argument("--region", default="")
@@ -837,7 +936,34 @@ def main() -> None:
     start = args.start or (date.fromisoformat(end) - timedelta(days=args.days)).isoformat()
 
     print(f"\n{name} ({region})")
-    print(f"  bbox {bbox}  window {start} to {end}")
+
+    # The study area. A raw bbox makes every city a rectangle, which is why
+    # the built cities looked nothing like Guwahati: the Earth Engine script
+    # clipped Guwahati to a geoBoundaries polygon and this script had no
+    # equivalent step.
+    #
+    # When the city's own boundary is small enough to tile at 100 m, it
+    # replaces the preset bbox outright and the city gets its true outline.
+    # When it is not -- Phoenix's city limits are 1,340 km2 -- the preset
+    # window is kept and city.json records that it is a window, because a
+    # centred crop of a much larger city is a rectangle whatever we call it.
+    boundary, boundary_name = (None, None)
+    if not args.no_clip:
+        boundary, boundary_name = fetch_boundary(name, region)
+
+    boundary_mode = "none"
+    if boundary is not None:
+        n_cells = boundary_cell_count(boundary)
+        if n_cells <= MAX_BOUNDARY_CELLS:
+            bbox = list(boundary.bounds)
+            boundary_mode = "full"
+            print(f"  boundary: {boundary_name} ({n_cells:,} cells in its bbox)")
+        else:
+            boundary_mode = "window"
+            print(f"  boundary: {boundary_name} is {n_cells:,} cells, over the "
+                  f"{MAX_BOUNDARY_CELLS:,} cap -- keeping the preset window")
+
+    print(f"  bbox {[round(v, 4) for v in bbox]}  window {start} to {end}")
 
     col0, row0, col1, row1 = snap_bbox(bbox)
     cols = np.arange(col0, col1)
@@ -894,6 +1020,20 @@ def main() -> None:
     print(f"  Heat_Risk LST bounds {lst_scale[0]:.0f}-{lst_scale[1]:.0f} C ({scale_basis})")
 
     df = build_dataframe(cols, rows_desc, data, lst_scale)
+
+    # Clip before tiering, not after. Priority tiers are quantiles over the
+    # study area, so cutting them from cells that are then discarded would
+    # tier the city against land outside it.
+    if boundary is not None:
+        before = len(df)
+        df = clip_to_boundary(df, boundary)
+        if df.empty:
+            raise SystemExit(
+                f"No cell fell inside {boundary_name}. Check the boundary match, "
+                f"or pass --no-clip.")
+        print(f"  {len(df):,} cells inside {boundary_name} "
+              f"({before - len(df):,} dropped outside it)")
+
     df["priority"], hi_cut, lo_cut = tier(df)
     df = apply_rules(df)
     df = add_plan_rank(df)
@@ -911,6 +1051,11 @@ def main() -> None:
         "name": name,
         "region": region,
         "bbox": bbox,
+        # Which outline the cells were clipped to, and whether the study area
+        # is the whole city or a window inside it. Without this the dashboard
+        # cannot tell a city from a crop of one.
+        "boundary": boundary_name,
+        "boundary_mode": boundary_mode,
         "cells": int(len(df)),
         "actionable_cells": actionable,
         "mean_lst_c": round(float(df["LST"].mean()), 2),

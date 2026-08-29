@@ -3,48 +3,50 @@
   "name": "Nagpur",
   "region": "Maharashtra, India",
   "bbox": [
-    79.0551,
-    21.1037,
-    79.1449,
-    21.1763
+    78.9952182,
+    21.0529736,
+    79.1788461,
+    21.2310022
   ],
-  "cells": 8282,
-  "actionable_cells": 5947,
-  "mean_lst_c": 44.19,
-  "max_lst_c": 50.82,
-  "mean_ndvi": 0.281,
-  "mean_drop_treated_c": 1.04,
-  "mean_drop_grid_c": 0.74,
-  "cost_all_actionable_inr": 2627208620,
+  "boundary": "Nagpur City, Nagpur Urban Taluka, Nagpur, Maharashtra, India",
+  "boundary_mode": "full",
+  "cells": 22714,
+  "actionable_cells": 16159,
+  "mean_lst_c": 46.39,
+  "max_lst_c": 56.49,
+  "mean_ndvi": 0.285,
+  "mean_drop_treated_c": 1.2,
+  "mean_drop_grid_c": 0.85,
+  "cost_all_actionable_inr": 8969102524,
   "budget_inr": 100000000,
   "funded_cells": 239,
-  "funded_cost_inr": 99808152,
+  "funded_cost_inr": 99818389,
   "funded_action_mix": {
     "Cool roof": 239
   },
   "action_mix": {
-    "Cool roof": 5622,
-    "None": 2335,
-    "Green park": 231,
-    "Tree cover": 94
+    "Cool roof": 10660,
+    "None": 6555,
+    "Green park": 3620,
+    "Tree cover": 1879
   },
   "land_cover_mix": {
-    "built_up": 6702,
-    "tree_cover": 1196,
-    "cropland": 185,
-    "grassland": 160,
-    "water": 21,
-    "bare_sparse": 14,
-    "shrubland": 4
+    "built_up": 13367,
+    "grassland": 3595,
+    "tree_cover": 3090,
+    "cropland": 2023,
+    "water": 335,
+    "shrubland": 271,
+    "bare_sparse": 33
   },
   "heat_risk_lst_scale": [
-    40.0,
-    48.0
+    41.0,
+    54.0
   ],
   "heat_risk_lst_scale_basis": "this city's own 2nd/98th LST percentiles, rounded outward",
-  "tier_cut_high": 0.2024,
-  "tier_cut_low": -0.1052,
-  "cell_area_m2": 9280.7,
+  "tier_cut_high": 0.0657,
+  "tier_cut_low": -0.1718,
+  "cell_area_m2": 9280.3,
   "composite_window": [
     "2024-08-29",
     "2026-08-29"
@@ -56,6 +58,6 @@
   "built_by": "backend/build_city.py",
   "cost_basis_applies": true,
   "cost_basis_note": "Unit rates in shared/constants.json are Indian municipal INR/m2. They are applied here unchanged.",
-  "grid_sha256": "1259783b2c5b8d9e7abe08713838d1e0ffa5a89e9b3fc3b183c39f0debf9c81b",
-  "release_id": "1259783b2c5b"
+  "grid_sha256": "8a4d4c89279509f571ee2f8b82650701c90ad65b7366b1febecc0ab15763c27e",
+  "release_id": "8a4d4c892795"
 }

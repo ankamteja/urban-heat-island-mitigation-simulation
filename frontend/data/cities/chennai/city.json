@@ -8,14 +8,16 @@
     80.2949,
     13.1064
   ],
-  "cells": 8282,
-  "actionable_cells": 5961,
-  "mean_lst_c": 41.25,
+  "boundary": "Chennai Corporation, Chennai, Tamil Nadu, India",
+  "boundary_mode": "window",
+  "cells": 7718,
+  "actionable_cells": 5626,
+  "mean_lst_c": 41.92,
   "max_lst_c": 50.43,
-  "mean_ndvi": 0.287,
-  "mean_drop_treated_c": 1.02,
-  "mean_drop_grid_c": 0.73,
-  "cost_all_actionable_inr": 2678413484,
+  "mean_ndvi": 0.313,
+  "mean_drop_treated_c": 1.01,
+  "mean_drop_grid_c": 0.74,
+  "cost_all_actionable_inr": 2489913705,
   "budget_inr": 100000000,
   "funded_cells": 229,
   "funded_cost_inr": 99773551,
@@ -23,17 +25,17 @@
     "Cool roof": 229
   },
   "action_mix": {
-    "Cool roof": 5756,
-    "None": 2321,
-    "Green park": 128,
-    "Tree cover": 77
+    "Cool roof": 5507,
+    "None": 2092,
+    "Green park": 63,
+    "Tree cover": 56
   },
   "land_cover_mix": {
     "built_up": 6418,
     "tree_cover": 1053,
-    "water": 560,
-    "bare_sparse": 136,
     "grassland": 106,
+    "water": 76,
+    "bare_sparse": 56,
     "cropland": 9
   },
   "heat_risk_lst_scale": [
@@ -41,9 +43,9 @@
     46.0
   ],
   "heat_risk_lst_scale_basis": "this city's own 2nd/98th LST percentiles, rounded outward",
-  "tier_cut_high": 0.3745,
-  "tier_cut_low": 0.1226,
-  "cell_area_m2": 9682.4,
+  "tier_cut_high": 0.3796,
+  "tier_cut_low": 0.1458,
+  "cell_area_m2": 9682.3,
   "composite_window": [
     "2024-08-29",
     "2026-08-29"
@@ -55,6 +57,6 @@
   "built_by": "backend/build_city.py",
   "cost_basis_applies": true,
   "cost_basis_note": "Unit rates in shared/constants.json are Indian municipal INR/m2. They are applied here unchanged.",
-  "grid_sha256": "d2d7703a332cf7e07077283976f80f34d63c04d9b7461b80dcaa0d7fee39152d",
-  "release_id": "d2d7703a332c"
+  "grid_sha256": "dab58acb377b17d314c32e3d325aa041707b1d72ec90e96d54b8c9ca8bf3417a",
+  "release_id": "dab58acb377b"
 }

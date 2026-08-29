@@ -3,48 +3,48 @@
   "name": "New Delhi",
   "region": "Delhi, India",
   "bbox": [
-    77.1951,
-    28.5837,
-    77.2849,
-    28.6563
+    77.1663519,
+    28.5604008,
+    77.2436519,
+    28.6451844
   ],
-  "cells": 8282,
-  "actionable_cells": 4521,
-  "mean_lst_c": 39.59,
-  "max_lst_c": 49.36,
-  "mean_ndvi": 0.363,
-  "mean_drop_treated_c": 1.01,
-  "mean_drop_grid_c": 0.55,
-  "cost_all_actionable_inr": 1823086860,
+  "boundary": "New Delhi, Delhi, India",
+  "boundary_mode": "full",
+  "cells": 4968,
+  "actionable_cells": 2003,
+  "mean_lst_c": 38.98,
+  "max_lst_c": 47.0,
+  "mean_ndvi": 0.42,
+  "mean_drop_treated_c": 1.03,
+  "mean_drop_grid_c": 0.41,
+  "cost_all_actionable_inr": 822454594,
   "budget_inr": 100000000,
   "funded_cells": 254,
-  "funded_cost_inr": 99969944,
+  "funded_cost_inr": 99990093,
   "funded_action_mix": {
     "Cool roof": 254
   },
   "action_mix": {
-    "Cool roof": 3959,
-    "None": 3761,
-    "Tree cover": 443,
-    "Green park": 119
+    "None": 2965,
+    "Cool roof": 1901,
+    "Green park": 60,
+    "Tree cover": 42
   },
   "land_cover_mix": {
-    "built_up": 3995,
-    "tree_cover": 3145,
-    "cropland": 661,
-    "water": 275,
-    "grassland": 179,
-    "bare_sparse": 25,
-    "shrubland": 2
+    "tree_cover": 2917,
+    "built_up": 1941,
+    "grassland": 90,
+    "cropland": 16,
+    "bare_sparse": 4
   },
   "heat_risk_lst_scale": [
-    33.0,
-    45.0
+    36.0,
+    43.0
   ],
   "heat_risk_lst_scale_basis": "this city's own 2nd/98th LST percentiles, rounded outward",
-  "tier_cut_high": 0.208,
-  "tier_cut_low": -0.2343,
-  "cell_area_m2": 8746.2,
+  "tier_cut_high": -0.0125,
+  "tier_cut_low": -0.3825,
+  "cell_area_m2": 8747.5,
   "composite_window": [
     "2024-08-29",
     "2026-08-29"
@@ -56,6 +56,6 @@
   "built_by": "backend/build_city.py",
   "cost_basis_applies": true,
   "cost_basis_note": "Unit rates in shared/constants.json are Indian municipal INR/m2. They are applied here unchanged.",
-  "grid_sha256": "a51213e82023fedfe04c000315b4490fb840a1bfc5515188f8f4f5a9b60f1526",
-  "release_id": "a51213e82023"
+  "grid_sha256": "a8625fa449984a4e1760e6260db0da5179b801814016543685d9ca7a3ab4b0e2",
+  "release_id": "a8625fa44998"
 }

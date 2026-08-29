@@ -23,6 +23,8 @@
         72.6349,
         23.0663
       ],
+      "boundary": "Ahmedabad, Gujarat, India",
+      "boundary_mode": "window",
       "cells": 8282,
       "actionable_cells": 6062,
       "mean_lst_c": 47.91,
@@ -86,14 +88,16 @@
         80.2949,
         13.1064
       ],
-      "cells": 8282,
-      "actionable_cells": 5961,
-      "mean_lst_c": 41.25,
+      "boundary": "Chennai Corporation, Chennai, Tamil Nadu, India",
+      "boundary_mode": "window",
+      "cells": 7718,
+      "actionable_cells": 5626,
+      "mean_lst_c": 41.92,
       "max_lst_c": 50.43,
-      "mean_ndvi": 0.287,
-      "mean_drop_treated_c": 1.02,
-      "mean_drop_grid_c": 0.73,
-      "cost_all_actionable_inr": 2678413484,
+      "mean_ndvi": 0.313,
+      "mean_drop_treated_c": 1.01,
+      "mean_drop_grid_c": 0.74,
+      "cost_all_actionable_inr": 2489913705,
       "budget_inr": 100000000,
       "funded_cells": 229,
       "funded_cost_inr": 99773551,
@@ -101,17 +105,17 @@
         "Cool roof": 229
       },
       "action_mix": {
-        "Cool roof": 5756,
-        "None": 2321,
-        "Green park": 128,
-        "Tree cover": 77
+        "Cool roof": 5507,
+        "None": 2092,
+        "Green park": 63,
+        "Tree cover": 56
       },
       "land_cover_mix": {
         "built_up": 6418,
         "tree_cover": 1053,
-        "water": 560,
-        "bare_sparse": 136,
         "grassland": 106,
+        "water": 76,
+        "bare_sparse": 56,
         "cropland": 9
       },
       "heat_risk_lst_scale": [
@@ -119,9 +123,9 @@
         46.0
       ],
       "heat_risk_lst_scale_basis": "this city's own 2nd/98th LST percentiles, rounded outward",
-      "tier_cut_high": 0.3745,
-      "tier_cut_low": 0.1226,
-      "cell_area_m2": 9682.4,
+      "tier_cut_high": 0.3796,
+      "tier_cut_low": 0.1458,
+      "cell_area_m2": 9682.3,
       "composite_window": [
         "2024-08-29",
         "2026-08-29"
@@ -133,8 +137,8 @@
       "built_by": "backend/build_city.py",
       "cost_basis_applies": true,
       "cost_basis_note": "Unit rates in shared/constants.json are Indian municipal INR/m2. They are applied here unchanged.",
-      "grid_sha256": "d2d7703a332cf7e07077283976f80f34d63c04d9b7461b80dcaa0d7fee39152d",
-      "release_id": "d2d7703a332c",
+      "grid_sha256": "dab58acb377b17d314c32e3d325aa041707b1d72ec90e96d54b8c9ca8bf3417a",
+      "release_id": "dab58acb377b",
       "path": "data/cities/chennai/grid.geojson",
       "builtin": false
     },
@@ -143,48 +147,48 @@
       "name": "New Delhi",
       "region": "Delhi, India",
       "bbox": [
-        77.1951,
-        28.5837,
-        77.2849,
-        28.6563
+        77.1663519,
+        28.5604008,
+        77.2436519,
+        28.6451844
       ],
-      "cells": 8282,
-      "actionable_cells": 4521,
-      "mean_lst_c": 39.59,
-      "max_lst_c": 49.36,
-      "mean_ndvi": 0.363,
-      "mean_drop_treated_c": 1.01,
-      "mean_drop_grid_c": 0.55,
-      "cost_all_actionable_inr": 1823086860,
+      "boundary": "New Delhi, Delhi, India",
+      "boundary_mode": "full",
+      "cells": 4968,
+      "actionable_cells": 2003,
+      "mean_lst_c": 38.98,
+      "max_lst_c": 47.0,
+      "mean_ndvi": 0.42,
+      "mean_drop_treated_c": 1.03,
+      "mean_drop_grid_c": 0.41,
+      "cost_all_actionable_inr": 822454594,
       "budget_inr": 100000000,
       "funded_cells": 254,
-      "funded_cost_inr": 99969944,
+      "funded_cost_inr": 99990093,
       "funded_action_mix": {
         "Cool roof": 254
       },
       "action_mix": {
-        "Cool roof": 3959,
-        "None": 3761,
-        "Tree cover": 443,
-        "Green park": 119
+        "None": 2965,
+        "Cool roof": 1901,
+        "Green park": 60,
+        "Tree cover": 42
       },
       "land_cover_mix": {
-        "built_up": 3995,
-        "tree_cover": 3145,
-        "cropland": 661,
-        "water": 275,
-        "grassland": 179,
-        "bare_sparse": 25,
-        "shrubland": 2
+        "tree_cover": 2917,
+        "built_up": 1941,
+        "grassland": 90,
+        "cropland": 16,
+        "bare_sparse": 4
       },
       "heat_risk_lst_scale": [
-        33.0,
-        45.0
+        36.0,
+        43.0
       ],
       "heat_risk_lst_scale_basis": "this city's own 2nd/98th LST percentiles, rounded outward",
-      "tier_cut_high": 0.208,
-      "tier_cut_low": -0.2343,
-      "cell_area_m2": 8746.2,
+      "tier_cut_high": -0.0125,
+      "tier_cut_low": -0.3825,
+      "cell_area_m2": 8747.5,
       "composite_window": [
         "2024-08-29",
         "2026-08-29"
@@ -196,9 +200,74 @@
       "built_by": "backend/build_city.py",
       "cost_basis_applies": true,
       "cost_basis_note": "Unit rates in shared/constants.json are Indian municipal INR/m2. They are applied here unchanged.",
-      "grid_sha256": "a51213e82023fedfe04c000315b4490fb840a1bfc5515188f8f4f5a9b60f1526",
-      "release_id": "a51213e82023",
+      "grid_sha256": "a8625fa449984a4e1760e6260db0da5179b801814016543685d9ca7a3ab4b0e2",
+      "release_id": "a8625fa44998",
       "path": "data/cities/delhi/grid.geojson",
+      "builtin": false
+    },
+    {
+      "slug": "hyderabad",
+      "name": "Hyderabad",
+      "region": "Telangana, India",
+      "bbox": [
+        78.4351,
+        17.3737,
+        78.5249,
+        17.4463
+      ],
+      "boundary": "Hyderabad, Bahadurpura mandal, Hyderabad, Telangana, India",
+      "boundary_mode": "window",
+      "cells": 8129,
+      "actionable_cells": 5819,
+      "mean_lst_c": 38.73,
+      "max_lst_c": 44.62,
+      "mean_ndvi": 0.247,
+      "mean_drop_treated_c": 1.01,
+      "mean_drop_grid_c": 0.72,
+      "cost_all_actionable_inr": 2521572195,
+      "budget_inr": 100000000,
+      "funded_cells": 234,
+      "funded_cost_inr": 99933409,
+      "funded_action_mix": {
+        "Cool roof": 234
+      },
+      "action_mix": {
+        "Cool roof": 5704,
+        "None": 2310,
+        "Green park": 61,
+        "Tree cover": 54
+      },
+      "land_cover_mix": {
+        "built_up": 6662,
+        "tree_cover": 859,
+        "water": 411,
+        "grassland": 118,
+        "cropland": 44,
+        "bare_sparse": 23,
+        "shrubland": 12
+      },
+      "heat_risk_lst_scale": [
+        29.0,
+        42.0
+      ],
+      "heat_risk_lst_scale_basis": "this city's own 2nd/98th LST percentiles, rounded outward",
+      "tier_cut_high": 0.4378,
+      "tier_cut_low": 0.2172,
+      "cell_area_m2": 9489.4,
+      "composite_window": [
+        "2024-08-29",
+        "2026-08-29"
+      ],
+      "composite_season": "Mar-Jun (northern hot season)",
+      "scenes_used": 8,
+      "max_cloud_cover_pct": 20.0,
+      "source": "Microsoft Planetary Computer STAC (Landsat 8/9 C2 L2 + ESA WorldCover v200)",
+      "built_by": "backend/build_city.py",
+      "cost_basis_applies": true,
+      "cost_basis_note": "Unit rates in shared/constants.json are Indian municipal INR/m2. They are applied here unchanged.",
+      "grid_sha256": "f7b1155e2641ff2f64beaf5e4dc96fdafa97848864486af7259fe136787089d4",
+      "release_id": "f7b1155e2641",
+      "path": "data/cities/hyderabad/grid.geojson",
       "builtin": false
     },
     {
@@ -206,48 +275,50 @@
       "name": "Nagpur",
       "region": "Maharashtra, India",
       "bbox": [
-        79.0551,
-        21.1037,
-        79.1449,
-        21.1763
+        78.9952182,
+        21.0529736,
+        79.1788461,
+        21.2310022
       ],
-      "cells": 8282,
-      "actionable_cells": 5947,
-      "mean_lst_c": 44.19,
-      "max_lst_c": 50.82,
-      "mean_ndvi": 0.281,
-      "mean_drop_treated_c": 1.04,
-      "mean_drop_grid_c": 0.74,
-      "cost_all_actionable_inr": 2627208620,
+      "boundary": "Nagpur City, Nagpur Urban Taluka, Nagpur, Maharashtra, India",
+      "boundary_mode": "full",
+      "cells": 22714,
+      "actionable_cells": 16159,
+      "mean_lst_c": 46.39,
+      "max_lst_c": 56.49,
+      "mean_ndvi": 0.285,
+      "mean_drop_treated_c": 1.2,
+      "mean_drop_grid_c": 0.85,
+      "cost_all_actionable_inr": 8969102524,
       "budget_inr": 100000000,
       "funded_cells": 239,
-      "funded_cost_inr": 99808152,
+      "funded_cost_inr": 99818389,
       "funded_action_mix": {
         "Cool roof": 239
       },
       "action_mix": {
-        "Cool roof": 5622,
-        "None": 2335,
-        "Green park": 231,
-        "Tree cover": 94
+        "Cool roof": 10660,
+        "None": 6555,
+        "Green park": 3620,
+        "Tree cover": 1879
       },
       "land_cover_mix": {
-        "built_up": 6702,
-        "tree_cover": 1196,
-        "cropland": 185,
-        "grassland": 160,
-        "water": 21,
-        "bare_sparse": 14,
-        "shrubland": 4
+        "built_up": 13367,
+        "grassland": 3595,
+        "tree_cover": 3090,
+        "cropland": 2023,
+        "water": 335,
+        "shrubland": 271,
+        "bare_sparse": 33
       },
       "heat_risk_lst_scale": [
-        40.0,
-        48.0
+        41.0,
+        54.0
       ],
       "heat_risk_lst_scale_basis": "this city's own 2nd/98th LST percentiles, rounded outward",
-      "tier_cut_high": 0.2024,
-      "tier_cut_low": -0.1052,
-      "cell_area_m2": 9280.7,
+      "tier_cut_high": 0.0657,
+      "tier_cut_low": -0.1718,
+      "cell_area_m2": 9280.3,
       "composite_window": [
         "2024-08-29",
         "2026-08-29"
@@ -259,8 +330,8 @@
       "built_by": "backend/build_city.py",
       "cost_basis_applies": true,
       "cost_basis_note": "Unit rates in shared/constants.json are Indian municipal INR/m2. They are applied here unchanged.",
-      "grid_sha256": "1259783b2c5b8d9e7abe08713838d1e0ffa5a89e9b3fc3b183c39f0debf9c81b",
-      "release_id": "1259783b2c5b",
+      "grid_sha256": "8a4d4c89279509f571ee2f8b82650701c90ad65b7366b1febecc0ab15763c27e",
+      "release_id": "8a4d4c892795",
       "path": "data/cities/nagpur/grid.geojson",
       "builtin": false
     },
@@ -274,14 +345,16 @@
         -112.0151,
         33.5063
       ],
-      "cells": 8282,
-      "actionable_cells": 6189,
-      "mean_lst_c": 48.58,
+      "boundary": "Phoenix, Maricopa County, Arizona, United States",
+      "boundary_mode": "window",
+      "cells": 8242,
+      "actionable_cells": 6159,
+      "mean_lst_c": 48.63,
       "max_lst_c": 53.1,
-      "mean_ndvi": 0.155,
+      "mean_ndvi": 0.153,
       "mean_drop_treated_c": 1.03,
       "mean_drop_grid_c": 0.77,
-      "cost_all_actionable_inr": 2427687599,
+      "cost_all_actionable_inr": 2416519910,
       "budget_inr": 100000000,
       "funded_cells": 267,
       "funded_cost_inr": 99981830,
@@ -289,27 +362,27 @@
         "Cool roof": 267
       },
       "action_mix": {
-        "Cool roof": 5862,
-        "None": 2093,
+        "Cool roof": 5833,
+        "None": 2083,
         "Green park": 203,
-        "Tree cover": 124
+        "Tree cover": 123
       },
       "land_cover_mix": {
         "built_up": 7297,
         "tree_cover": 440,
         "bare_sparse": 316,
-        "grassland": 200,
+        "grassland": 164,
         "shrubland": 18,
-        "cropland": 6,
-        "water": 5
+        "water": 4,
+        "cropland": 3
       },
       "heat_risk_lst_scale": [
         42.0,
         52.0
       ],
       "heat_risk_lst_scale_basis": "this city's own 2nd/98th LST percentiles, rounded outward",
-      "tier_cut_high": 0.4773,
-      "tier_cut_low": 0.1975,
+      "tier_cut_high": 0.4779,
+      "tier_cut_low": 0.2004,
       "cell_area_m2": 8319.7,
       "composite_window": [
         "2024-08-29",
@@ -322,8 +395,8 @@
       "built_by": "backend/build_city.py",
       "cost_basis_applies": false,
       "cost_basis_note": "Unit rates in shared/constants.json are INDIAN municipal INR/m2 and do NOT transfer to this city. Every cost figure below is the Indian rate card applied to a non-Indian city, which is wrong by an unknown factor. Treat the geometry and the temperatures as real and every rupee figure as a placeholder.",
-      "grid_sha256": "f04035f68098b7c1157f91aeb5e7260538a33adf51ad0f214fb9fedf6c7ae563",
-      "release_id": "f04035f68098",
+      "grid_sha256": "2ab4efef9f11622b9855cec23f430cd76e22c311cfc3d272383c76e30c4ae23a",
+      "release_id": "2ab4efef9f11",
       "path": "data/cities/phoenix/grid.geojson",
       "builtin": false
     }

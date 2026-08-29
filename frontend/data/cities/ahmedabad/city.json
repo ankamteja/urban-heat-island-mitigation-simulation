@@ -8,6 +8,8 @@
     72.6349,
     23.0663
   ],
+  "boundary": "Ahmedabad, Gujarat, India",
+  "boundary_mode": "window",
   "cells": 8282,
   "actionable_cells": 6062,
   "mean_lst_c": 47.91,
