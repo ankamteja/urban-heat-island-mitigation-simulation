@@ -10,41 +10,41 @@
 
 | Rule | Value |
 |---|---|
-| Heat_Risk q0.25 (Low boundary) | -0.324837 |
-| Heat_Risk q0.75 (High boundary) | 0.039573 |
+| Heat_Risk q0.25 (Low boundary) | -0.246099 |
+| Heat_Risk q0.75 (High boundary) | 0.046398 |
 | NDVI vegetation threshold (absolute) | 0.3 |
 
 ## Land cover of the study area
 
 | Land cover | Cells |
 |---|---|
-| tree_cover | 3,752 |
-| built_up | 3,523 |
-| cropland | 573 |
-| water | 149 |
-| grassland | 79 |
+| tree_cover | 3,743 |
+| built_up | 3,527 |
+| cropland | 576 |
+| water | 153 |
+| grassland | 80 |
 | wetland | 44 |
-| bare_sparse | 24 |
+| bare_sparse | 21 |
 
 ## Why cells received no action
 
 | Reason | Cells |
 |---|---|
-| already vegetated (tree cover) - no action needed | 3,752 |
-| never-touch land cover (water) | 149 |
+| already vegetated (tree cover) - no action needed | 3,743 |
+| never-touch land cover (water) | 153 |
+| low priority - no action needed | 108 |
 | never-touch land cover (wetland) | 44 |
-| low priority - no action needed | 42 |
 
 ## Outcome
 
 | Priority | Action | Cells | Mean LST (C) | Mean NDVI | Total cost (INR) | Mean cooling (C, assumed) |
 |---|---|---|---|---|---|---|
-| High | Cool roof | 1,770 | 28.64 | 0.281 | 710,122,393 | 1.00 |
-| High | Green park | 74 | 28.82 | 0.277 | 75,889,420 | 2.00 |
-| High | None | 192 | 26.06 | 0.038 | 0 | 0.00 |
-| Low | None | 2,036 | 25.08 | 0.636 | 0 | 0.00 |
-| Medium | Cool roof | 1,724 | 27.27 | 0.396 | 691,622,664 | 1.00 |
-| Medium | None | 1,759 | 27.11 | 0.497 | 0 | 0.00 |
-| Medium | Tree cover | 589 | 27.71 | 0.472 | 196,982,433 | 0.80 |
+| High | Cool roof | 1,583 | 28.27 | 0.239 | 635,125,290 | 1.00 |
+| High | Green park | 239 | 29.58 | 0.345 | 245,119,737 | 2.00 |
+| High | None | 214 | 27.18 | 0.193 | 0 | 0.00 |
+| Low | None | 2,036 | 24.92 | 0.542 | 0 | 0.00 |
+| Medium | Cool roof | 1,853 | 26.57 | 0.319 | 743,355,856 | 1.00 |
+| Medium | None | 1,798 | 26.99 | 0.422 | 0 | 0.00 |
+| Medium | Tree cover | 421 | 27.84 | 0.425 | 140,796,827 | 0.80 |
 
-**Total notional programme cost: INR 1,674,616,910** (placeholder unit rates - see README section 5).
+**Total notional programme cost: INR 1,764,397,710** (placeholder unit rates - see README section 5).

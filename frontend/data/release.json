@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "grid_sha256": "aa26b5c9dc55fd650727f294eaaecf9d90cc2541fef4bbdff42ec450838b1450",
-  "release_id": "aa26b5c9dc55",
+  "grid_sha256": "3fb0b4871b44ad1d6c39fb62117893b4f8495dd996172607d191f5bbc406cb2b",
+  "release_id": "3fb0b4871b44",
   "cell_count": 8144,
-  "total_cost_inr": 1674616910,
+  "total_cost_inr": 1764397710,
   "action_counts": {
-    "None": 3987,
-    "Cool roof": 3494,
-    "Tree cover": 589,
-    "Green park": 74
+    "None": 4048,
+    "Cool roof": 3436,
+    "Tree cover": 421,
+    "Green park": 239
   }
 }
